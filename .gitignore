@@ -1,0 +1,27 @@
+node_modules
+data/
+build/
+dist
+/**/sha.ts
+/**/sha.h
+*.tgz
+.env
+.DS_Store
+*.tsbuildinfo
+*.log
+scratch.txt
+typechain
+
+#Hardhat files
+cache
+artifacts
+typechain/**
+
+# Script output
+logs
+
+# Coverage result files
+coverage/
+coverage.json
+
+abi
