@@ -16,7 +16,9 @@ interface MeemStandard {
 	}
 
 	/** The total number of copies allowed for a Meem */
-	function totalCopies(uint256 tokenId) external view returns (uint256);
+	// function totalCopies(uint256 tokenId) external view returns (uint256);
+
+	// function setTotalCopies(uint256 numCopies) external;
 
 	/** The address of the parent contract NFT */
 	function parent(uint256 tokenId) external view returns (address);
@@ -27,11 +29,14 @@ interface MeemStandard {
 	/** The chain of the parent contract NFT  */
 	function parentChain(uint256 tokenId) external view returns (Chain);
 
-	function copyPermission(uint256 tokenId) external view returns (Chain);
+	function copyPermission(uint256 tokenId) external view returns (Permission);
 
-	function remixPermission(uint256 tokenId) external view returns (Chain);
+	function remixPermission(uint256 tokenId)
+		external
+		view
+		returns (Permission);
 
-	function readPermission(uint256 tokenId) external view returns (Chain);
+	function readPermission(uint256 tokenId) external view returns (Permission);
 
 	function copyPermissionAddresses(uint256 tokenId)
 		external
@@ -51,32 +56,47 @@ interface MeemStandard {
 	function copyPermissionNumTokens(uint256 tokenId)
 		external
 		view
-		returns (uint256);
+		returns (uint256[] memory);
 
 	function remixPermissionNumTokens(uint256 tokenId)
 		external
 		view
-		returns (uint256);
+		returns (uint256[] memory);
 
 	function readPermissionNumTokens(uint256 tokenId)
 		external
 		view
-		returns (uint256);
+		returns (uint256[] memory);
 
 	function numSplits(uint256 tokenId) external view returns (uint256);
 
-	function splitAddress(uint256 tokenId, uint256 i)
+	function splitAddresses(uint256 tokenId)
 		external
 		view
-		returns (address);
+		returns (address[] memory);
 
-	function splitAmount(uint256 tokenId, uint256 i)
+	function splitAmounts(uint256 tokenId)
 		external
 		view
-		returns (uint256);
+		returns (uint256[] memory);
 
-	function splitLockedBy(uint256 tokenId, uint256 i)
+	function splitLockedBy(uint256 tokenId)
 		external
 		view
-		returns (address);
+		returns (address[] memory);
+
+	function mint(
+		string memory mTokenURI,
+		address mTo,
+		Chain mChain,
+		address mParent,
+		uint256 mParentTokenId,
+		Permission[] memory mCopyRemixReadPermission,
+		address[] memory mCopyPermissionAddresses,
+		address[] memory mRemixPermissionAddresses,
+		address[] memory mReadPermissionAddresses,
+		address[] memory mCopyRemixReadLockedByAddress,
+		address[] memory mSplitAddresses,
+		uint256[] memory mSplitAmounts
+	) external;
 }
