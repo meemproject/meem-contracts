@@ -579,31 +579,31 @@
             "contract": "Meem",
             "label": "_tokenIdCounter",
             "type": "t_struct(Counter)3123_storage",
-            "src": "contracts/Meem.sol:41"
+            "src": "contracts/Meem.sol:39"
           },
           {
             "contract": "Meem",
             "label": "_tokenURIContractAddress",
             "type": "t_address",
-            "src": "contracts/Meem.sol:45"
+            "src": "contracts/Meem.sol:41"
           },
           {
             "contract": "Meem",
             "label": "_contractURI",
             "type": "t_string_storage",
-            "src": "contracts/Meem.sol:46"
+            "src": "contracts/Meem.sol:42"
           },
           {
             "contract": "Meem",
             "label": "_properties",
-            "type": "t_mapping(t_uint256,t_struct(MeemProperties)4343_storage)",
-            "src": "contracts/Meem.sol:47"
+            "type": "t_mapping(t_uint256,t_struct(MeemProperties)4342_storage)",
+            "src": "contracts/Meem.sol:43"
           },
           {
             "contract": "Meem",
             "label": "_tokenURIs",
             "type": "t_mapping(t_uint256,t_string_storage)",
-            "src": "contracts/Meem.sol:66"
+            "src": "contracts/Meem.sol:44"
           }
         ],
         "types": {
@@ -625,27 +625,27 @@
           "t_string_storage": {
             "label": "string"
           },
-          "t_mapping(t_uint256,t_struct(MeemProperties)4343_storage)": {
+          "t_mapping(t_uint256,t_struct(MeemProperties)4342_storage)": {
             "label": "mapping(uint256 => struct MeemStandard.MeemProperties)"
           },
-          "t_struct(MeemProperties)4343_storage": {
+          "t_struct(MeemProperties)4342_storage": {
             "label": "struct MeemStandard.MeemProperties",
             "members": [
               {
                 "label": "copyPermissions",
-                "type": "t_array(t_struct(MeemPermission)4317_storage)dyn_storage"
+                "type": "t_array(t_struct(MeemPermission)4316_storage)dyn_storage"
               },
               {
                 "label": "remixPermissions",
-                "type": "t_array(t_struct(MeemPermission)4317_storage)dyn_storage"
+                "type": "t_array(t_struct(MeemPermission)4316_storage)dyn_storage"
               },
               {
                 "label": "readPermissions",
-                "type": "t_array(t_struct(MeemPermission)4317_storage)dyn_storage"
+                "type": "t_array(t_struct(MeemPermission)4316_storage)dyn_storage"
               },
               {
                 "label": "chain",
-                "type": "t_enum(Chain)4296"
+                "type": "t_enum(Chain)4295"
               },
               {
                 "label": "parent",
@@ -657,7 +657,7 @@
               },
               {
                 "label": "splits",
-                "type": "t_array(t_struct(Split)4306_storage)dyn_storage"
+                "type": "t_array(t_struct(Split)4305_storage)dyn_storage"
               },
               {
                 "label": "totalCopies",
@@ -665,15 +665,15 @@
               }
             ]
           },
-          "t_array(t_struct(MeemPermission)4317_storage)dyn_storage": {
+          "t_array(t_struct(MeemPermission)4316_storage)dyn_storage": {
             "label": "struct MeemStandard.MeemPermission[]"
           },
-          "t_struct(MeemPermission)4317_storage": {
+          "t_struct(MeemPermission)4316_storage": {
             "label": "struct MeemStandard.MeemPermission",
             "members": [
               {
                 "label": "permission",
-                "type": "t_enum(Permission)4301"
+                "type": "t_enum(Permission)4300"
               },
               {
                 "label": "addresses",
@@ -689,7 +689,7 @@
               }
             ]
           },
-          "t_enum(Chain)4296": {
+          "t_enum(Chain)4295": {
             "label": "enum MeemStandard.Chain",
             "members": [
               "Ethereum",
@@ -697,10 +697,10 @@
               "Cardano"
             ]
           },
-          "t_array(t_struct(Split)4306_storage)dyn_storage": {
+          "t_array(t_struct(Split)4305_storage)dyn_storage": {
             "label": "struct MeemStandard.Split[]"
           },
-          "t_struct(Split)4306_storage": {
+          "t_struct(Split)4305_storage": {
             "label": "struct MeemStandard.Split",
             "members": [
               {
@@ -713,7 +713,7 @@
               }
             ]
           },
-          "t_enum(Permission)4301": {
+          "t_enum(Permission)4300": {
             "label": "enum MeemStandard.Permission",
             "members": [
               "Owner",
@@ -739,6 +739,399 @@
           },
           "t_array(t_uint256)dyn_storage": {
             "label": "uint256[]"
+          },
+          "t_array(t_uint256)46_storage": {
+            "label": "uint256[46]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_struct(RoleData)43_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_array(t_uint256)44_storage": {
+            "label": "uint256[44]"
+          }
+        }
+      }
+    },
+    "595a0d27665116cfedd254cbe0e46ca2a35715d1e68cd37bf96d0a5a0f4c7046": {
+      "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      "txHash": "0x70f2bda607f37bb36a5eb42f80087cbb6ef487a97d086b7a9f68b952ebb67d36",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:30"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:35"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:24"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:27"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_owners",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:30"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:33"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:36"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:39"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)44_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:418"
+          },
+          {
+            "contract": "ERC721TradableUpgradeable",
+            "label": "proxyRegistryAddress",
+            "type": "t_address",
+            "src": "contracts/ERC721TradableUpgradeable.sol:14"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "_roles",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:63"
+          },
+          {
+            "contract": "AccessControlUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:219"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:21"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:77"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:214"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:80"
+          },
+          {
+            "contract": "ERC721BurnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721EnumerableUpgradeable",
+            "label": "_ownedTokens",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol:24"
+          },
+          {
+            "contract": "ERC721EnumerableUpgradeable",
+            "label": "_ownedTokensIndex",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol:27"
+          },
+          {
+            "contract": "ERC721EnumerableUpgradeable",
+            "label": "_allTokens",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol:30"
+          },
+          {
+            "contract": "ERC721EnumerableUpgradeable",
+            "label": "_allTokensIndex",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol:33"
+          },
+          {
+            "contract": "ERC721EnumerableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)46_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol:171"
+          },
+          {
+            "contract": "ERC721URIStorageUpgradeable",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol:23"
+          },
+          {
+            "contract": "ERC721URIStorageUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol:75"
+          },
+          {
+            "contract": "Meem",
+            "label": "_tokenIdCounter",
+            "type": "t_struct(Counter)3123_storage",
+            "src": "contracts/Meem.sol:39"
+          },
+          {
+            "contract": "Meem",
+            "label": "_tokenURIContractAddress",
+            "type": "t_address",
+            "src": "contracts/Meem.sol:41"
+          },
+          {
+            "contract": "Meem",
+            "label": "_contractURI",
+            "type": "t_string_storage",
+            "src": "contracts/Meem.sol:42"
+          },
+          {
+            "contract": "Meem",
+            "label": "_properties",
+            "type": "t_mapping(t_uint256,t_struct(MeemProperties)4392_storage)",
+            "src": "contracts/Meem.sol:43"
+          },
+          {
+            "contract": "Meem",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "contracts/Meem.sol:44"
+          },
+          {
+            "contract": "Meem",
+            "label": "_children",
+            "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)",
+            "src": "contracts/Meem.sol:45"
+          }
+        ],
+        "types": {
+          "t_struct(Counter)3123_storage": {
+            "label": "struct CountersUpgradeable.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_struct(MeemProperties)4392_storage)": {
+            "label": "mapping(uint256 => struct MeemStandard.MeemProperties)"
+          },
+          "t_struct(MeemProperties)4392_storage": {
+            "label": "struct MeemStandard.MeemProperties",
+            "members": [
+              {
+                "label": "copyPermissions",
+                "type": "t_array(t_struct(MeemPermission)4366_storage)dyn_storage"
+              },
+              {
+                "label": "remixPermissions",
+                "type": "t_array(t_struct(MeemPermission)4366_storage)dyn_storage"
+              },
+              {
+                "label": "readPermissions",
+                "type": "t_array(t_struct(MeemPermission)4366_storage)dyn_storage"
+              },
+              {
+                "label": "chain",
+                "type": "t_enum(Chain)4345"
+              },
+              {
+                "label": "parent",
+                "type": "t_address"
+              },
+              {
+                "label": "parentTokenId",
+                "type": "t_uint256"
+              },
+              {
+                "label": "splits",
+                "type": "t_array(t_struct(Split)4355_storage)dyn_storage"
+              },
+              {
+                "label": "totalCopies",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_array(t_struct(MeemPermission)4366_storage)dyn_storage": {
+            "label": "struct MeemStandard.MeemPermission[]"
+          },
+          "t_struct(MeemPermission)4366_storage": {
+            "label": "struct MeemStandard.MeemPermission",
+            "members": [
+              {
+                "label": "permission",
+                "type": "t_enum(Permission)4350"
+              },
+              {
+                "label": "addresses",
+                "type": "t_array(t_address)dyn_storage"
+              },
+              {
+                "label": "numTokens",
+                "type": "t_uint256"
+              },
+              {
+                "label": "lockedBy",
+                "type": "t_address"
+              }
+            ]
+          },
+          "t_enum(Chain)4345": {
+            "label": "enum MeemStandard.Chain",
+            "members": [
+              "Ethereum",
+              "Polygon",
+              "Cardano"
+            ]
+          },
+          "t_array(t_struct(Split)4355_storage)dyn_storage": {
+            "label": "struct MeemStandard.Split[]"
+          },
+          "t_struct(Split)4355_storage": {
+            "label": "struct MeemStandard.Split",
+            "members": [
+              {
+                "label": "toAddress",
+                "type": "t_address"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_enum(Permission)4350": {
+            "label": "enum MeemStandard.Permission",
+            "members": [
+              "Owner",
+              "Anyone",
+              "Addresses",
+              "Holders"
+            ]
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(uint256 => uint256[])"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
           },
           "t_array(t_uint256)46_storage": {
             "label": "uint256[46]"
