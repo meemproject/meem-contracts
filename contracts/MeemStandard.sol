@@ -1,56 +1,56 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+enum Chain {
+	Ethereum,
+	Polygon,
+	Cardano
+}
+
+enum PermissionType {
+	Copy,
+	Remix,
+	Read
+}
+
+enum Permission {
+	Owner,
+	Anyone,
+	Addresses,
+	Holders
+}
+
+enum PropertyType {
+	Meem,
+	Child
+}
+
+struct Split {
+	address toAddress;
+	uint256 amount;
+	address lockedBy;
+}
+struct MeemPermission {
+	Permission permission;
+	address[] addresses;
+	uint256 numTokens;
+	address lockedBy;
+}
+
+struct MeemProperties {
+	MeemPermission[] copyPermissions;
+	MeemPermission[] remixPermissions;
+	MeemPermission[] readPermissions;
+	address copyPermissionsLockedBy;
+	address remixPermissionsLockedBy;
+	address readPermissionsLockedBy;
+	Split[] splits;
+	address splitsLockedBy;
+	uint256 totalCopies;
+	address totalCopiesLockedBy;
+}
+
 interface MeemStandard {
-	enum Chain {
-		Ethereum,
-		Polygon,
-		Cardano
-	}
-
-	enum PermissionType {
-		Copy,
-		Remix,
-		Read
-	}
-
-	enum Permission {
-		Owner,
-		Anyone,
-		Addresses,
-		Holders
-	}
-
-	enum PropertyType {
-		Meem,
-		Child
-	}
-
-	struct Split {
-		address toAddress;
-		uint256 amount;
-		address lockedBy;
-	}
-	struct MeemPermission {
-		Permission permission;
-		address[] addresses;
-		uint256 numTokens;
-		address lockedBy;
-	}
-
-	struct MeemProperties {
-		MeemPermission[] copyPermissions;
-		MeemPermission[] remixPermissions;
-		MeemPermission[] readPermissions;
-		address copyPermissionsLockedBy;
-		address remixPermissionsLockedBy;
-		address readPermissionsLockedBy;
-		Split[] splits;
-		address splitsLockedBy;
-		uint256 totalCopies;
-		address totalCopiesLockedBy;
-	}
-
 	function mint(
 		address to,
 		string memory mTokenURI,
@@ -82,44 +82,44 @@ interface MeemStandard {
 
 	function lockTotalCopies(uint256 tokenId) external;
 
-	function addPermission(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		MeemPermission memory permission
-	) external;
+	// function addPermission(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	MeemPermission memory permission
+	// ) external;
 
-	function removePermissionAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		uint256 idx
-	) external;
+	// function removePermissionAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	uint256 idx
+	// ) external;
 
-	function updatePermissionAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		uint256 idx,
-		MeemPermission memory permission
-	) external;
+	// function updatePermissionAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	uint256 idx,
+	// 	MeemPermission memory permission
+	// ) external;
 
-	function addSplit(
-		uint256 tokenId,
-		PropertyType propertyType,
-		Split memory split
-	) external;
+	// function addSplit(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	Split memory split
+	// ) external;
 
-	function removeSplitAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		uint256 idx
-	) external;
+	// function removeSplitAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	uint256 idx
+	// ) external;
 
-	function updateSplitAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		uint256 idx,
-		Split memory split
-	) external;
+	// function updateSplitAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	uint256 idx,
+	// 	Split memory split
+	// ) external;
 }
