@@ -16,7 +16,7 @@ contract MeemProps is
 {
 	using MeemPropsLibrary for MeemProperties;
 
-	uint256 internal _nonOwnerSplitAllocationAmount = 1000;
+	uint256 internal _nonOwnerSplitAllocationAmount;
 	mapping(uint256 => Chain) internal _chain;
 	mapping(uint256 => address) internal _parent;
 	mapping(uint256 => uint256) internal _parentTokenId;

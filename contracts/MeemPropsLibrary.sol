@@ -4,22 +4,6 @@ pragma experimental ABIEncoderV2;
 
 import './MeemStandard.sol';
 
-// library MeemPermissionLibrary {
-// 	function removePermissionAtIndex(MeemPermission[] storage self, uint256 idx)
-// 		public
-// 	{
-// 		if (idx >= self.length) {
-// 			revert('Index out of range');
-// 		}
-
-// 		for (uint256 i = idx; i < self.length - 1; i++) {
-// 			self[i] = self[i + 1];
-// 		}
-
-// 		delete self[self.length - 1];
-// 	}
-// }
-
 library MeemPropsLibrary {
 	function properties(MeemProperties storage self)
 		public

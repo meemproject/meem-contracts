@@ -5,7 +5,8 @@ type ContractName = 'Meem'
 interface Contract {
 	args?: (string | number | (() => string | undefined))[]
 	address?: string
-	libraries?: () => Record<string, string>
+	// libraries?: () => Record<string, string>
+	libraries?: Record<string, string>
 	waitForConfirmation?: boolean
 }
 
@@ -16,9 +17,25 @@ task('deploy', 'Deploys Meem').setAction(
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
+		const MeemPropsLibrary = await ethers.getContractFactory('MeemPropsLibrary')
+
+		const mpl = await MeemPropsLibrary.deploy()
+		await mpl.deployed()
+
+		console.log(`Deployed MeemPropsLibrary to: ${mpl.address}`)
+
 		// const nonce = await deployer.getTransactionCount();
 		const contracts: Record<ContractName, Contract> = {
-			Meem: {}
+			// Meem: {
+			// 	libraries: () => ({
+			// 		MeemPropsLibrary: mpl.address
+			// 	})
+			// }
+			Meem: {
+				libraries: {
+					MeemPropsLibrary: mpl.address
+				}
+			}
 		}
 
 		// This is the OpenSea proxy address which will allow trading to work properly
@@ -39,17 +56,21 @@ task('deploy', 'Deploys Meem').setAction(
 				break
 
 			case 'local':
-				proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
-				break
-
 			default:
+				proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
 				break
 		}
 
-		const Meem = await ethers.getContractFactory('Meem')
+		const Meem = await ethers.getContractFactory('Meem', {
+			libraries: {
+				MeemPropsLibrary: mpl.address
+			}
+		})
 
 		const meem = await upgrades.deployProxy(Meem, [proxyRegistryAddress], {
-			kind: 'uups'
+			kind: 'uups',
+			unsafeAllow: ['external-library-linking'],
+			unsafeAllowLinkedLibraries: true
 		})
 
 		await meem.deployed()

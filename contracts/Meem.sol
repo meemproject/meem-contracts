@@ -42,7 +42,7 @@ contract Meem is
 
 	address private _tokenURIContractAddress;
 	string private _contractURI;
-	uint256 private copyDepth = 1;
+	uint256 private _copyDepth;
 	mapping(uint256 => string) private _tokenURIs;
 	mapping(uint256 => uint256[]) private _children;
 
@@ -62,6 +62,9 @@ contract Meem is
 		_setupRole(UPGRADER_ROLE, msg.sender);
 
 		_contractURI = '{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/5NP8PYN8","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": 1000, "fee_recipient": "0x40c6BeE45d94063c5B05144489cd8A9879899592"}';
+
+		_copyDepth = 1;
+		_nonOwnerSplitAllocationAmount = 1000;
 	}
 
 	// External functions
