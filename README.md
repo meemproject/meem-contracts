@@ -6,20 +6,20 @@ Join us in building the future of digital content where creators set the rules: 
 
 ### Polygon (MATIC) Mainnet
 
+Meem Proxy: [](https://polygonscan.com/address/)
+
+Meem Implementation: [](https://polygonscan.com/address/)
+
+MeemPropsLibrary: [](https://polygonscan.com/address/)
+
+
+### Rinkeby Testnet
+
 Meem Proxy: [0xb40F5F1bb69C6D30dBa68E0b5f17d7cADA215837](https://rinkeby.etherscan.io/address/0xb40F5F1bb69C6D30dBa68E0b5f17d7cADA215837)
 
 Meem Implementation: [0x20FD5E1e8874704A03F6c7278353BFd62B503192](https://rinkeby.etherscan.io/address/0x20FD5E1e8874704A03F6c7278353BFd62B503192)
 
 MeemPropsLibrary: [0x36E4efAb3953361CaC4BBd284f07C4186906fE22](https://rinkeby.etherscan.io/address/0x36E4efAb3953361CaC4BBd284f07C4186906fE22)
-
-
-### Rinkeby Testnet
-
-Meem Proxy: [](https://rinkeby.etherscan.io/address/)
-
-Meem Implementation: [](https://rinkeby.etherscan.io/address/)
-
-MeemPropsLibrary: [](https://rinkeby.etherscan.io/address/)
 
 ## Development
 
