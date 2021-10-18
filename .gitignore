@@ -24,4 +24,4 @@ logs
 coverage/
 coverage.json
 
-abi
+# abi

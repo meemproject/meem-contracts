@@ -1,82 +1,125 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+enum Chain {
+	Ethereum,
+	Polygon,
+	Cardano
+}
+
+enum PermissionType {
+	Copy,
+	Remix,
+	Read
+}
+
+enum Permission {
+	Owner,
+	Anyone,
+	Addresses,
+	Holders
+}
+
+enum PropertyType {
+	Meem,
+	Child
+}
+
+struct Split {
+	address toAddress;
+	uint256 amount;
+	address lockedBy;
+}
+struct MeemPermission {
+	Permission permission;
+	address[] addresses;
+	uint256 numTokens;
+	address lockedBy;
+}
+
+struct MeemProperties {
+	MeemPermission[] copyPermissions;
+	MeemPermission[] remixPermissions;
+	MeemPermission[] readPermissions;
+	address copyPermissionsLockedBy;
+	address remixPermissionsLockedBy;
+	address readPermissionsLockedBy;
+	Split[] splits;
+	address splitsLockedBy;
+	uint256 totalCopies;
+	address totalCopiesLockedBy;
+}
+
 interface MeemStandard {
-	enum Chain {
-		Ethereum,
-		Polygon,
-		Cardano
-	}
+	function mint(
+		address to,
+		string memory mTokenURI,
+		Chain chain,
+		address parent,
+		uint256 parentTokenId,
+		MeemProperties memory properties,
+		MeemProperties memory childProperties
+	) external;
 
-	enum Permission {
-		Owner,
-		Anyone,
-		Addresses,
-		Holders
-	}
+	// function mintChild(
+	// 	address to,
+	// 	string memory mTokenURI,
+	// 	Chain chain,
+	// 	uint256 parentTokenId,
+	// 	MeemProperties memory properties,
+	// 	MeemProperties memory childProperties
+	// ) external;
 
-	/** The total number of copies allowed for a Meem */
-	function totalCopies(uint256 tokenId) external view returns (uint256);
-
-	/** The address of the parent contract NFT */
-	function parent(uint256 tokenId) external view returns (address);
-
-	/** The tokenId of the parent contract NFT */
-	function parentTokenId(uint256 tokenId) external view returns (uint256);
-
-	/** The chain of the parent contract NFT  */
-	function parentChain(uint256 tokenId) external view returns (Chain);
-
-	function copyPermission(uint256 tokenId) external view returns (Chain);
-
-	function remixPermission(uint256 tokenId) external view returns (Chain);
-
-	function readPermission(uint256 tokenId) external view returns (Chain);
-
-	function copyPermissionAddresses(uint256 tokenId)
+	// Get children meems
+	function childrenOf(uint256 tokenId)
 		external
 		view
-		returns (address[] memory);
+		returns (uint256[] memory);
 
-	function remixPermissionAddresses(uint256 tokenId)
-		external
-		view
-		returns (address[] memory);
+	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
-	function readPermissionAddresses(uint256 tokenId)
-		external
-		view
-		returns (address[] memory);
+	function setTotalCopies(uint256 tokenId, uint256 newTotalCopies) external;
 
-	function copyPermissionNumTokens(uint256 tokenId)
-		external
-		view
-		returns (uint256);
+	function lockTotalCopies(uint256 tokenId) external;
 
-	function remixPermissionNumTokens(uint256 tokenId)
-		external
-		view
-		returns (uint256);
+	// function addPermission(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	MeemPermission memory permission
+	// ) external;
 
-	function readPermissionNumTokens(uint256 tokenId)
-		external
-		view
-		returns (uint256);
+	// function removePermissionAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	uint256 idx
+	// ) external;
 
-	function numSplits(uint256 tokenId) external view returns (uint256);
+	// function updatePermissionAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	PermissionType permissionType,
+	// 	uint256 idx,
+	// 	MeemPermission memory permission
+	// ) external;
 
-	function splitAddress(uint256 tokenId, uint256 i)
-		external
-		view
-		returns (address);
+	// function addSplit(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	Split memory split
+	// ) external;
 
-	function splitAmount(uint256 tokenId, uint256 i)
-		external
-		view
-		returns (uint256);
+	// function removeSplitAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	uint256 idx
+	// ) external;
 
-	function splitLockedBy(uint256 tokenId, uint256 i)
-		external
-		view
-		returns (address);
+	// function updateSplitAt(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	uint256 idx,
+	// 	Split memory split
+	// ) external;
 }
