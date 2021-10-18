@@ -13,6 +13,7 @@
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
 		"deploy": "hardhat deploy",
+		"deployLib": "hardhat deployLib",
 		"deployURI": "hardhat deployURI",
 		"upgradeContract": "hardhat upgradeContract",
 		"test": "hardhat test --network hardhat",

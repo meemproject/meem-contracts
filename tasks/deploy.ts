@@ -1,39 +1,34 @@
-import { task } from 'hardhat/config'
+import { getImplementationAddress } from '@openzeppelin/upgrades-core'
+import { task, types } from 'hardhat/config'
 
 type ContractName = 'Meem'
+// type ContractName = 'Meem' | 'MeemPropsLibrary'
 
 interface Contract {
 	args?: (string | number | (() => string | undefined))[]
 	address?: string
-	// libraries?: () => Record<string, string>
 	libraries?: Record<string, string>
 	waitForConfirmation?: boolean
 }
 
-task('deploy', 'Deploys Meem').setAction(
-	async (args, { ethers, upgrades, hardhatArguments }) => {
+task('deploy', 'Deploys Meem')
+	.addParam(
+		'library',
+		'The MeemPropsLibrary address',
+		undefined,
+		types.string,
+		false
+	)
+	.setAction(async (args, { ethers, upgrades, hardhatArguments }) => {
 		const [deployer] = await ethers.getSigners()
 		console.log('Deploying contracts with the account:', deployer.address)
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
-		const MeemPropsLibrary = await ethers.getContractFactory('MeemPropsLibrary')
-
-		const mpl = await MeemPropsLibrary.deploy()
-		await mpl.deployed()
-
-		console.log(`Deployed MeemPropsLibrary to: ${mpl.address}`)
-
-		// const nonce = await deployer.getTransactionCount();
 		const contracts: Record<ContractName, Contract> = {
-			// Meem: {
-			// 	libraries: () => ({
-			// 		MeemPropsLibrary: mpl.address
-			// 	})
-			// }
 			Meem: {
 				libraries: {
-					MeemPropsLibrary: mpl.address
+					MeemPropsLibrary: args.library
 				}
 			}
 		}
@@ -63,20 +58,29 @@ task('deploy', 'Deploys Meem').setAction(
 
 		const Meem = await ethers.getContractFactory('Meem', {
 			libraries: {
-				MeemPropsLibrary: mpl.address
+				MeemPropsLibrary: args.library
 			}
 		})
 
 		const meem = await upgrades.deployProxy(Meem, [proxyRegistryAddress], {
 			kind: 'uups',
-			unsafeAllow: ['external-library-linking'],
-			unsafeAllowLinkedLibraries: true
+			unsafeAllow: ['external-library-linking']
 		})
 
 		await meem.deployed()
 
-		console.log('Meem deployed to:', meem.address)
+		console.log('Meem proxy deployed to: ', meem.address)
+
+		try {
+			const implementationAddress = await getImplementationAddress(
+				ethers.provider,
+				meem.address
+			)
+
+			console.log('Meem implementation deployed to: ', implementationAddress)
+		} catch (e) {
+			console.log(e)
+		}
 
 		return contracts
-	}
-)
+	})

@@ -1,6 +1,4 @@
-# MeemVite token
-
-A MeemVite token connects you directly with the MeemDAO team on Discord as a full "Meember".
+# Meem
 
 Join us in building the future of digital content where creators set the rules: [https://discord.gg/5NP8PYN8](https://discord.gg/5NP8PYN8)
 
@@ -8,31 +6,20 @@ Join us in building the future of digital content where creators set the rules: 
 
 ### Polygon (MATIC) Mainnet
 
-MeemVite Proxy: [0xF503e9A36402F9184211b7DCAf097b5a59923bAF](https://polygonscan.com/address/0xF503e9A36402F9184211b7DCAf097b5a59923bAF)
+Meem Proxy: [0xb40F5F1bb69C6D30dBa68E0b5f17d7cADA215837](https://rinkeby.etherscan.io/address/0xb40F5F1bb69C6D30dBa68E0b5f17d7cADA215837)
 
-MeemVite Implementation: [0x824b166E7F6289518c8a694CF6385941a85d58DE](https://polygonscan.com/address/0x824b166E7F6289518c8a694CF6385941a85d58DE)
+Meem Implementation: [0x20FD5E1e8874704A03F6c7278353BFd62B503192](https://rinkeby.etherscan.io/address/0x20FD5E1e8874704A03F6c7278353BFd62B503192)
 
-MeemViteURI: [0xe00400D4b6dd34ACCa34b591F395379B65248503](https://polygonscan.com/address/0xe00400D4b6dd34ACCa34b591F395379B65248503)
+MeemPropsLibrary: [0x36E4efAb3953361CaC4BBd284f07C4186906fE22](https://rinkeby.etherscan.io/address/0x36E4efAb3953361CaC4BBd284f07C4186906fE22)
 
-Opensea: [https://opensea.io/collection/meemvite](https://opensea.io/collection/meemvite)
 
 ### Rinkeby Testnet
 
-MeemVite Proxy: [0x275EeF8f111D2B79cB9C196133d1E1aD0a8710F2](https://rinkeby.etherscan.io/address/0x275EeF8f111D2B79cB9C196133d1E1aD0a8710F2)
+Meem Proxy: [](https://rinkeby.etherscan.io/address/)
 
-MeemVite Implementation: [0x0bfae9bb23c5c7633f37af2928b2ffd5594f4809](https://rinkeby.etherscan.io/address/0x0bfae9bb23c5c7633f37af2928b2ffd5594f4809)
+Meem Implementation: [](https://rinkeby.etherscan.io/address/)
 
-MeemViteURI: [0x1d2fA012f7557025Ac9FE1ADB0D738C4Bf57c1E2](https://rinkeby.etherscan.io/address/0x1d2fA012f7557025Ac9FE1ADB0D738C4Bf57c1E2)
-
-Opensea: [https://testnets.opensea.io/collection/meemvite-testnet](https://testnets.opensea.io/collection/meemvite-testnet)
-
-## Metadata
-
-All metadata is 100% on-chain!
-
-* Metadata standards for opensea: https://docs.opensea.io/docs/metadata-standards
-
-* Contract (opensea collection) standards for opensea: https://docs.opensea.io/docs/contract-level-metadata
+MeemPropsLibrary: [](https://rinkeby.etherscan.io/address/)
 
 ## Development
 
@@ -74,17 +61,17 @@ This will start up a local node using hardhat
 
 **You should only do this the first time. After that you should use upgrade to keep the same address**
 
-#### Deploy MeemVite contract
+#### Deploy MeemPropsLibrary
 
-```yarn deploy```
+```yarn deployLib```
 
-#### Deploy MeemVite URI contract
+#### Deploy Meem URI contract
 
-```yarn deployURI```
+```yarn deploy --library <MeemPropsLibrary address>```
 
 ### Upgrade the contract
 
-```yarn upgradeContract --contractaddress <address>```
+```yarn upgradeContract --contractaddress <address> --library <MeemPropsLibrary address>```
 
 ## Console Interaction
 
@@ -95,29 +82,7 @@ This will open a hardhat console where you can interact directly with the smart 
 ### Get a meem instance for use in hardhat console
 
 ```
-const meemVite = await (await ethers.getContractFactory('MeemVite')).attach('<Contract_address>')
-```
-
-### Set the token URI contract
-
-To properly return the `tokenURI`, the contract of the MeemViteURI address must be set
-
-```
-await meemVite.setTokenURIContractAddress(<MeemViteURI address>)
-```
-
-### Mint a MeemVite
-
-```
-await meem.mint('<To address>')
-```
-
-### Get meem metadata uri
-
-```
-await meem.tokenURI(<Meem id>)
-
-await meem.tokenURI(0)
+const meem = await (await ethers.getContractFactory('Meem', { libraries: { MeemPropsLibrary: '<Library address>' }})).attach('<Contract_address>')
 ```
 
 ### Grant a role

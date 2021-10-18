@@ -114,6 +114,7 @@ contract Meem is
 		return super.supportsInterface(interfaceId);
 	}
 
+	/** Mint a Meem */
 	function mint(
 		address to,
 		string memory mTokenURI,
@@ -248,7 +249,7 @@ contract Meem is
 		require(
 			hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
 				_parent[tokenId] == address(this),
-			'Only Meem copies can be transferred. If you own the original NFT use the claim function instead'
+			'Only Meem copies can be transferred.'
 		);
 
 		super._beforeTokenTransfer(from, to, tokenId);
