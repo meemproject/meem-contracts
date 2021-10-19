@@ -15,6 +15,7 @@
 		"accounts": "hardhat accounts",
 		"deploy": "hardhat deploy",
 		"deployLib": "hardhat deployLib",
+		"deployDiamond": "hardhat deployDiamond",
 		"deployURI": "hardhat deployURI",
 		"upgradeContract": "hardhat upgradeContract",
 		"test": "hardhat test --network hardhat",

@@ -50,6 +50,21 @@ struct MeemProperties {
 	address totalCopiesLockedBy;
 }
 
+struct Meem {
+	address owner;
+	Chain chain;
+	address parent;
+	uint256 parentTokenId;
+	MeemProperties properties;
+	MeemProperties childProperties;
+}
+
+// mapping(uint256 => Chain) chain;
+// mapping(uint256 => address) parent;
+// mapping(uint256 => uint256) parentTokenId;
+// mapping(uint256 => MeemProperties) properties;
+// mapping(uint256 => MeemProperties) childProperties;
+
 interface MeemStandard {
 	function mint(
 		address to,
