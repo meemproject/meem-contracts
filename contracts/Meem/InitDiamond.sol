@@ -2,11 +2,11 @@
 pragma solidity ^0.8.4;
 
 import {AppStorage} from './libraries/LibAppStorage.sol';
-import {LibDiamond} from '../shared/libraries/LibDiamond.sol';
-import {IDiamondCut} from '../shared/interfaces/IDiamondCut.sol';
-import {IERC165} from '../shared/interfaces/IERC165.sol';
-import {IDiamondLoupe} from '../shared/interfaces/IDiamondLoupe.sol';
-import {IERC173} from '../shared/interfaces/IERC173.sol';
+import {LibDiamond} from './libraries/LibDiamond.sol';
+import {IDiamondCut} from './interfaces/IDiamondCut.sol';
+import {IERC165} from './interfaces/IERC165.sol';
+import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
+import {IERC173} from './interfaces/IERC173.sol';
 
 contract InitDiamond {
 	AppStorage internal s;
@@ -14,6 +14,8 @@ contract InitDiamond {
 	struct Args {
 		string name;
 		string symbol;
+		uint256 copyDepth;
+		uint256 nonOwnerSplitAllocationAmount;
 	}
 
 	function init(Args memory _args) external {
@@ -27,5 +29,11 @@ contract InitDiamond {
 
 		s.name = _args.name;
 		s.symbol = _args.symbol;
+		s.copyDepth = _args.copyDepth;
+		s.nonOwnerSplitAllocationAmount = _args.nonOwnerSplitAllocationAmount;
+		s.PAUSER_ROLE = keccak256('PAUSER_ROLE');
+		s.MINTER_ROLE = keccak256('MINTER_ROLE');
+		s.UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
+		s.DEFAULT_ADMIN_ROLE = keccak256('DEFAULT_ADMIN_ROLE');
 	}
 }

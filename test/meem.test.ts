@@ -4,45 +4,54 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers, waffle } from 'hardhat'
 // import MeemArtifact from '../build/Meem.json'
 // import MeemPropsLibraryArtifact from '../build/MeemPropsLibrary.json'
-import MeemArtifact from '../artifacts/contracts/Meem.sol/Meem.json'
-import MeemPropsLibraryArtifact from '../artifacts/contracts/MeemPropsLibrary.sol/MeemPropsLibrary.json'
-import { Meem } from '../typechain/Meem'
+import { deployDiamond } from '../tasks'
+import {
+	DiamondCutFacet,
+	DiamondLoupeFacet,
+	MeemFacet,
+	OwnershipFacet
+} from '../typechain'
 
 chai.use(chaiAsPromised)
 
-const { deployContract, link } = waffle
+// const { deployContract, link } = waffle
 
 describe('Meem', function Test() {
-	let meem: Meem
-	let meemPropsLibrary: any
+	let meemFacet: MeemFacet
+	let diamondAddress
+	let diamondCutFacet: DiamondCutFacet
+	let diamondLoupeFacet: DiamondLoupeFacet
+	let ownershipFacet: OwnershipFacet
 	let signers: SignerWithAddress[]
 
 	beforeEach(async () => {
 		signers = await ethers.getSigners()
 		console.log({ signers })
-		meemPropsLibrary = await deployContract(
-			signers[0],
-			MeemPropsLibraryArtifact
-		)
-
-		await meemPropsLibrary.deployed()
-
-		link(
-			// @ts-ignorenode_modules/@ethereum-waffle/compiler/dist/cjs/link.js
-			MeemArtifact,
-			'contracts/MeemPropsLibrary.sol:MeemPropsLibrary',
-			meemPropsLibrary.address
-		)
-		meem = (await deployContract(signers[0], MeemArtifact)) as Meem
-
-		await meem.initialize('0x0000000000000000000000000000000000000000')
-		await meem.deployed()
+		diamondAddress = await deployDiamond({ ethers })
+		diamondCutFacet = (await ethers.getContractAt(
+			'DiamondCutFacet',
+			diamondAddress
+		)) as DiamondCutFacet
+		diamondLoupeFacet = (await ethers.getContractAt(
+			'DiamondLoupeFacet',
+			diamondAddress
+		)) as DiamondLoupeFacet
+		ownershipFacet = (await ethers.getContractAt(
+			'OwnershipFacet',
+			diamondAddress
+		)) as OwnershipFacet
+		meemFacet = (await ethers.getContractAt(
+			'MeemFacet',
+			diamondAddress
+		)) as MeemFacet
 	})
 
 	it('Can do basic access', async () => {
-		const result = await (await meem.connect(signers[0])).name()
-		console.log({ result })
-		assert.isTrue(true)
+		const name = await meemFacet.name()
+		console.log({ name })
+		// const result = await (await meem.connect(signers[0])).name()
+		// console.log({ result })
+		// assert.isTrue(true)
 		// assert.equal(status, 1)
 	})
 

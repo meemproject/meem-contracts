@@ -5,19 +5,19 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_owner",
+        "name": "owner",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_approved",
+        "name": "approved",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "_tokenId",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],
@@ -30,19 +30,19 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_owner",
+        "name": "owner",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_operator",
+        "name": "operator",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "bool",
-        "name": "_approved",
+        "name": "approved",
         "type": "bool"
       }
     ],
@@ -55,19 +55,19 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_from",
+        "name": "from",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_to",
+        "name": "to",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "_tokenId",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],

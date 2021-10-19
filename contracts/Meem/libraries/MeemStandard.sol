@@ -57,6 +57,7 @@ struct Meem {
 	uint256 parentTokenId;
 	MeemProperties properties;
 	MeemProperties childProperties;
+	uint256 totalSupply;
 }
 
 // mapping(uint256 => Chain) chain;

@@ -9,7 +9,7 @@ import './ERC721TradableUpgradeable.sol';
 import './MeemStandard.sol';
 import './MeemPropsLibrary.sol';
 import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
-import {LibERC721} from '../../shared/libraries/LibERC721.sol';
+import {LibERC721} from '../libraries/LibERC721.sol';
 
 library LibMeem {
 	using MeemPropsLibrary for MeemProperties;
@@ -19,7 +19,7 @@ library LibMeem {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		MeemPermission memory permission
-	) public {
+	) internal {
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.addPermission(permissionType, permission);
@@ -30,7 +30,7 @@ library LibMeem {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		uint256 idx
-	) public {
+	) internal {
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.removePermissionAt(permissionType, idx);
@@ -42,7 +42,7 @@ library LibMeem {
 		PermissionType permissionType,
 		uint256 idx,
 		MeemPermission memory permission
-	) public {
+	) internal {
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.updatePermissionAt(permissionType, idx, permission);
@@ -52,7 +52,7 @@ library LibMeem {
 		uint256 tokenId,
 		PropertyType propertyType,
 		Split memory split
-	) public {
+	) internal {
 		AppStorage storage s = LibAppStorage.diamondStorage();
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
@@ -67,7 +67,7 @@ library LibMeem {
 		uint256 tokenId,
 		PropertyType propertyType,
 		uint256 idx
-	) public {
+	) internal {
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.removeSplitAt(idx);
@@ -78,7 +78,7 @@ library LibMeem {
 		PropertyType propertyType,
 		uint256 idx,
 		Split memory split
-	) public {
+	) internal {
 		AppStorage storage s = LibAppStorage.diamondStorage();
 		ownsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
@@ -145,7 +145,7 @@ library LibMeem {
 		uint256 index = s.ownerTokenIdIndexes[_from][_tokenId];
 		uint256 lastIndex = s.ownerTokenIds[_from].length - 1;
 		if (index != lastIndex) {
-			uint32 lastTokenId = s.ownerTokenIds[_from][lastIndex];
+			uint256 lastTokenId = s.ownerTokenIds[_from][lastIndex];
 			s.ownerTokenIds[_from][index] = lastTokenId;
 			s.ownerTokenIdIndexes[_from][lastTokenId] = index;
 		}
@@ -158,7 +158,7 @@ library LibMeem {
 		// add
 		s.meems[_tokenId].owner = _to;
 		s.ownerTokenIdIndexes[_to][_tokenId] = s.ownerTokenIds[_to].length;
-		s.ownerTokenIds[_to].push(uint32(_tokenId));
+		s.ownerTokenIds[_to].push(_tokenId);
 		emit LibERC721.Transfer(_from, _to, _tokenId);
 	}
 }
