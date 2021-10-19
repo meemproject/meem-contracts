@@ -44,7 +44,9 @@ task('upgradeContract', 'Upgrade Meem')
 				MeemPropsLibrary: args.library
 			}
 		})
-		const meem = await upgrades.upgradeProxy(args.contractaddress, Meem)
+		const meem = await upgrades.upgradeProxy(args.contractaddress, Meem, {
+			unsafeAllow: ['external-library-linking']
+		})
 
 		await meem.deployed()
 		console.log('Meem proxy deployed to: ', meem.address)

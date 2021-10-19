@@ -6,7 +6,8 @@
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
 	"scripts": {
-		"build": "yarn build:sol && yarn build:ts",
+		"build": "concurrently -r \"yarn build:sol\" \"yarn build:ts\"",
+		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain",
 		"build:ts": "tsc -p .",
 		"build:sol": "hardhat compile",

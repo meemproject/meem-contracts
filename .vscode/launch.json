@@ -1,0 +1,22 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Mocha Test single file",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				"${workspaceRoot}/node_modules/.bin/hardhat",
+				"test",
+				"--network",
+				"hardhat"
+			],
+			"runtimeExecutable": "${env:NVM_BIN}/node",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"port": 9229,
+			"cwd": "${workspaceRoot}",
+			"env": {}
+		}
+	]
+}
