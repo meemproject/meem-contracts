@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+// import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
@@ -12,6 +13,11 @@ import {Base64} from '../libraries/Base64.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC165} from '../interfaces/IERC165.sol';
 import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
+import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import {ERC721Tradable} from '../libraries/ERC721Tradable.sol';
+import {IERC173} from '../interfaces/IERC173.sol';
 
 contract OwnableDelegateProxy {}
 
@@ -19,19 +25,20 @@ contract ProxyRegistry {
 	mapping(address => OwnableDelegateProxy) public proxies;
 }
 
-contract ERC721Facet {
+contract ERC721Facet is
+	IERC721,
+	IERC721Enumerable,
+	IERC721Metadata,
+	IERC721Receiver
+{
 	AppStorage internal s;
 
-	// function supportsInterface(bytes4 interfaceId)
-	// 	public
-	// 	pure
-	//
-	// 	returns (bool)
-	// {
-	// 	return
-	// 		interfaceId == type(IERC721).interfaceId ||
-	// 		interfaceId == type(IERC165).interfaceId;
-	// }
+	function onERC721Received(
+		address _operator,
+		address _from,
+		uint256 _tokenId,
+		bytes calldata _data
+	) public override returns (bytes4) {}
 
 	function setContractURI(string memory newContractURI) public {
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
@@ -66,7 +73,7 @@ contract ERC721Facet {
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
-	function totalSupply() external view returns (uint256 totalSupply_) {
+	function totalSupply() public view override returns (uint256 totalSupply_) {
 		return LibERC721.totalSupply();
 	}
 
@@ -75,7 +82,12 @@ contract ERC721Facet {
 	///  function throws for queries about the zero address.
 	/// @param owner An address for whom to query the balance
 	/// @return balance The number of NFTs owned by `_owner`, possibly zero
-	function balanceOf(address owner) external view returns (uint256 balance) {
+	function balanceOf(address owner)
+		public
+		view
+		override
+		returns (uint256 balance)
+	{
 		return LibERC721.balanceOf(owner);
 	}
 
@@ -85,8 +97,9 @@ contract ERC721Facet {
 	/// @return tokenId_ The token identifier for the `_index`th NFT,
 	///  (sort order not specified)
 	function tokenByIndex(uint256 _index)
-		external
+		public
 		view
+		override
 		returns (uint256 tokenId_)
 	{
 		return LibERC721.tokenByIndex(_index);
@@ -100,8 +113,9 @@ contract ERC721Facet {
 	/// @return tokenId_ The token identifier for the `_index`th NFT assigned to `_owner`,
 	///   (sort order not specified)
 	function tokenOfOwnerByIndex(address _owner, uint256 _index)
-		external
+		public
 		view
+		override
 		returns (uint256 tokenId_)
 	{
 		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
@@ -111,7 +125,7 @@ contract ERC721Facet {
 	/// @param _owner The address to check for the NFTs
 	/// @return tokenIds_ an array of unsigned integers,each representing the tokenId of each NFT
 	function tokenIdsOfOwner(address _owner)
-		external
+		public
 		view
 		returns (uint256[] memory tokenIds_)
 	{
@@ -140,7 +154,12 @@ contract ERC721Facet {
 	///  about them do throw.
 	/// @param tokenId The identifier for an NFT
 	/// @return owner The address of the owner of the NFT
-	function ownerOf(uint256 tokenId) external view returns (address owner) {
+	function ownerOf(uint256 tokenId)
+		public
+		view
+		override
+		returns (address owner)
+	{
 		return LibERC721.ownerOf(tokenId);
 	}
 
@@ -149,8 +168,9 @@ contract ERC721Facet {
 	/// @param tokenId The NFT to find the approved address for
 	/// @return operator The approved address for this NFT, or the zero address if there is none
 	function getApproved(uint256 tokenId)
-		external
+		public
 		view
+		override
 		returns (address operator)
 	{
 		require(tokenId < s.tokenCounter, 'ERC721: tokenId is invalid');
@@ -161,19 +181,20 @@ contract ERC721Facet {
 	/// @param owner The address that owns the NFTs
 	/// @param operator The address that acts on behalf of the owner
 	/// @return approved_ True if `_operator` is an approved operator for `_owner`, false otherwise
-	function isApprovedForAll(address owner, address operator)
-		public
-		view
-		returns (bool)
-	{
-		// Whitelist OpenSea proxy contract for easy trading.
-		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
-		if (address(proxyRegistry.proxies(owner)) == operator) {
-			return true;
-		}
+	// function isApprovedForAll(address owner, address operator)
+	// 	public
+	// 	view
+	// 	override
+	// 	returns (bool)
+	// {
+	// 	// Whitelist OpenSea proxy contract for easy trading.
+	// 	ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
+	// 	if (address(proxyRegistry.proxies(owner)) == operator) {
+	// 		return true;
+	// 	}
 
-		return s.operators[owner][operator];
-	}
+	// 	return s.operators[owner][operator];
+	// }
 
 	/// @notice Transfers the ownership of an NFT from one address to another address
 	/// @dev Throws unless `LibMeta.msgSender()` is the current owner, an authorized
@@ -192,7 +213,7 @@ contract ERC721Facet {
 		address to,
 		uint256 tokenId,
 		bytes calldata _data
-	) external {
+	) public override {
 		address sender = LibMeta.msgSender();
 		internalTransferFrom(sender, from, to, tokenId);
 		LibERC721._checkOnERC721Received(sender, from, to, tokenId, _data);
@@ -240,7 +261,7 @@ contract ERC721Facet {
 		address from,
 		address to,
 		uint256 tokenId
-	) external {
+	) public override {
 		address sender = LibMeta.msgSender();
 		internalTransferFrom(sender, from, to, tokenId);
 		LibERC721._checkOnERC721Received(sender, from, to, tokenId, '');
@@ -260,7 +281,7 @@ contract ERC721Facet {
 		address from,
 		address to,
 		uint256 tokenId
-	) external {
+	) public override {
 		internalTransferFrom(LibMeta.msgSender(), from, to, tokenId);
 	}
 
@@ -296,7 +317,7 @@ contract ERC721Facet {
 	///  operator of the current owner.
 	/// @param to The new approved NFT controller
 	/// @param tokenId The NFT to approve
-	function approve(address to, uint256 tokenId) external {
+	function approve(address to, uint256 tokenId) public override {
 		address owner = s.meems[tokenId].owner;
 		require(
 			owner == LibMeta.msgSender() ||
@@ -313,26 +334,73 @@ contract ERC721Facet {
 	///  multiple operators per owner.
 	/// @param operator Address to add to the set of authorized operators
 	/// @param _approved True if the operator is approved, false to revoke approval
-	function setApprovalForAll(address operator, bool _approved) external {
+	function setApprovalForAll(address operator, bool _approved)
+		public
+		override
+	{
 		s.operators[LibMeta.msgSender()][operator] = _approved;
 		emit LibERC721.ApprovalForAll(LibMeta.msgSender(), operator, _approved);
 	}
 
 	///@notice Return the universal name of the NFT
-	function name() external view returns (string memory) {
+	function name() public view override returns (string memory) {
 		return LibERC721.name();
 	}
 
 	/// @notice An abbreviated name for NFTs in this contract
-	function symbol() external view returns (string memory) {
+	function symbol() public view override returns (string memory) {
 		return LibERC721.symbol();
+	}
+
+	function baseTokenURI() public pure returns (string memory) {
+		return 'https://meem.wtf/tokens';
 	}
 
 	/// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
 	/// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
 	///  3986. The URI may point to a JSON file that conforms to the "ERC721
 	///  Metadata JSON Schema".
-	function tokenURI(uint256 _tokenId) external view returns (string memory) {
-		return s.tokenURIs[_tokenId];
+	function tokenURI(uint256 tokenId)
+		public
+		pure
+		override
+		returns (string memory)
+	{
+		// return s.tokenURIs[_tokenId];
+		return
+			'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json';
+	}
+
+	function isApprovedForAll(address owner, address operator)
+		public
+		view
+		virtual
+		override
+		returns (bool)
+	{
+		// Whitelist OpenSea proxy contract for easy trading.
+		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
+		if (address(proxyRegistry.proxies(owner)) == operator) {
+			return true;
+		}
+
+		return false;
+		// return super.isApprovedForAll(owner, operator);
+	}
+
+	function supportsInterface(bytes4 interfaceId)
+		public
+		view
+		virtual
+		override
+		returns (bool)
+	{
+		return
+			interfaceId == type(IERC165).interfaceId ||
+			interfaceId == type(IERC173).interfaceId ||
+			interfaceId == type(IERC721).interfaceId ||
+			interfaceId == type(IERC721Metadata).interfaceId ||
+			interfaceId == type(IERC721Receiver).interfaceId ||
+			interfaceId == type(IERC721Enumerable).interfaceId;
 	}
 }
