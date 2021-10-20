@@ -27,6 +27,11 @@
             "internalType": "address",
             "name": "proxyRegistryAddress",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "contractURI",
+            "type": "string"
           }
         ],
         "internalType": "struct InitDiamond.Args",

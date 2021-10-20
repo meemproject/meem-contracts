@@ -25,6 +25,7 @@ contract InitDiamond {
 		uint256 copyDepth;
 		uint256 nonOwnerSplitAllocationAmount;
 		address proxyRegistryAddress;
+		string contractURI;
 	}
 
 	function init(Args memory _args) external {
@@ -51,8 +52,7 @@ contract InitDiamond {
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
 		s.UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
 		s.DEFAULT_ADMIN_ROLE = keccak256('DEFAULT_ADMIN_ROLE');
-		s
-			.contractURI = '{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/5NP8PYN8","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": 1000, "fee_recipient": "0x40c6BeE45d94063c5B05144489cd8A9879899592"}';
+		s.contractURI = _args.contractURI;
 
 		LibAccessControl._grantRole(s.PAUSER_ROLE, msg.sender);
 		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);

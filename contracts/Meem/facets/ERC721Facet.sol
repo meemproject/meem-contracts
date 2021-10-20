@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
-// import "hardhat/console.sol";
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
@@ -16,7 +14,6 @@ import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
 import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
-import {ERC721Tradable} from '../libraries/ERC721Tradable.sol';
 import {IERC173} from '../interfaces/IERC173.sol';
 
 contract OwnableDelegateProxy {}

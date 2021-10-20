@@ -18,40 +18,15 @@ task('upgradeMeemFacet', 'Upgrade MeemFacet')
 		types.string,
 		false
 	)
-	.addParam(
-		'library',
-		'The MeemPropsLibrary address',
-		undefined,
-		types.string,
-		false
-	)
 	.setAction(async (args, { ethers }) => {
 		const [deployer] = await ethers.getSigners()
 		console.log('Deploying contracts with the account:', deployer.address)
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
-		const MeemFacet = await ethers.getContractFactory('MeemFacet', {
-			libraries: {
-				MeemPropsLibrary: args.library
-			}
-		})
+		const MeemFacet = await ethers.getContractFactory('MeemFacet')
 		const meemFacet = await MeemFacet.deploy()
 		await meemFacet.deployed()
-
-		// const diamondInit = await ethers.getContractAt(
-		// 	'InitDiamond',
-		// 	args.diamondinit
-		// )
-
-		// const functionCall = diamondInit.interface.encodeFunctionData('init', [
-		// 	{
-		// 		name: 'Meem',
-		// 		symbol: 'MEEM',
-		// 		copyDepth: 1,
-		// 		nonOwnerSplitAllocationAmount: 1000
-		// 	}
-		// ])
 
 		const diamondCut = await ethers.getContractAt('IDiamondCut', args.diamond)
 		const tx = await diamondCut.diamondCut(

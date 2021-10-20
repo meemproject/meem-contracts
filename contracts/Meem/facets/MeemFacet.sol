@@ -6,13 +6,10 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split} from '../libraries/MeemStandard.sol';
-import {MeemPropsLibrary} from '../libraries/MeemPropsLibrary.sol';
+import {Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split} from '../interfaces/MeemStandard.sol';
 
 contract MeemFacet {
 	AppStorage internal s;
-
-	using MeemPropsLibrary for MeemProperties;
 
 	/** Mint a Meem */
 	function mint(
@@ -106,9 +103,12 @@ contract MeemFacet {
 		PermissionType permissionType,
 		MeemPermission memory permission
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.addPermission(permissionType, permission);
+		LibMeem.addPermission(
+			tokenId,
+			propertyType,
+			permissionType,
+			permission
+		);
 	}
 
 	function removePermissionAt(
@@ -117,9 +117,7 @@ contract MeemFacet {
 		PermissionType permissionType,
 		uint256 idx
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.removePermissionAt(permissionType, idx);
+		LibMeem.removePermissionAt(tokenId, propertyType, permissionType, idx);
 	}
 
 	function updatePermissionAt(
@@ -129,9 +127,13 @@ contract MeemFacet {
 		uint256 idx,
 		MeemPermission memory permission
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.updatePermissionAt(permissionType, idx, permission);
+		LibMeem.updatePermissionAt(
+			tokenId,
+			propertyType,
+			permissionType,
+			idx,
+			permission
+		);
 	}
 
 	function addSplit(
@@ -139,13 +141,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		Split memory split
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.addSplit(
-			LibMeem.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount,
-			split
-		);
+		LibMeem.addSplit(tokenId, propertyType, split);
 	}
 
 	function removeSplitAt(
@@ -153,9 +149,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		uint256 idx
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.removeSplitAt(idx);
+		LibMeem.removeSplitAt(tokenId, propertyType, idx);
 	}
 
 	function updateSplitAt(
@@ -164,14 +158,7 @@ contract MeemFacet {
 		uint256 idx,
 		Split memory split
 	) public {
-		LibMeem.requireOwnsToken(tokenId);
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.updateSplitAt(
-			LibMeem.ownerOf(tokenId),
-			idx,
-			s.nonOwnerSplitAllocationAmount,
-			split
-		);
+		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 
 	function getProperties(uint256 tokenId, PropertyType propertyType)
@@ -179,13 +166,7 @@ contract MeemFacet {
 		view
 		returns (MeemProperties storage)
 	{
-		if (propertyType == PropertyType.Meem) {
-			return s.meems[tokenId].properties;
-		} else if (propertyType == PropertyType.Child) {
-			return s.meems[tokenId].childProperties;
-		}
-
-		revert('Invalid property type');
+		return LibMeem.getProperties(tokenId, propertyType);
 	}
 
 	function setProperties(
@@ -193,12 +174,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		MeemProperties memory mProperties
 	) internal {
-		MeemProperties storage props = getProperties(tokenId, propertyType);
-		props.setProperties(mProperties);
-		props.validateSplits(
-			LibMeem.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
+		LibMeem.setProperties(tokenId, propertyType, mProperties);
 	}
 
 	function setTokenCounter(uint256 tokenCounter) public {

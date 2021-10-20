@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 import {LibDiamond} from '../libraries/LibDiamond.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
-import {Meem, Chain} from './MeemStandard.sol';
+import {Meem, Chain} from '../interfaces/MeemStandard.sol';
 
 struct RoleData {
 	mapping(address => bool) members;

@@ -16,7 +16,7 @@ import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 
 import './ERC721TradableUpgradeable.sol';
 import './Base64.sol';
-import './MeemStandard.sol';
+import '../interfaces/MeemStandard.sol';
 import './MeemProps.sol';
 
 contract Meem is

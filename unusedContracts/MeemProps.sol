@@ -6,7 +6,7 @@ import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 import './ERC721TradableUpgradeable.sol';
-import './MeemStandard.sol';
+import '../interfaces/MeemStandard.sol';
 import './MeemPropsLibrary.sol';
 
 contract MeemProps is

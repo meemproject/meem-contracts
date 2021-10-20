@@ -51,21 +51,10 @@ export async function deployDiamond(options: {
 	console.log('')
 	console.log('Deploying facets')
 
-	const MeemPropsLibrary = await ethers.getContractFactory('MeemPropsLibrary')
-
-	const mpl = await MeemPropsLibrary.deploy()
-	await mpl.deployed()
-	deployedContracts.MeemPropsLibrary = mpl.address
-	console.log(`MeemPropsLibrary deployed: ${mpl.address}`)
-
 	const facets: Record<string, Contract> = {
 		DiamondLoupeFacet: {},
 		OwnershipFacet: {},
-		MeemFacet: {
-			libraries: {
-				MeemPropsLibrary: mpl.address
-			}
-		},
+		MeemFacet: {},
 		ERC721Facet: {}
 	}
 
@@ -120,7 +109,9 @@ export async function deployDiamond(options: {
 			symbol: 'MEEM',
 			copyDepth: 1,
 			nonOwnerSplitAllocationAmount: 1000,
-			proxyRegistryAddress
+			proxyRegistryAddress,
+			contractURI:
+				'{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/5NP8PYN8","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": 1000, "fee_recipient": "0x40c6BeE45d94063c5B05144489cd8A9879899592"}'
 		}
 	])
 	console.log({ functionCall })
