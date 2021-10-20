@@ -8,12 +8,30 @@ import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {IERC721TokenReceiver} from '../interfaces/IERC721TokenReceiver.sol';
-import {IERC721} from '../interfaces/IERC721.sol';
 import {Base64} from '../libraries/Base64.sol';
+import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import {IERC165} from '../interfaces/IERC165.sol';
+import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 
-contract ERC721Facet is IERC721 {
+contract OwnableDelegateProxy {}
+
+contract ProxyRegistry {
+	mapping(address => OwnableDelegateProxy) public proxies;
+}
+
+contract ERC721Facet {
 	AppStorage internal s;
+
+	// function supportsInterface(bytes4 interfaceId)
+	// 	public
+	// 	pure
+	//
+	// 	returns (bool)
+	// {
+	// 	return
+	// 		interfaceId == type(IERC721).interfaceId ||
+	// 		interfaceId == type(IERC165).interfaceId;
+	// }
 
 	function setContractURI(string memory newContractURI) public {
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
@@ -55,15 +73,10 @@ contract ERC721Facet is IERC721 {
 	/// @notice Count all NFTs assigned to an owner
 	/// @dev NFTs assigned to the zero address are considered invalid, and this.
 	///  function throws for queries about the zero address.
-	/// @param _owner An address for whom to query the balance
-	/// @return balance_ The number of NFTs owned by `_owner`, possibly zero
-	function balanceOf(address _owner)
-		external
-		view
-		override
-		returns (uint256)
-	{
-		return LibERC721.balanceOf(_owner);
+	/// @param owner An address for whom to query the balance
+	/// @return balance The number of NFTs owned by `_owner`, possibly zero
+	function balanceOf(address owner) external view returns (uint256 balance) {
+		return LibERC721.balanceOf(owner);
 	}
 
 	/// @notice Enumerate valid NFTs
@@ -125,48 +138,41 @@ contract ERC721Facet is IERC721 {
 	/// @notice Find the owner of an NFT
 	/// @dev NFTs assigned to zero address are considered invalid, and queries
 	///  about them do throw.
-	/// @param _tokenId The identifier for an NFT
-	/// @return owner_ The address of the owner of the NFT
-	function ownerOf(uint256 _tokenId)
-		external
-		view
-		override
-		returns (address owner_)
-	{
-		return LibERC721.ownerOf(_tokenId);
+	/// @param tokenId The identifier for an NFT
+	/// @return owner The address of the owner of the NFT
+	function ownerOf(uint256 tokenId) external view returns (address owner) {
+		return LibERC721.ownerOf(tokenId);
 	}
 
 	/// @notice Get the approved address for a single NFT
 	/// @dev Throws if `_tokenId` is not a valid NFT.
-	/// @param _tokenId The NFT to find the approved address for
-	/// @return approved_ The approved address for this NFT, or the zero address if there is none
-	function getApproved(uint256 _tokenId)
+	/// @param tokenId The NFT to find the approved address for
+	/// @return operator The approved address for this NFT, or the zero address if there is none
+	function getApproved(uint256 tokenId)
 		external
 		view
-		override
-		returns (address approved_)
+		returns (address operator)
 	{
-		require(_tokenId < s.tokenCounter, 'ERC721: tokenId is invalid');
-		approved_ = s.approved[_tokenId];
+		require(tokenId < s.tokenCounter, 'ERC721: tokenId is invalid');
+		operator = s.approved[tokenId];
 	}
 
 	/// @notice Query if an address is an authorized operator for another address
-	/// @param _owner The address that owns the NFTs
-	/// @param _operator The address that acts on behalf of the owner
+	/// @param owner The address that owns the NFTs
+	/// @param operator The address that acts on behalf of the owner
 	/// @return approved_ True if `_operator` is an approved operator for `_owner`, false otherwise
-	function isApprovedForAll(address _owner, address _operator)
+	function isApprovedForAll(address owner, address operator)
 		public
 		view
-		override
 		returns (bool)
 	{
 		// Whitelist OpenSea proxy contract for easy trading.
-		// ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
-		// if (address(proxyRegistry.proxies(owner)) == operator) {
-		// 	return true;
-		// }
+		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
+		if (address(proxyRegistry.proxies(owner)) == operator) {
+			return true;
+		}
 
-		return s.operators[_owner][_operator];
+		return s.operators[owner][operator];
 	}
 
 	/// @notice Transfers the ownership of an NFT from one address to another address
@@ -177,19 +183,19 @@ contract ERC721Facet is IERC721 {
 	///  checks if `_to` is a smart contract (code size > 0). If so, it calls
 	///  `onERC721Received` on `_to` and throws if the return value is not
 	///  `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
-	/// @param _from The current owner of the NFT
-	/// @param _to The new owner
-	/// @param _tokenId The NFT to transfer
+	/// @param from The current owner of the NFT
+	/// @param to The new owner
+	/// @param tokenId The NFT to transfer
 	/// @param _data Additional data with no specified format, sent in call to `_to`
 	function safeTransferFrom(
-		address _from,
-		address _to,
-		uint256 _tokenId,
+		address from,
+		address to,
+		uint256 tokenId,
 		bytes calldata _data
-	) external override {
+	) external {
 		address sender = LibMeta.msgSender();
-		internalTransferFrom(sender, _from, _to, _tokenId);
-		LibERC721._checkOnERC721Received(sender, _from, _to, _tokenId, _data);
+		internalTransferFrom(sender, from, to, tokenId);
+		LibERC721._checkOnERC721Received(sender, from, to, tokenId, _data);
 	}
 
 	// @notice Transfers the ownership of multiple  NFTs from one address to another at once
@@ -227,17 +233,17 @@ contract ERC721Facet is IERC721 {
 	/// @notice Transfers the ownership of an NFT from one address to another address
 	/// @dev This works identically to the other function with an extra data parameter,
 	///  except this function just sets data to "".
-	/// @param _from The current owner of the NFT
-	/// @param _to The new owner
-	/// @param _tokenId The NFT to transfer
+	/// @param from The current owner of the NFT
+	/// @param to The new owner
+	/// @param tokenId The NFT to transfer
 	function safeTransferFrom(
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) external override {
+		address from,
+		address to,
+		uint256 tokenId
+	) external {
 		address sender = LibMeta.msgSender();
-		internalTransferFrom(sender, _from, _to, _tokenId);
-		LibERC721._checkOnERC721Received(sender, _from, _to, _tokenId, '');
+		internalTransferFrom(sender, from, to, tokenId);
+		LibERC721._checkOnERC721Received(sender, from, to, tokenId, '');
 	}
 
 	/// @notice Transfer ownership of an NFT -- THE CALLER IS RESPONSIBLE
@@ -247,15 +253,15 @@ contract ERC721Facet is IERC721 {
 	///  operator, or the approved address for this NFT. Throws if `_from` is
 	///  not the current owner. Throws if `_to` is the zero address. Throws if
 	///  `_tokenId` is not a valid NFT.
-	/// @param _from The current owner of the NFT
-	/// @param _to The new owner
-	/// @param _tokenId The NFT to transfer
+	/// @param from The current owner of the NFT
+	/// @param to The new owner
+	/// @param tokenId The NFT to transfer
 	function transferFrom(
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) external override {
-		internalTransferFrom(LibMeta.msgSender(), _from, _to, _tokenId);
+		address from,
+		address to,
+		uint256 tokenId
+	) external {
+		internalTransferFrom(LibMeta.msgSender(), from, to, tokenId);
 	}
 
 	function internalTransferFrom(
@@ -288,35 +294,28 @@ contract ERC721Facet is IERC721 {
 	/// @dev The zero address indicates there is no approved address.
 	///  Throws unless `LibMeta.msgSender()` is the current NFT owner, or an authorized
 	///  operator of the current owner.
-	/// @param _approved The new approved NFT controller
-	/// @param _tokenId The NFT to approve
-	function approve(address _approved, uint256 _tokenId) external override {
-		address owner = s.meems[_tokenId].owner;
+	/// @param to The new approved NFT controller
+	/// @param tokenId The NFT to approve
+	function approve(address to, uint256 tokenId) external {
+		address owner = s.meems[tokenId].owner;
 		require(
 			owner == LibMeta.msgSender() ||
 				s.operators[owner][LibMeta.msgSender()],
 			'ERC721: Not owner or operator of token.'
 		);
-		s.approved[_tokenId] = _approved;
-		emit LibERC721.Approval(owner, _approved, _tokenId);
+		s.approved[tokenId] = to;
+		emit LibERC721.Approval(owner, to, tokenId);
 	}
 
 	/// @notice Enable or disable approval for a third party ("operator") to manage
 	///  all of `LibMeta.msgSender()`'s assets
 	/// @dev Emits the ApprovalForAll event. The contract MUST allow
 	///  multiple operators per owner.
-	/// @param _operator Address to add to the set of authorized operators
+	/// @param operator Address to add to the set of authorized operators
 	/// @param _approved True if the operator is approved, false to revoke approval
-	function setApprovalForAll(address _operator, bool _approved)
-		external
-		override
-	{
-		s.operators[LibMeta.msgSender()][_operator] = _approved;
-		emit LibERC721.ApprovalForAll(
-			LibMeta.msgSender(),
-			_operator,
-			_approved
-		);
+	function setApprovalForAll(address operator, bool _approved) external {
+		s.operators[LibMeta.msgSender()][operator] = _approved;
+		emit LibERC721.ApprovalForAll(LibMeta.msgSender(), operator, _approved);
 	}
 
 	///@notice Return the universal name of the NFT

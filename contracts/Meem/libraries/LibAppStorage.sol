@@ -10,6 +10,7 @@ struct RoleData {
 }
 
 struct AppStorage {
+	address proxyRegistryAddress;
 	/** AccessControl Role: Admin */
 	bytes32 DEFAULT_ADMIN_ROLE;
 	/** AccessControl Role: Pauser */

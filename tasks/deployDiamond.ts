@@ -1,5 +1,6 @@
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { task } from 'hardhat/config'
+import { HardhatArguments } from 'hardhat/types'
 import { FacetCutAction, getSelectors } from './lib/diamond'
 
 interface Contract {
@@ -9,9 +10,12 @@ interface Contract {
 	waitForConfirmation?: boolean
 }
 
-export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
+export async function deployDiamond(options: {
+	ethers: HardhatEthersHelpers
+	hardhatArguments?: HardhatArguments
+}) {
 	const deployedContracts: Record<string, string> = {}
-	const { ethers } = options
+	const { ethers, hardhatArguments } = options
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
 	console.log('Deploying contracts with the account:', contractOwner.address)
@@ -86,15 +90,37 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	console.log('')
 	console.log('Diamond Cut:', cuts)
 	const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address)
-	// let tx
-	// let receipt
+
+	let proxyRegistryAddress = ''
+
+	switch (hardhatArguments?.network) {
+		case 'matic':
+		case 'polygon':
+			proxyRegistryAddress = '0x58807baD0B376efc12F5AD86aAc70E78ed67deaE'
+			break
+
+		case 'rinkeby':
+			proxyRegistryAddress = '0xf57b2c51ded3a29e6891aba85459d600256cf317'
+			break
+
+		case 'mainnet':
+			proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1'
+			break
+
+		case 'local':
+		default:
+			proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
+			break
+	}
+
 	// call to init function
 	const functionCall = diamondInit.interface.encodeFunctionData('init', [
 		{
 			name: 'Meem',
 			symbol: 'MEEM',
 			copyDepth: 1,
-			nonOwnerSplitAllocationAmount: 1000
+			nonOwnerSplitAllocationAmount: 1000,
+			proxyRegistryAddress
 		}
 	])
 	console.log({ functionCall })
@@ -113,7 +139,9 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	return deployedContracts
 }
 
-task('deployDiamond', 'Deploys Meem').setAction(async (args, { ethers }) => {
-	const result = await deployDiamond({ ethers })
-	return result
-})
+task('deployDiamond', 'Deploys Meem').setAction(
+	async (args, { ethers, hardhatArguments }) => {
+		const result = await deployDiamond({ ethers, hardhatArguments })
+		return result
+	}
+)

@@ -22,6 +22,11 @@
             "internalType": "uint256",
             "name": "nonOwnerSplitAllocationAmount",
             "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "proxyRegistryAddress",
+            "type": "address"
           }
         ],
         "internalType": "struct InitDiamond.Args",

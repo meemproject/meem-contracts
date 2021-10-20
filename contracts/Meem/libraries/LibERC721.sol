@@ -504,7 +504,7 @@ library LibERC721 {
 						_tokenId,
 						_data
 					),
-				'AavegotchiFacet: Transfer rejected/failed by _to'
+				'LibERC721: Transfer rejected/failed by _to'
 			);
 		}
 	}
