@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {AppStorage} from './libraries/LibAppStorage.sol';
+import {LibAccessControl} from './libraries/LibAccessControl.sol';
 import {LibDiamond} from './libraries/LibDiamond.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
 import {IERC165} from './interfaces/IERC165.sol';
@@ -35,5 +36,10 @@ contract InitDiamond {
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
 		s.UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
 		s.DEFAULT_ADMIN_ROLE = keccak256('DEFAULT_ADMIN_ROLE');
+
+		LibAccessControl._grantRole(s.PAUSER_ROLE, msg.sender);
+		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
+		LibAccessControl._grantRole(s.UPGRADER_ROLE, msg.sender);
+		LibAccessControl._grantRole(s.DEFAULT_ADMIN_ROLE, msg.sender);
 	}
 }

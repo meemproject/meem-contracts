@@ -245,7 +245,9 @@ library LibDiamond {
 				oldFacetAddress != _facetAddress,
 				"LibDiamondCut: Can't replace function with same function"
 			);
-			removeFunction(oldFacetAddress, selector);
+			if (oldFacetAddress != address(0)) {
+				removeFunction(oldFacetAddress, selector);
+			}
 			// add function
 			ds
 				.selectorToFacetAndPosition[selector]

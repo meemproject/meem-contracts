@@ -1,10 +1,6 @@
-// import { getImplementationAddress } from '@openzeppelin/upgrades-core'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { task } from 'hardhat/config'
 import { FacetCutAction, getSelectors } from './lib/diamond'
-
-type ContractName = 'Meem'
-// type ContractName = 'Meem' | 'MeemPropsLibrary'
 
 interface Contract {
 	args?: (string | number | (() => string | undefined))[]
@@ -14,6 +10,7 @@ interface Contract {
 }
 
 export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
+	const deployedContracts: Record<string, string> = {}
 	const { ethers } = options
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
@@ -25,6 +22,7 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	const DiamondCutFacet = await ethers.getContractFactory('DiamondCutFacet')
 	const diamondCutFacet = await DiamondCutFacet.deploy()
 	await diamondCutFacet.deployed()
+	deployedContracts.DiamondCutFacet = diamondCutFacet.address
 	console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
 
 	// deploy Diamond
@@ -35,6 +33,7 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	)
 	await diamond.deployed()
 	console.log('Diamond deployed:', diamond.address)
+	deployedContracts.Diamond = diamond.address
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
@@ -47,14 +46,36 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	// deploy facets
 	console.log('')
 	console.log('Deploying facets')
-	const FacetNames = ['DiamondLoupeFacet', 'OwnershipFacet', 'MeemFacet']
-	const cut = []
-	for (const FacetName of FacetNames) {
-		const Facet = await ethers.getContractFactory(FacetName)
+
+	const MeemPropsLibrary = await ethers.getContractFactory('MeemPropsLibrary')
+
+	const mpl = await MeemPropsLibrary.deploy()
+	await mpl.deployed()
+	deployedContracts.MeemPropsLibrary = mpl.address
+	console.log(`MeemPropsLibrary deployed: ${mpl.address}`)
+
+	const facets: Record<string, Contract> = {
+		DiamondLoupeFacet: {},
+		OwnershipFacet: {},
+		MeemFacet: {
+			libraries: {
+				MeemPropsLibrary: mpl.address
+			}
+		},
+		ERC721Facet: {}
+	}
+
+	const cuts = []
+	const facetNames = Object.keys(facets)
+	for (const facetName of facetNames) {
+		const Facet = await ethers.getContractFactory(facetName, {
+			...facets[facetName]
+		})
 		const facet = await Facet.deploy()
 		await facet.deployed()
-		console.log(`${FacetName} deployed: ${facet.address}`)
-		cut.push({
+		console.log(`${facetName} deployed: ${facet.address}`)
+		deployedContracts[facetName] = facet.address
+		cuts.push({
 			facetAddress: facet.address,
 			action: FacetCutAction.Add,
 			functionSelectors: getSelectors(facet)
@@ -63,7 +84,7 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 
 	// upgrade diamond with facets
 	console.log('')
-	console.log('Diamond Cut:', cut)
+	console.log('Diamond Cut:', cuts)
 	const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address)
 	// let tx
 	// let receipt
@@ -71,18 +92,25 @@ export async function deployDiamond(options: { ethers: HardhatEthersHelpers }) {
 	const functionCall = diamondInit.interface.encodeFunctionData('init', [
 		{
 			name: 'Meem',
-			symbol: 'MEEM'
+			symbol: 'MEEM',
+			copyDepth: 1,
+			nonOwnerSplitAllocationAmount: 1000
 		}
 	])
 	console.log({ functionCall })
-	const tx = await diamondCut.diamondCut(cut, diamondInit.address, functionCall)
+	const tx = await diamondCut.diamondCut(
+		cuts,
+		diamondInit.address,
+		functionCall
+	)
 	console.log('Diamond cut tx: ', tx.hash)
 	const receipt = await tx.wait()
 	if (!receipt.status) {
 		throw Error(`Diamond upgrade failed: ${tx.hash}`)
 	}
 	console.log('Completed diamond cut')
-	return diamond.address
+	console.log({ deployedContracts })
+	return deployedContracts
 }
 
 task('deployDiamond', 'Deploys Meem').setAction(async (args, { ethers }) => {

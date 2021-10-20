@@ -7,17 +7,28 @@ import {LibMeem} from '../libraries/LibMeem.sol';
 // import "hardhat/console.sol";
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
+import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {IERC721TokenReceiver} from '../interfaces/IERC721TokenReceiver.sol';
 import {IERC721} from '../interfaces/IERC721.sol';
+import {Base64} from '../libraries/Base64.sol';
 
 contract ERC721Facet is IERC721 {
 	AppStorage internal s;
 
-	// event PetOperatorApprovalForAll(
-	// 	address indexed _owner,
-	// 	address indexed _operator,
-	// 	bool _approved
-	// );
+	function setContractURI(string memory newContractURI) public {
+		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+		s.contractURI = newContractURI;
+	}
+
+	function contractURI() public view returns (string memory) {
+		return
+			string(
+				abi.encodePacked(
+					'data:application/json;base64,',
+					Base64.encode(bytes(s.contractURI))
+				)
+			);
+	}
 
 	function DEFAULT_ADMIN_ROLE() public view returns (bytes32) {
 		return s.DEFAULT_ADMIN_ROLE;

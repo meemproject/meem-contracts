@@ -43,4 +43,17 @@ contract MeemFacet {
 
 		s.tokenCounter += 1;
 	}
+
+	function setNonOnwerSplitAllocationAmount(uint256 amount) public {
+		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+		if (amount < 0 || amount > 10000) {
+			revert('Amount must be between 0 - 10000 basis points');
+		}
+
+		s.nonOwnerSplitAllocationAmount = amount;
+	}
+
+	function nonOwnerSplitAllocationAmount() public view returns (uint256) {
+		return s.nonOwnerSplitAllocationAmount;
+	}
 }
