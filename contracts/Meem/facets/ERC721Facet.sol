@@ -146,7 +146,7 @@ contract ERC721Facet is IERC721 {
 		override
 		returns (address approved_)
 	{
-		require(_tokenId < s.tokenIds.length, 'ERC721: tokenId is invalid');
+		require(_tokenId < s.tokenCounter, 'ERC721: tokenId is invalid');
 		approved_ = s.approved[_tokenId];
 	}
 

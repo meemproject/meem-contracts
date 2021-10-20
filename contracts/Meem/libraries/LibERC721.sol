@@ -38,7 +38,8 @@ library LibERC721 {
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() internal view returns (uint256 totalSupply_) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		totalSupply_ = s.tokenIds.length;
+		// totalSupply_ = s.tokenIds.length;
+		totalSupply_ = s.tokenCounter;
 	}
 
 	/**
@@ -64,8 +65,9 @@ library LibERC721 {
 		returns (uint256 tokenId_)
 	{
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		require(_index < s.tokenIds.length, 'ERC721: index beyond supply');
-		tokenId_ = s.tokenIds[_index];
+		require(_index < s.tokenCounter, 'ERC721: index beyond supply');
+		// tokenId_ = s.tokenIds[_index];
+		tokenId_ = _index;
 	}
 
 	/// @notice Enumerate NFTs assigned to an owner
@@ -557,7 +559,17 @@ library LibERC721 {
 		address from,
 		address to,
 		uint256 tokenId
-	) internal {}
+	) internal view {
+		AppStorage storage s = LibAppStorage.diamondStorage();
+
+		require(
+			s.meems[tokenId].parent == address(this) ||
+				s.meems[tokenId].parent == address(0),
+			'Only Meem copies or original works may be transferred'
+		);
+
+		require(from != to, 'Token can not be transferred to self');
+	}
 
 	function _msgSender() internal view returns (address) {
 		return msg.sender;

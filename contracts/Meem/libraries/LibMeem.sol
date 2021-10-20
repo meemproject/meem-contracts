@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
-import './ERC721TradableUpgradeable.sol';
 import './MeemStandard.sol';
 import './MeemPropsLibrary.sol';
 import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
@@ -20,7 +19,7 @@ library LibMeem {
 		PermissionType permissionType,
 		MeemPermission memory permission
 	) internal {
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.addPermission(permissionType, permission);
 	}
@@ -31,7 +30,7 @@ library LibMeem {
 		PermissionType permissionType,
 		uint256 idx
 	) internal {
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.removePermissionAt(permissionType, idx);
 	}
@@ -43,7 +42,7 @@ library LibMeem {
 		uint256 idx,
 		MeemPermission memory permission
 	) internal {
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.updatePermissionAt(permissionType, idx, permission);
 	}
@@ -54,7 +53,7 @@ library LibMeem {
 		Split memory split
 	) internal {
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.addSplit(
 			ownerOf(tokenId),
@@ -68,7 +67,7 @@ library LibMeem {
 		PropertyType propertyType,
 		uint256 idx
 	) internal {
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.removeSplitAt(idx);
 	}
@@ -80,7 +79,7 @@ library LibMeem {
 		Split memory split
 	) internal {
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		ownsToken(tokenId);
+		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		props.updateSplitAt(
 			ownerOf(tokenId),
@@ -119,7 +118,7 @@ library LibMeem {
 		props.validateSplits(ownerOf(tokenId), s.nonOwnerSplitAllocationAmount);
 	}
 
-	function ownsToken(uint256 tokenId) internal view {
+	function requireOwnsToken(uint256 tokenId) internal view {
 		// require(
 		// 	ownerOf(tokenId) == msg.sender ||
 		// 		hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
@@ -131,7 +130,7 @@ library LibMeem {
 	function ownerOf(uint256 _tokenId) internal view returns (address owner_) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
 		owner_ = s.meems[_tokenId].owner;
-		require(owner_ != address(0), 'MeemFacet: invalid _tokenId');
+		require(owner_ != address(0), 'LibMeem: invalid _tokenId');
 	}
 
 	function transfer(

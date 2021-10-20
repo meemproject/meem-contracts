@@ -32,6 +32,7 @@ contract InitDiamond {
 		s.symbol = _args.symbol;
 		s.copyDepth = _args.copyDepth;
 		s.nonOwnerSplitAllocationAmount = _args.nonOwnerSplitAllocationAmount;
+		s.tokenCounter = 0;
 		s.PAUSER_ROLE = keccak256('PAUSER_ROLE');
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
 		s.UPGRADER_ROLE = keccak256('UPGRADER_ROLE');

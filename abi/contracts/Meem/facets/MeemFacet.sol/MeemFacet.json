@@ -2,6 +2,128 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum Permission",
+            "name": "permission",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address[]",
+            "name": "addresses",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numTokens",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "lockedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct MeemPermission",
+        "name": "permission",
+        "type": "tuple"
+      }
+    ],
+    "name": "addPermission",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "toAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "lockedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Split",
+        "name": "split",
+        "type": "tuple"
+      }
+    ],
+    "name": "addSplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "childrenOf",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "lockTotalCopies",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "to",
         "type": "address"
@@ -329,11 +451,212 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "numChildrenOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "idx",
+        "type": "uint256"
+      }
+    ],
+    "name": "removePermissionAt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "idx",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeSplitAt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
     ],
     "name": "setNonOnwerSplitAllocationAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenCounter",
+        "type": "uint256"
+      }
+    ],
+    "name": "setTokenCounter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newTotalCopies",
+        "type": "uint256"
+      }
+    ],
+    "name": "setTotalCopies",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "idx",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum Permission",
+            "name": "permission",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address[]",
+            "name": "addresses",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numTokens",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "lockedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct MeemPermission",
+        "name": "permission",
+        "type": "tuple"
+      }
+    ],
+    "name": "updatePermissionAt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "idx",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "toAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "lockedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Split",
+        "name": "split",
+        "type": "tuple"
+      }
+    ],
+    "name": "updateSplitAt",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
