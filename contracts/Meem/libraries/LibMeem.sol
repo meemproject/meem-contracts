@@ -176,8 +176,10 @@ library LibMeem {
 			props.splits.push(mProperties.splits[i]);
 		}
 
-		props.totalCopies = mProperties.totalCopies;
-		props.totalCopiesLockedBy = mProperties.totalCopiesLockedBy;
+		props.totalChildren = mProperties.totalChildren;
+		props.totalChildrenLockedBy = mProperties.totalChildrenLockedBy;
+		props.childrenPerWallet = mProperties.childrenPerWallet;
+		props.childrenPerWalletLockedBy = mProperties.childrenPerWalletLockedBy;
 		props.copyPermissionsLockedBy = mProperties.copyPermissionsLockedBy;
 		props.remixPermissionsLockedBy = mProperties.remixPermissionsLockedBy;
 		props.readPermissionsLockedBy = mProperties.readPermissionsLockedBy;

@@ -1,5 +1,36 @@
 [
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "uint96",
+            "name": "value",
+            "type": "uint96"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct LibPart.Part[]",
+        "name": "royalties",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "RoyaltiesSet",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -116,7 +147,51 @@
         "type": "uint256"
       }
     ],
-    "name": "lockTotalCopies",
+    "name": "getRaribleV2Royalties",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address payable",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "uint96",
+            "name": "value",
+            "type": "uint96"
+          }
+        ],
+        "internalType": "struct LibPart.Part[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "lockChildrenPerWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "lockTotalChildren",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -151,6 +226,26 @@
       {
         "components": [
           {
+            "internalType": "uint256",
+            "name": "totalChildren",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalChildrenLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "childrenPerWallet",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "childrenPerWalletLockedBy",
+            "type": "address"
+          },
+          {
             "components": [
               {
                 "internalType": "enum Permission",
@@ -271,16 +366,6 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "totalCopies",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "totalCopiesLockedBy",
             "type": "address"
           }
         ],
@@ -291,6 +376,26 @@
       {
         "components": [
           {
+            "internalType": "uint256",
+            "name": "totalChildren",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalChildrenLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "childrenPerWallet",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "childrenPerWalletLockedBy",
+            "type": "address"
+          },
+          {
             "components": [
               {
                 "internalType": "enum Permission",
@@ -411,16 +516,6 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "totalCopies",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "totalCopiesLockedBy",
             "type": "address"
           }
         ],
@@ -521,11 +616,29 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newTotalChildren",
+        "type": "uint256"
+      }
+    ],
+    "name": "setChildrenPerWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "setNonOnwerSplitAllocationAmount",
+    "name": "setNonOwnerSplitAllocationAmount",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -552,11 +665,11 @@
       },
       {
         "internalType": "uint256",
-        "name": "newTotalCopies",
+        "name": "newTotalChildren",
         "type": "uint256"
       }
     ],
-    "name": "setTotalCopies",
+    "name": "setTotalChildren",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

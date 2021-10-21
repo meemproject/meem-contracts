@@ -38,6 +38,10 @@ struct MeemPermission {
 }
 
 struct MeemProperties {
+	uint256 totalChildren;
+	address totalChildrenLockedBy;
+	uint256 childrenPerWallet;
+	address childrenPerWalletLockedBy;
 	MeemPermission[] copyPermissions;
 	MeemPermission[] remixPermissions;
 	MeemPermission[] readPermissions;
@@ -46,8 +50,6 @@ struct MeemProperties {
 	address readPermissionsLockedBy;
 	Split[] splits;
 	address splitsLockedBy;
-	uint256 totalCopies;
-	address totalCopiesLockedBy;
 }
 
 struct Meem {
@@ -94,9 +96,60 @@ interface MeemStandard {
 
 	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
-	function setTotalCopies(uint256 tokenId, uint256 newTotalCopies) external;
+	function setTotalChildren(uint256 tokenId, uint256 newTotalChildren)
+		external;
 
-	function lockTotalCopies(uint256 tokenId) external;
+	function lockTotalChildren(uint256 tokenId) external;
+
+	function setChildrenPerWallet(uint256 tokenId, uint256 newChildrenPerWallet)
+		external;
+
+	function lockChildrenPerWallet(uint256 tokenId) external;
+
+	function setNonOwnerSplitAllocationAmount(uint256 amount) external;
+
+	function nonOwnerSplitAllocationAmount() external view returns (uint256);
+
+	function addPermission(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission memory permission
+	) external;
+
+	function removePermissionAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		uint256 idx
+	) external;
+
+	function updatePermissionAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		uint256 idx,
+		MeemPermission memory permission
+	) external;
+
+	function addSplit(
+		uint256 tokenId,
+		PropertyType propertyType,
+		Split memory split
+	) external;
+
+	function removeSplitAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		uint256 idx
+	) external;
+
+	function updateSplitAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		uint256 idx,
+		Split memory split
+	) external;
 
 	// function addPermission(
 	// 	uint256 tokenId,

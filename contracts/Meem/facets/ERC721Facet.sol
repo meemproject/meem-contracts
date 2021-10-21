@@ -359,13 +359,11 @@ contract ERC721Facet is
 	///  Metadata JSON Schema".
 	function tokenURI(uint256 tokenId)
 		public
-		pure
+		view
 		override
 		returns (string memory)
 	{
-		// return s.tokenURIs[_tokenId];
-		return
-			'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json';
+		return s.tokenURIs[tokenId];
 	}
 
 	function isApprovedForAll(address owner, address operator)
@@ -382,7 +380,6 @@ contract ERC721Facet is
 		}
 
 		return false;
-		// return super.isApprovedForAll(owner, operator);
 	}
 
 	function supportsInterface(bytes4 interfaceId)

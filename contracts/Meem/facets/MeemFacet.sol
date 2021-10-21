@@ -7,9 +7,20 @@ import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split} from '../interfaces/MeemStandard.sol';
+import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
+import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
+import {LibPart} from '../../royalties/LibPart.sol';
+import {MeemStandard} from '../interfaces/MeemStandard.sol';
 
-contract MeemFacet {
+contract MeemFacet is RoyaltiesV2, MeemStandard {
 	AppStorage internal s;
+
+	function getRaribleV2Royalties(uint256 tokenId)
+		public
+		view
+		override
+		returns (LibPart.Part[] memory)
+	{}
 
 	/** Mint a Meem */
 	function mint(
@@ -20,7 +31,7 @@ contract MeemFacet {
 		uint256 parentTokenId,
 		MeemProperties memory mProperties,
 		MeemProperties memory mChildProperties
-	) public {
+	) public override {
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
@@ -45,7 +56,7 @@ contract MeemFacet {
 		s.tokenCounter += 1;
 	}
 
-	function setNonOnwerSplitAllocationAmount(uint256 amount) public {
+	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		if (amount < 0 || amount > 10000) {
 			revert('Amount must be between 0 - 10000 basis points');
@@ -54,47 +65,91 @@ contract MeemFacet {
 		s.nonOwnerSplitAllocationAmount = amount;
 	}
 
-	function nonOwnerSplitAllocationAmount() public view returns (uint256) {
+	function nonOwnerSplitAllocationAmount()
+		public
+		view
+		override
+		returns (uint256)
+	{
 		return s.nonOwnerSplitAllocationAmount;
 	}
 
 	function childrenOf(uint256 tokenId)
 		public
 		view
+		override
 		returns (uint256[] memory)
 	{
 		return s.children[tokenId];
 	}
 
-	function numChildrenOf(uint256 tokenId) public view returns (uint256) {
+	function numChildrenOf(uint256 tokenId)
+		public
+		view
+		override
+		returns (uint256)
+	{
 		return s.children[tokenId].length;
 	}
 
-	function setTotalCopies(uint256 tokenId, uint256 newTotalCopies) public {
+	function setTotalChildren(uint256 tokenId, uint256 newTotalChildren)
+		public
+		override
+	{
 		LibMeem.requireOwnsToken(tokenId);
 
 		require(
-			newTotalCopies <= numChildrenOf(tokenId),
+			newTotalChildren <= numChildrenOf(tokenId),
 			'Total copies can not be less than the the existing number of copies'
 		);
 
 		require(
-			s.meems[tokenId].properties.totalCopiesLockedBy == address(0),
-			'Total Copies is locked'
+			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
+			'Total Children is locked'
 		);
 
-		s.meems[tokenId].properties.totalCopies = newTotalCopies;
+		s.meems[tokenId].properties.totalChildren = newTotalChildren;
 	}
 
-	function lockTotalCopies(uint256 tokenId) public {
+	function lockTotalChildren(uint256 tokenId) public override {
 		LibMeem.requireOwnsToken(tokenId);
 
 		require(
-			s.meems[tokenId].properties.totalCopiesLockedBy == address(0),
-			'Total Copies is already locked'
+			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
+			'Total Children is already locked'
 		);
 
-		s.meems[tokenId].properties.totalCopiesLockedBy = msg.sender;
+		s.meems[tokenId].properties.totalChildrenLockedBy = msg.sender;
+	}
+
+	function setChildrenPerWallet(uint256 tokenId, uint256 newTotalChildren)
+		public
+		override
+	{
+		LibMeem.requireOwnsToken(tokenId);
+
+		require(
+			newTotalChildren <= numChildrenOf(tokenId),
+			'Total children can not be less than the the existing number of copies'
+		);
+
+		require(
+			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
+			'Total Children is locked'
+		);
+
+		s.meems[tokenId].properties.childrenPerWallet = newTotalChildren;
+	}
+
+	function lockChildrenPerWallet(uint256 tokenId) public override {
+		LibMeem.requireOwnsToken(tokenId);
+
+		require(
+			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
+			'Children per wallet is already locked'
+		);
+
+		s.meems[tokenId].properties.childrenPerWalletLockedBy = msg.sender;
 	}
 
 	function addPermission(
@@ -102,7 +157,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		MeemPermission memory permission
-	) public {
+	) public override {
 		LibMeem.addPermission(
 			tokenId,
 			propertyType,
@@ -116,7 +171,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		uint256 idx
-	) public {
+	) public override {
 		LibMeem.removePermissionAt(tokenId, propertyType, permissionType, idx);
 	}
 
@@ -126,7 +181,7 @@ contract MeemFacet {
 		PermissionType permissionType,
 		uint256 idx,
 		MeemPermission memory permission
-	) public {
+	) public override {
 		LibMeem.updatePermissionAt(
 			tokenId,
 			propertyType,
@@ -140,7 +195,7 @@ contract MeemFacet {
 		uint256 tokenId,
 		PropertyType propertyType,
 		Split memory split
-	) public {
+	) public override {
 		LibMeem.addSplit(tokenId, propertyType, split);
 	}
 
@@ -148,7 +203,7 @@ contract MeemFacet {
 		uint256 tokenId,
 		PropertyType propertyType,
 		uint256 idx
-	) public {
+	) public override {
 		LibMeem.removeSplitAt(tokenId, propertyType, idx);
 	}
 
@@ -157,7 +212,7 @@ contract MeemFacet {
 		PropertyType propertyType,
 		uint256 idx,
 		Split memory split
-	) public {
+	) public override {
 		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 
