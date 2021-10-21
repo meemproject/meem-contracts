@@ -321,4 +321,70 @@ library LibMeem {
 		s.ownerTokenIds[_to].push(_tokenId);
 		emit LibERC721.Transfer(_from, _to, _tokenId);
 	}
+
+	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
+		internal
+	{
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		requireOwnsToken(tokenId);
+
+		if (newTotalChildren > -1) {
+			require(
+				uint256(newTotalChildren) <= s.children[tokenId].length,
+				'Total copies can not be less than the the existing number of copies'
+			);
+		}
+
+		require(
+			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
+			'Total Children is locked'
+		);
+
+		s.meems[tokenId].properties.totalChildren = newTotalChildren;
+	}
+
+	function lockTotalChildren(uint256 tokenId) internal {
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		requireOwnsToken(tokenId);
+
+		require(
+			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
+			'Total Children is already locked'
+		);
+
+		s.meems[tokenId].properties.totalChildrenLockedBy = msg.sender;
+	}
+
+	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
+		internal
+	{
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		requireOwnsToken(tokenId);
+
+		if (newTotalChildren > -1) {
+			require(
+				uint256(newTotalChildren) <= s.children[tokenId].length,
+				'Total children can not be less than the the existing number of copies'
+			);
+		}
+
+		require(
+			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
+			'Total Children is locked'
+		);
+
+		s.meems[tokenId].properties.childrenPerWallet = newTotalChildren;
+	}
+
+	function lockChildrenPerWallet(uint256 tokenId) internal {
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		requireOwnsToken(tokenId);
+
+		require(
+			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
+			'Children per wallet is already locked'
+		);
+
+		s.meems[tokenId].properties.childrenPerWalletLockedBy = msg.sender;
+	}
 }

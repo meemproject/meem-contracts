@@ -224,11 +224,21 @@
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "root",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rootTokenId",
+        "type": "uint256"
+      },
+      {
         "components": [
           {
-            "internalType": "uint256",
+            "internalType": "int256",
             "name": "totalChildren",
-            "type": "uint256"
+            "type": "int256"
           },
           {
             "internalType": "address",
@@ -236,9 +246,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "int256",
             "name": "childrenPerWallet",
-            "type": "uint256"
+            "type": "int256"
           },
           {
             "internalType": "address",
@@ -376,9 +386,9 @@
       {
         "components": [
           {
-            "internalType": "uint256",
+            "internalType": "int256",
             "name": "totalChildren",
-            "type": "uint256"
+            "type": "int256"
           },
           {
             "internalType": "address",
@@ -386,9 +396,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
+            "internalType": "int256",
             "name": "childrenPerWallet",
-            "type": "uint256"
+            "type": "int256"
           },
           {
             "internalType": "address",
@@ -620,9 +630,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "newTotalChildren",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "name": "setChildrenPerWallet",
@@ -664,9 +674,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "newTotalChildren",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "name": "setTotalChildren",

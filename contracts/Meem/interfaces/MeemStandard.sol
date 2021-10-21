@@ -38,9 +38,9 @@ struct MeemPermission {
 }
 
 struct MeemProperties {
-	uint256 totalChildren;
+	int256 totalChildren;
 	address totalChildrenLockedBy;
-	uint256 childrenPerWallet;
+	int256 childrenPerWallet;
 	address childrenPerWalletLockedBy;
 	MeemPermission[] copyPermissions;
 	MeemPermission[] remixPermissions;
@@ -57,24 +57,21 @@ struct Meem {
 	Chain chain;
 	address parent;
 	uint256 parentTokenId;
+	address root;
+	uint256 rootTokenId;
 	MeemProperties properties;
 	MeemProperties childProperties;
-	uint256 totalSupply;
 }
 
-// mapping(uint256 => Chain) chain;
-// mapping(uint256 => address) parent;
-// mapping(uint256 => uint256) parentTokenId;
-// mapping(uint256 => MeemProperties) properties;
-// mapping(uint256 => MeemProperties) childProperties;
-
-interface MeemStandard {
+interface IMeemStandard {
 	function mint(
 		address to,
 		string memory mTokenURI,
 		Chain chain,
 		address parent,
 		uint256 parentTokenId,
+		address root,
+		uint256 rootTokenId,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
 	) external;
@@ -96,12 +93,12 @@ interface MeemStandard {
 
 	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
-	function setTotalChildren(uint256 tokenId, uint256 newTotalChildren)
+	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
 		external;
 
 	function lockTotalChildren(uint256 tokenId) external;
 
-	function setChildrenPerWallet(uint256 tokenId, uint256 newChildrenPerWallet)
+	function setChildrenPerWallet(uint256 tokenId, int256 newChildrenPerWallet)
 		external;
 
 	function lockChildrenPerWallet(uint256 tokenId) external;

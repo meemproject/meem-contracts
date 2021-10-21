@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
+import {LibDiamond} from '../libraries/LibDiamond.sol';
 import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
@@ -382,19 +383,28 @@ contract ERC721Facet is
 		return false;
 	}
 
-	function supportsInterface(bytes4 interfaceId)
-		public
+	// function supportsInterface(bytes4 interfaceId)
+	// 	public
+	// 	view
+	// 	virtual
+	// 	override
+	// 	returns (bool)
+	// {
+	// 	return
+	// 		interfaceId == type(IERC165).interfaceId ||
+	// 		interfaceId == type(IERC173).interfaceId ||
+	// 		interfaceId == type(IERC721).interfaceId ||
+	// 		interfaceId == type(IERC721Metadata).interfaceId ||
+	// 		interfaceId == type(IERC721Receiver).interfaceId ||
+	// 		interfaceId == type(IERC721Enumerable).interfaceId;
+	// }
+	function supportsInterface(bytes4 _interfaceId)
+		external
 		view
-		virtual
 		override
 		returns (bool)
 	{
-		return
-			interfaceId == type(IERC165).interfaceId ||
-			interfaceId == type(IERC173).interfaceId ||
-			interfaceId == type(IERC721).interfaceId ||
-			interfaceId == type(IERC721Metadata).interfaceId ||
-			interfaceId == type(IERC721Receiver).interfaceId ||
-			interfaceId == type(IERC721Enumerable).interfaceId;
+		LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+		return ds.supportedInterfaces[_interfaceId];
 	}
 }

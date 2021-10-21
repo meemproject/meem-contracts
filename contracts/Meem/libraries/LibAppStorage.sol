@@ -46,6 +46,8 @@ struct AppStorage {
 	mapping(uint256 => string) tokenURIs;
 	/** Mapping of token to all children */
 	mapping(uint256 => uint256[]) children;
+	/** Mapping of token to all decendants */
+	mapping(uint256 => uint256[]) decendants;
 	/** Keeps track of assigned roles */
 	mapping(bytes32 => RoleData) roles;
 	/** Mapping from token ID to owner address */

@@ -8,6 +8,8 @@ import {IDiamondCut} from './interfaces/IDiamondCut.sol';
 import {IERC165} from './interfaces/IERC165.sol';
 import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
 import {IERC173} from './interfaces/IERC173.sol';
+import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
+import {IMeemStandard} from './interfaces/MeemStandard.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
@@ -41,6 +43,8 @@ contract InitDiamond {
 		ds.supportedInterfaces[type(IERC721Enumerable).interfaceId] = true;
 		ds.supportedInterfaces[type(IERC721Enumerable).interfaceId] = true;
 		ds.supportedInterfaces[type(ERC721URIStorage).interfaceId] = true;
+		ds.supportedInterfaces[type(IRoyaltiesProvider).interfaceId] = true;
+		ds.supportedInterfaces[type(IMeemStandard).interfaceId] = true;
 
 		s.proxyRegistryAddress = _args.proxyRegistryAddress;
 		s.name = _args.name;
