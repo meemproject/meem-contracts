@@ -24,7 +24,7 @@ contract InitDiamond {
 	struct Args {
 		string name;
 		string symbol;
-		uint256 copyDepth;
+		uint256 childDepth;
 		uint256 nonOwnerSplitAllocationAmount;
 		address proxyRegistryAddress;
 		string contractURI;
@@ -49,7 +49,7 @@ contract InitDiamond {
 		s.proxyRegistryAddress = _args.proxyRegistryAddress;
 		s.name = _args.name;
 		s.symbol = _args.symbol;
-		s.copyDepth = _args.copyDepth;
+		s.childDepth = _args.childDepth;
 		s.nonOwnerSplitAllocationAmount = _args.nonOwnerSplitAllocationAmount;
 		s.tokenCounter = 0;
 		s.PAUSER_ROLE = keccak256('PAUSER_ROLE');

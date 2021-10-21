@@ -41,7 +41,7 @@ struct AppStorage {
 	/** The contract URI. Used to describe this NFT collection */
 	string contractURI;
 	/** The depth allowed for minting of children. If 0, no child copies are allowed. */
-	uint256 copyDepth;
+	uint256 childDepth;
 	/** Mapping of token => URIs for each token */
 	mapping(uint256 => string) tokenURIs;
 	/** Mapping of token to all children */

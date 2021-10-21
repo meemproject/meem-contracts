@@ -20,22 +20,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		override
 		returns (LibPart.Part[] memory)
 	{
-		uint256 numSplits = s.meems[tokenId].properties.splits.length;
-		LibPart.Part[] memory parts = new LibPart.Part[](numSplits);
-		for (
-			uint256 i = 0;
-			i < s.meems[tokenId].properties.splits.length;
-			i++
-		) {
-			parts[i] = LibPart.Part({
-				account: payable(
-					s.meems[tokenId].properties.splits[i].toAddress
-				),
-				value: uint96(s.meems[tokenId].properties.splits[i].amount)
-			});
-		}
-
-		return parts;
+		return LibMeem.getRaribleV2Royalties(tokenId);
 	}
 
 	/** Mint a Meem */
@@ -220,5 +205,14 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	function setTokenCounter(uint256 tokenCounter) public {
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		s.tokenCounter = tokenCounter;
+	}
+
+	function childDepth() public view override returns (uint256) {
+		return s.childDepth;
+	}
+
+	function setChildDepth(uint256 newChildDepth) public override {
+		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+		s.childDepth = newChildDepth;
 	}
 }

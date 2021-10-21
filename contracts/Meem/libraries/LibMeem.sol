@@ -8,8 +8,55 @@ import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol'
 import '../interfaces/MeemStandard.sol';
 import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
+import {LibPart} from '../../royalties/LibPart.sol';
 
 library LibMeem {
+	// Rarible royalties event
+	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
+
+	// MeemStandard events
+	event PermissionsSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission[] permission
+	);
+	event SplitsSet(uint256 tokenId, Split[] splits);
+	event PropertiesSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		MeemProperties props
+	);
+	event TotalChildrenSet(uint256 tokenId, int256 newTotalChildren);
+	event TotalChildrenLocked(uint256 tokenId, address lockedBy);
+	event ChildrenPerWalletSet(uint256 tokenId, int256 newTotalChildren);
+	event ChildrenPerWalletLocked(uint256 tokenId, address lockedBy);
+
+	function getRaribleV2Royalties(uint256 tokenId)
+		internal
+		view
+		returns (LibPart.Part[] memory)
+	{
+		AppStorage storage s = LibAppStorage.diamondStorage();
+
+		uint256 numSplits = s.meems[tokenId].properties.splits.length;
+		LibPart.Part[] memory parts = new LibPart.Part[](numSplits);
+		for (
+			uint256 i = 0;
+			i < s.meems[tokenId].properties.splits.length;
+			i++
+		) {
+			parts[i] = LibPart.Part({
+				account: payable(
+					s.meems[tokenId].properties.splits[i].toAddress
+				),
+				value: uint96(s.meems[tokenId].properties.splits[i].amount)
+			});
+		}
+
+		return parts;
+	}
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -20,6 +67,8 @@ library LibMeem {
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		perms.push(permission);
+
+		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
 	}
 
 	function removePermissionAt(
@@ -48,6 +97,7 @@ library LibMeem {
 		}
 
 		delete perms[perms.length - 1];
+		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
 	}
 
 	function updatePermissionAt(
@@ -68,6 +118,7 @@ library LibMeem {
 		);
 
 		perms[idx] = permission;
+		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
 	}
 
 	function addSplit(
@@ -85,6 +136,8 @@ library LibMeem {
 			ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
+		emit SplitsSet(tokenId, props.splits);
+		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function removeSplitAt(
@@ -109,6 +162,8 @@ library LibMeem {
 		}
 
 		delete props.splits[props.splits.length - 1];
+		emit SplitsSet(tokenId, props.splits);
+		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function updateSplitAt(
@@ -132,6 +187,8 @@ library LibMeem {
 			ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
+		emit SplitsSet(tokenId, props.splits);
+		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function getProperties(uint256 tokenId, PropertyType propertyType)
@@ -190,6 +247,8 @@ library LibMeem {
 			ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
+
+		emit PropertiesSet(tokenId, propertyType, props);
 	}
 
 	function requireOwnsToken(uint256 tokenId) internal view {
@@ -341,6 +400,7 @@ library LibMeem {
 		);
 
 		s.meems[tokenId].properties.totalChildren = newTotalChildren;
+		emit TotalChildrenSet(tokenId, newTotalChildren);
 	}
 
 	function lockTotalChildren(uint256 tokenId) internal {
@@ -353,6 +413,7 @@ library LibMeem {
 		);
 
 		s.meems[tokenId].properties.totalChildrenLockedBy = msg.sender;
+		emit TotalChildrenLocked(tokenId, msg.sender);
 	}
 
 	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
@@ -374,6 +435,7 @@ library LibMeem {
 		);
 
 		s.meems[tokenId].properties.childrenPerWallet = newTotalChildren;
+		emit ChildrenPerWalletSet(tokenId, newTotalChildren);
 	}
 
 	function lockChildrenPerWallet(uint256 tokenId) internal {
@@ -386,5 +448,6 @@ library LibMeem {
 		);
 
 		s.meems[tokenId].properties.childrenPerWalletLockedBy = msg.sender;
+		emit ChildrenPerWalletLocked(tokenId, msg.sender);
 	}
 }

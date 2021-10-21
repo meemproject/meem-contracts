@@ -15,7 +15,7 @@
           },
           {
             "internalType": "uint256",
-            "name": "copyDepth",
+            "name": "childDepth",
             "type": "uint256"
           },
           {

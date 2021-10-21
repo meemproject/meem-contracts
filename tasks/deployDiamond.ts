@@ -107,7 +107,7 @@ export async function deployDiamond(options: {
 		{
 			name: 'Meem',
 			symbol: 'MEEM',
-			copyDepth: 1,
+			childDepth: 1,
 			nonOwnerSplitAllocationAmount: 1000,
 			proxyRegistryAddress,
 			contractURI:
