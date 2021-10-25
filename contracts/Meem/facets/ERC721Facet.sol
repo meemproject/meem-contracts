@@ -9,35 +9,10 @@ import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Base64} from '../libraries/Base64.sol';
-// import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-// import {ERC721} from '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-// import {IERC165} from '../interfaces/IERC165.sol';
-// import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
-// import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
-// import {ERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
-// import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
-// import {IERC721Receiver} from '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
-// import {IERC173} from '../interfaces/IERC173.sol';
 import {ERC721Tradable, ProxyRegistry} from '../../common/ERC721Tradable.sol';
 
 contract ERC721Facet is ERC721Tradable {
-	constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {
-		// _name = name_;
-		// _symbol = symbol_;
-	}
-
-	// function onERC721Received(
-	// 	address _operator,
-	// 	address _from,
-	// 	uint256 _tokenId,
-	// 	bytes calldata _data
-	// ) public override returns (bytes4) {}
-
-	function setContractURI(string memory newContractURI) public {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
-		s.contractURI = newContractURI;
-	}
+	constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {}
 
 	function contractURI() public view returns (string memory) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
@@ -48,26 +23,6 @@ contract ERC721Facet is ERC721Tradable {
 					Base64.encode(bytes(s.contractURI))
 				)
 			);
-	}
-
-	function DEFAULT_ADMIN_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.DEFAULT_ADMIN_ROLE;
-	}
-
-	function PAUSER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.PAUSER_ROLE;
-	}
-
-	function MINTER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.MINTER_ROLE;
-	}
-
-	function UPGRADER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.UPGRADER_ROLE;
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
@@ -90,22 +45,17 @@ contract ERC721Facet is ERC721Tradable {
 		return LibERC721.tokenByIndex(_index);
 	}
 
-	function ownerOf(uint256 tokenId)
-		public
-		view
-		override
-		returns (address owner)
-	{
+	function ownerOf(uint256 tokenId) public view override returns (address) {
 		return LibERC721.ownerOf(tokenId);
 	}
 
-	function balanceOf(address owner)
+	function balanceOf(address _owner)
 		public
 		view
 		override
 		returns (uint256 balance)
 	{
-		return LibERC721.balanceOf(owner);
+		return LibERC721.balanceOf(_owner);
 	}
 
 	/// @notice Enumerate NFTs assigned to an owner
@@ -122,17 +72,6 @@ contract ERC721Facet is ERC721Tradable {
 		returns (uint256 tokenId_)
 	{
 		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
-	}
-
-	/// @notice Get all the Ids of NFTs owned by an address
-	/// @param _owner The address to check for the NFTs
-	/// @return tokenIds_ an array of unsigned integers,each representing the tokenId of each NFT
-	function tokenIdsOfOwner(address _owner)
-		public
-		view
-		returns (uint256[] memory tokenIds_)
-	{
-		return LibERC721.tokenIdsOfOwner(_owner);
 	}
 
 	// @notice Transfers the ownership of multiple  NFTs from one address to another at once
@@ -205,12 +144,8 @@ contract ERC721Facet is ERC721Tradable {
 	}
 
 	function baseTokenURI() public pure override returns (string memory) {
-		return 'https://creatures-api.opensea.io/api/creature/';
+		return LibERC721.baseTokenURI();
 	}
-
-	// function contractURI() public pure returns (string memory) {
-	// 	return 'https://creatures-api.opensea.io/contract/opensea-creatures';
-	// }
 
 	/// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
 	/// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
@@ -226,7 +161,7 @@ contract ERC721Facet is ERC721Tradable {
 		return s.tokenURIs[tokenId];
 	}
 
-	function isApprovedForAll(address owner, address operator)
+	function isApprovedForAll(address _owner, address operator)
 		public
 		view
 		virtual
@@ -236,53 +171,38 @@ contract ERC721Facet is ERC721Tradable {
 		AppStorage storage s = LibAppStorage.diamondStorage();
 		// Whitelist OpenSea proxy contract for easy trading.
 		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
-		if (address(proxyRegistry.proxies(owner)) == operator) {
+		if (address(proxyRegistry.proxies(_owner)) == operator) {
 			return true;
 		}
 
 		return false;
 	}
 
-	// function supportsInterface(bytes4 interfaceId)
-	// 	public
-	// 	view
-	// 	virtual
-	// 	override
-	// 	returns (bool)
-	// {
-	// 	return
-	// 		interfaceId == type(IERC165).interfaceId ||
-	// 		interfaceId == type(IERC173).interfaceId ||
-	// 		interfaceId == type(IERC721).interfaceId ||
-	// 		interfaceId == type(IERC721Metadata).interfaceId ||
-	// 		interfaceId == type(IERC721Receiver).interfaceId ||
-	// 		interfaceId == type(IERC721Enumerable).interfaceId;
-	// }
-	// function supportsInterface(bytes4 _interfaceId)
-	// 	public
-	// 	view
-	// 	override(ERC721, ERC721Enumerable)
-	// 	returns (bool)
-	// {
-	// 	LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
-	// 	return ds.supportedInterfaces[_interfaceId];
-	// }
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal virtual override {
+		super._beforeTokenTransfer(from, to, tokenId);
 
-	// function supportsInterface(bytes4 interfaceId)
-	// 	public
-	// 	view
-	// 	virtual
-	// 	override(ERC721, ERC721Enumerable)
-	// 	returns (bool)
-	// {
-	// 	return super.supportsInterface(interfaceId);
-	// }
+		// if (from == address(0)) {
+		//     _addTokenToAllTokensEnumeration(tokenId);
+		// } else if (from != to) {
+		//     _removeTokenFromOwnerEnumeration(from, tokenId);
+		// }
+		// if (to == address(0)) {
+		//     _removeTokenFromAllTokensEnumeration(tokenId);
+		// } else if (to != from) {
+		//     _addTokenToOwnerEnumeration(to, tokenId);
+		// }
+	}
 
-	// function _beforeTokenTransfer(
-	// 	address from,
-	// 	address to,
-	// 	uint256 tokenId
-	// ) internal override(ERC721, ERC721Enumerable) {
-	// 	super._beforeTokenTransfer(from, to, tokenId);
-	// }
+	function transferOwnership(address _newOwner) public override {
+		LibDiamond.enforceIsContractOwner();
+		LibDiamond.setContractOwner(_newOwner);
+	}
+
+	function owner() public view override returns (address owner_) {
+		owner_ = LibDiamond.contractOwner();
+	}
 }

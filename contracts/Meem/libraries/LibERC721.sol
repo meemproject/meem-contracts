@@ -151,6 +151,10 @@ library LibERC721 {
 		return '';
 	}
 
+	function baseTokenURI() internal pure returns (string memory) {
+		return 'https://meem.wtf/tokens/';
+	}
+
 	/**
 	 * @dev See {IERC721-approve}.
 	 */

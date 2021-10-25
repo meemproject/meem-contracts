@@ -34,7 +34,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		uint256 rootTokenId,
 		MeemProperties memory mProperties,
 		MeemProperties memory mChildProperties
-	) public override {
+	) public override returns(uint tokenId_) {
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
@@ -62,6 +62,8 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		}
 
 		s.tokenCounter += 1;
+
+		return tokenId
 	}
 
 	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
@@ -186,6 +188,11 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 
+	function setContractURI(string memory newContractURI) public {
+		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+		s.contractURI = newContractURI;
+	}
+
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal
 		view
@@ -214,5 +221,16 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	function setChildDepth(uint256 newChildDepth) public override {
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		s.childDepth = newChildDepth;
+	}
+
+	/// @notice Get all the Ids of NFTs owned by an address
+	/// @param _owner The address to check for the NFTs
+	/// @return tokenIds_ an array of unsigned integers,each representing the tokenId of each NFT
+	function tokenIdsOfOwner(address _owner)
+		public
+		view
+		returns (uint256[] memory tokenIds_)
+	{
+		return LibERC721.tokenIdsOfOwner(_owner);
 	}
 }
