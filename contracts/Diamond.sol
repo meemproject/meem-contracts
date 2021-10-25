@@ -10,8 +10,9 @@ pragma solidity ^0.8.0;
 
 import {LibDiamond} from './Meem/libraries/LibDiamond.sol';
 import {IDiamondCut} from './Meem/interfaces/IDiamondCut.sol';
+import {ERC721Facet} from './Meem/facets/ERC721Facet.sol';
 
-contract Diamond {
+contract Diamond is ERC721Facet {
 	constructor(address _contractOwner, address _diamondCutFacet) payable {
 		LibDiamond.setContractOwner(_contractOwner);
 

@@ -53,9 +53,9 @@ export async function deployDiamond(options: {
 
 	const facets: Record<string, Contract> = {
 		DiamondLoupeFacet: {},
-		OwnershipFacet: {},
-		MeemFacet: {},
-		ERC721Facet: {}
+		// OwnershipFacet: {},
+		MeemFacet: {}
+		// ERC721Facet: {}
 	}
 
 	const cuts = []
