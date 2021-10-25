@@ -36,10 +36,11 @@ library LibERC721 {
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
-	function totalSupply() internal view returns (uint256 totalSupply_) {
+	function totalSupply() internal view returns (uint256) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
 		// totalSupply_ = s.tokenIds.length;
-		totalSupply_ = s.tokenCounter;
+		// totalSupply_ = s.tokenCounter;
+		return s.tokenCounter;
 	}
 
 	/**
@@ -107,7 +108,7 @@ library LibERC721 {
 	 */
 	function ownerOf(uint256 tokenId) internal view returns (address) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		address owner = s.owners[tokenId];
+		address owner = s.meems[tokenId].owner;
 		require(
 			owner != address(0),
 			'ERC721: owner query for nonexistent token'
@@ -286,7 +287,7 @@ library LibERC721 {
 	 */
 	function _exists(uint256 tokenId) internal view returns (bool) {
 		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.owners[tokenId] != address(0);
+		return s.meems[tokenId].owner != address(0);
 	}
 
 	/**
@@ -364,7 +365,7 @@ library LibERC721 {
 		// s.owners[tokenId] = to;
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
-		s.owners[tokenId] = to;
+		s.meems[tokenId].owner = to;
 
 		emit Transfer(address(0), to, tokenId);
 	}
@@ -390,7 +391,7 @@ library LibERC721 {
 
 		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
 		LibArray.removeAt(s.ownerTokenIds[owner], index);
-		delete s.owners[tokenId];
+		delete s.meems[tokenId];
 
 		emit Transfer(owner, address(0), tokenId);
 	}
@@ -426,7 +427,7 @@ library LibERC721 {
 		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
 		LibArray.removeAt(s.ownerTokenIds[from], index);
 		s.ownerTokenIds[to].push(tokenId);
-		s.owners[tokenId] = to;
+		s.meems[tokenId].owner = to;
 
 		emit Transfer(from, to, tokenId);
 	}

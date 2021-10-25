@@ -51,7 +51,7 @@ struct AppStorage {
 	/** Keeps track of assigned roles */
 	mapping(bytes32 => RoleData) roles;
 	/** Mapping from token ID to owner address */
-	mapping(uint256 => address) owners;
+	// mapping(uint256 => address) owners;
 	// Mapping owner address to token count
 	// mapping(address => uint256) balances;
 
