@@ -8,6 +8,7 @@ import { deployDiamond } from '../tasks'
 import {
 	DiamondCutFacet,
 	DiamondLoupeFacet,
+	Erc721Facet,
 	MeemFacet,
 	OwnershipFacet
 } from '../typechain'
@@ -18,37 +19,63 @@ chai.use(chaiAsPromised)
 
 describe('Meem', function Test() {
 	let meemFacet: MeemFacet
-	let diamondAddress
-	let diamondCutFacet: DiamondCutFacet
-	let diamondLoupeFacet: DiamondLoupeFacet
-	let ownershipFacet: OwnershipFacet
+	let erc721Facet: Erc721Facet
+	// let diamondAddress
+	// let diamondCutFacet: DiamondCutFacet
+	// let diamondLoupeFacet: DiamondLoupeFacet
+	// let ownershipFacet: OwnershipFacet
 	let signers: SignerWithAddress[]
 
 	beforeEach(async () => {
 		signers = await ethers.getSigners()
 		console.log({ signers })
-		diamondAddress = await deployDiamond({ ethers })
-		diamondCutFacet = (await ethers.getContractAt(
-			'DiamondCutFacet',
-			diamondAddress
-		)) as DiamondCutFacet
-		diamondLoupeFacet = (await ethers.getContractAt(
-			'DiamondLoupeFacet',
-			diamondAddress
-		)) as DiamondLoupeFacet
-		ownershipFacet = (await ethers.getContractAt(
-			'OwnershipFacet',
-			diamondAddress
-		)) as OwnershipFacet
+		const { Diamond: DiamondAddress } = await deployDiamond({ ethers })
+
+		// diamondCutFacet = (await ethers.getContractAt(
+		// 	'DiamondCutFacet',
+		// 	DiamondAddress
+		// )) as DiamondCutFacet
+		// diamondLoupeFacet = (await ethers.getContractAt(
+		// 	'DiamondLoupeFacet',
+		// 	DiamondAddress
+		// )) as DiamondLoupeFacet
+		// ownershipFacet = (await ethers.getContractAt(
+		// 	'OwnershipFacet',
+		// 	DiamondAddress
+		// )) as OwnershipFacet
 		meemFacet = (await ethers.getContractAt(
 			'MeemFacet',
-			diamondAddress
+			DiamondAddress
 		)) as MeemFacet
+		erc721Facet = (await ethers.getContractAt(
+			'ERC721Facet',
+			DiamondAddress
+		)) as Erc721Facet
 	})
 
-	it('Can do basic access', async () => {
-		const name = await meemFacet.name()
-		console.log({ name })
+	it('Can get nonOwnerSplitAllocationAmount', async () => {
+		const nonOwnerSplitAllocationAmount =
+			await meemFacet.nonOwnerSplitAllocationAmount()
+		assert.equal(nonOwnerSplitAllocationAmount.toNumber(), 1000)
+	})
+
+	it('Can get contractURI', async () => {
+		const contractURI = await erc721Facet.contractURI()
+		const json = JSON.parse(
+			Buffer.from(
+				contractURI.replace('data:application/json;base64,', ''),
+				'base64'
+			).toString('ascii')
+		)
+		assert.equal(json.name, 'Meem')
+		assert.isAbove(json.description.length, 1)
+		assert.isAbove(json.image.length, 1)
+		assert.isAbove(json.image.length, 1)
+		assert.equal(json.seller_fee_basis_points, 1000)
+		assert.equal(
+			json.fee_recipient,
+			'0x40c6BeE45d94063c5B05144489cd8A9879899592'
+		)
 		// const result = await (await meem.connect(signers[0])).name()
 		// console.log({ result })
 		// assert.isTrue(true)
