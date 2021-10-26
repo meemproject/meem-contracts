@@ -91,7 +91,7 @@ interface IMeemStandard {
 		uint256 rootTokenId,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external;
+	) external returns (uint256 tokenId_);
 
 	// TODO: Implement child minting
 	// function mintChild(

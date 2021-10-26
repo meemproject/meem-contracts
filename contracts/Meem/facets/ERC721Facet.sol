@@ -25,6 +25,10 @@ contract ERC721Facet is ERC721Tradable {
 			);
 	}
 
+	function contractAddress() public view returns (address) {
+		return address(this);
+	}
+
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() public view override returns (uint256 totalSupply_) {
@@ -106,33 +110,6 @@ contract ERC721Facet is ERC721Tradable {
 		}
 	}
 
-	function internalTransferFrom(
-		address _sender,
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
-		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
-		require(
-			_from == s.meems[_tokenId].owner,
-			'ERC721Facet: _from is not owner, transfer failed'
-		);
-		require(
-			_sender == _from ||
-				s.operators[_from][_sender] ||
-				_sender == s.approved[_tokenId],
-			'ERC721Facet: Not owner or approved to transfer'
-		);
-		LibMeem.transfer(_from, _to, _tokenId);
-		// LibERC721Marketplace.updateERC721Listing(
-		// 	address(this),
-		// 	_tokenId,
-		// 	_from
-		// );
-	}
-
 	///@notice Return the universal name of the NFT
 	function name() public view override returns (string memory) {
 		return LibERC721.name();
@@ -178,25 +155,6 @@ contract ERC721Facet is ERC721Tradable {
 		return false;
 	}
 
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal virtual override {
-		super._beforeTokenTransfer(from, to, tokenId);
-
-		// if (from == address(0)) {
-		//     _addTokenToAllTokensEnumeration(tokenId);
-		// } else if (from != to) {
-		//     _removeTokenFromOwnerEnumeration(from, tokenId);
-		// }
-		// if (to == address(0)) {
-		//     _removeTokenFromAllTokensEnumeration(tokenId);
-		// } else if (to != from) {
-		//     _addTokenToOwnerEnumeration(to, tokenId);
-		// }
-	}
-
 	function transferOwnership(address _newOwner) public override {
 		LibDiamond.enforceIsContractOwner();
 		LibDiamond.setContractOwner(_newOwner);
@@ -204,5 +162,73 @@ contract ERC721Facet is ERC721Tradable {
 
 	function owner() public view override returns (address owner_) {
 		owner_ = LibDiamond.contractOwner();
+	}
+
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal virtual override {}
+
+	function _transfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal override {
+		LibERC721._transfer(from, to, tokenId);
+	}
+
+	function internalTransferFrom(
+		address _sender,
+		address _from,
+		address _to,
+		uint256 _tokenId
+	) internal {
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
+		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
+		require(
+			_from == s.meems[_tokenId].owner,
+			'ERC721Facet: _from is not owner, transfer failed'
+		);
+		require(
+			_sender == _from ||
+				s.operators[_from][_sender] ||
+				_sender == s.approved[_tokenId],
+			'ERC721Facet: Not owner or approved to transfer'
+		);
+		LibMeem.transfer(_from, _to, _tokenId);
+		// LibERC721Marketplace.updateERC721Listing(
+		// 	address(this),
+		// 	_tokenId,
+		// 	_from
+		// );
+	}
+
+	function _exists(uint256 tokenId)
+		internal
+		view
+		virtual
+		override
+		returns (bool)
+	{
+		return LibERC721._exists(tokenId);
+	}
+
+	function _isApprovedOrOwner(address spender, uint256 tokenId)
+		internal
+		view
+		virtual
+		override
+		returns (bool)
+	{
+		require(
+			_exists(tokenId),
+			'ERC721: operator query for nonexistent token'
+		);
+		address _owner = ownerOf(tokenId);
+		return (spender == _owner ||
+			getApproved(tokenId) == spender ||
+			isApprovedForAll(_owner, spender));
 	}
 }

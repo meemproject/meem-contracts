@@ -1,4 +1,6 @@
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
+import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
+import { getImplementationAddress } from '@openzeppelin/upgrades-core'
 import { task } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import { FacetCutAction, getSelectors } from './lib/diamond'
@@ -12,10 +14,11 @@ interface Contract {
 
 export async function deployDiamond(options: {
 	ethers: HardhatEthersHelpers
+	upgrades: HardhatUpgrades
 	hardhatArguments?: HardhatArguments
 }) {
 	const deployedContracts: Record<string, string> = {}
-	const { ethers, hardhatArguments } = options
+	const { ethers, upgrades, hardhatArguments } = options
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
 	console.log('Deploying contracts with the account:', contractOwner.address)
@@ -31,13 +34,29 @@ export async function deployDiamond(options: {
 
 	// deploy Diamond
 	const Diamond = await ethers.getContractFactory('Diamond')
-	const diamond = await Diamond.deploy(
-		contractOwner.address,
-		diamondCutFacet.address
+	// const diamond = await Diamond.deploy(
+	// 	contractOwner.address,
+	// 	diamondCutFacet.address
+	// )
+	const diamond = await upgrades.deployProxy(
+		Diamond,
+		[contractOwner.address, diamondCutFacet.address],
+		{
+			kind: 'uups',
+			unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
+		}
 	)
 	await diamond.deployed()
-	console.log('Diamond deployed:', diamond.address)
-	deployedContracts.Diamond = diamond.address
+	const implementationAddress = await getImplementationAddress(
+		ethers.provider,
+		diamond.address
+	)
+	console.log('Diamond deployed:', {
+		proxy: diamond.address,
+		implementationAddress
+	})
+	deployedContracts.DiamondProxy = diamond.address
+	deployedContracts.DiamondImplementation = implementationAddress
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
@@ -131,8 +150,8 @@ export async function deployDiamond(options: {
 }
 
 task('deployDiamond', 'Deploys Meem').setAction(
-	async (args, { ethers, hardhatArguments }) => {
-		const result = await deployDiamond({ ethers, hardhatArguments })
+	async (args, { ethers, upgrades, hardhatArguments }) => {
+		const result = await deployDiamond({ ethers, upgrades, hardhatArguments })
 		return result
 	}
 )

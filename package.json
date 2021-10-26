@@ -13,7 +13,7 @@
 		"build:sol": "hardhat compile",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
-		"deploy": "hardhat deploy",
+		"deployProxy": "hardhat deployProxy",
 		"deployLib": "hardhat deployLib",
 		"deployDiamond": "hardhat deployDiamond",
 		"deployURI": "hardhat deployURI",

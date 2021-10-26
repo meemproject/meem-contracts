@@ -111,7 +111,7 @@ library LibERC721 {
 		address owner = s.meems[tokenId].owner;
 		require(
 			owner != address(0),
-			'ERC721: owner query for nonexistent token'
+			'LibERC721: owner query for nonexistent token'
 		);
 		return owner;
 	}
@@ -429,8 +429,10 @@ library LibERC721 {
 		_approve(address(0), tokenId);
 
 		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
+		// TODO: Remove token
 		LibArray.removeAt(s.ownerTokenIds[from], index);
 		s.ownerTokenIds[to].push(tokenId);
+		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
 		s.meems[tokenId].owner = to;
 
 		emit Transfer(from, to, tokenId);
@@ -570,7 +572,7 @@ library LibERC721 {
 		require(
 			s.meems[tokenId].parent == address(this) ||
 				s.meems[tokenId].parent == address(0),
-			'Only Meem copies or original works may be transferred'
+			'LibERC721: Only Meem copies or original works may be transferred'
 		);
 
 		require(from != to, 'Token can not be transferred to self');

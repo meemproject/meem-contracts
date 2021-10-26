@@ -191,6 +191,11 @@ library LibMeem {
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
+	function getMeem(uint256 tokenId) internal view returns (Meem storage) {
+		AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.meems[tokenId];
+	}
+
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal
 		view

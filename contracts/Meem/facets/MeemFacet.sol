@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
+pragma experimental ABIEncoderV2;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {AppStorage} from '../libraries/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemStandard} from '../interfaces/MeemStandard.sol';
+import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemStandard} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
@@ -34,7 +35,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		uint256 rootTokenId,
 		MeemProperties memory mProperties,
 		MeemProperties memory mChildProperties
-	) public override returns(uint tokenId_) {
+	) public override returns (uint256 tokenId_) {
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
@@ -63,7 +64,20 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 
 		s.tokenCounter += 1;
 
-		return tokenId
+		// require(
+		// 	LibERC721._checkOnERC721Received(
+		// 		address(0),
+		// 		to,
+		// 		tokenId
+		// 	),
+		// 	'ERC721: transfer to non ERC721Receiver implementer'
+		// );
+
+		// s.ownerTokenIds[to].push(tokenId);
+		// s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
+
+		emit LibERC721.Transfer(address(0), to, tokenId);
+		return tokenId;
 	}
 
 	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
@@ -193,6 +207,10 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		s.contractURI = newContractURI;
 	}
 
+	function getMeem(uint256 tokenId) public view returns (Meem memory) {
+		return LibMeem.getMeem(tokenId);
+	}
+
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal
 		view
@@ -232,5 +250,13 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		returns (uint256[] memory tokenIds_)
 	{
 		return LibERC721.tokenIdsOfOwner(_owner);
+	}
+
+	function tokenOfOwnerByIndex(address _owner, uint256 _index)
+		public
+		view
+		returns (uint256)
+	{
+		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
 	}
 }

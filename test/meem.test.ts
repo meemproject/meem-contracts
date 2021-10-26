@@ -1,17 +1,11 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers, waffle } from 'hardhat'
+import { ethers, waffle, upgrades } from 'hardhat'
 // import MeemArtifact from '../build/Meem.json'
 // import MeemPropsLibraryArtifact from '../build/MeemPropsLibrary.json'
 import { deployDiamond } from '../tasks'
-import {
-	DiamondCutFacet,
-	DiamondLoupeFacet,
-	Erc721Facet,
-	MeemFacet,
-	OwnershipFacet
-} from '../typechain'
+import { Erc721Facet, MeemFacet } from '../typechain'
 
 chai.use(chaiAsPromised)
 
@@ -20,35 +14,23 @@ chai.use(chaiAsPromised)
 describe('Meem', function Test() {
 	let meemFacet: MeemFacet
 	let erc721Facet: Erc721Facet
-	// let diamondAddress
-	// let diamondCutFacet: DiamondCutFacet
-	// let diamondLoupeFacet: DiamondLoupeFacet
-	// let ownershipFacet: OwnershipFacet
 	let signers: SignerWithAddress[]
 
 	beforeEach(async () => {
 		signers = await ethers.getSigners()
 		console.log({ signers })
-		const { Diamond: DiamondAddress } = await deployDiamond({ ethers })
+		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			ethers,
+			upgrades
+		})
 
-		// diamondCutFacet = (await ethers.getContractAt(
-		// 	'DiamondCutFacet',
-		// 	DiamondAddress
-		// )) as DiamondCutFacet
-		// diamondLoupeFacet = (await ethers.getContractAt(
-		// 	'DiamondLoupeFacet',
-		// 	DiamondAddress
-		// )) as DiamondLoupeFacet
-		// ownershipFacet = (await ethers.getContractAt(
-		// 	'OwnershipFacet',
-		// 	DiamondAddress
-		// )) as OwnershipFacet
 		meemFacet = (await ethers.getContractAt(
 			'MeemFacet',
 			DiamondAddress
 		)) as MeemFacet
 		erc721Facet = (await ethers.getContractAt(
-			'ERC721Facet',
+			// 'ERC721Facet',
+			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
 			DiamondAddress
 		)) as Erc721Facet
 	})
@@ -76,18 +58,108 @@ describe('Meem', function Test() {
 			json.fee_recipient,
 			'0x40c6BeE45d94063c5B05144489cd8A9879899592'
 		)
-		// const result = await (await meem.connect(signers[0])).name()
-		// console.log({ result })
-		// assert.isTrue(true)
-		// assert.equal(status, 1)
 	})
 
-	// it('Can mint as owner', async () => {
-	// 	const { status } = await (
-	// 		await meem.connect(signers[0]).mint(signers[0].address)
-	// 	).wait()
-	// 	assert.equal(status, 1)
-	// })
+	it('Can mint as owner', async () => {
+		const { status } = await (
+			await meemFacet.connect(signers[0]).mint(
+				'0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+				'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+				0,
+				'0x0000000000000000000000000000000000000000',
+				0,
+				'0x0000000000000000000000000000000000000000',
+				0,
+				{
+					copyPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					remixPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					readPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					copyPermissionsLockedBy: '0x0000000000000000000000000000000000000000',
+					remixPermissionsLockedBy:
+						'0x0000000000000000000000000000000000000000',
+					readPermissionsLockedBy: '0x0000000000000000000000000000000000000000',
+					splits: [
+						{
+							toAddress: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
+							amount: 1000,
+							lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+						}
+					],
+					splitsLockedBy: '0x0000000000000000000000000000000000000000',
+					childrenPerWallet: -1,
+					childrenPerWalletLockedBy:
+						'0x0000000000000000000000000000000000000000',
+					totalChildren: 99,
+					totalChildrenLockedBy: '0x0000000000000000000000000000000000000000'
+				},
+				{
+					copyPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					remixPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					readPermissions: [
+						{
+							permission: 1,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000'
+						}
+					],
+					copyPermissionsLockedBy: '0x0000000000000000000000000000000000000000',
+					remixPermissionsLockedBy:
+						'0x0000000000000000000000000000000000000000',
+					readPermissionsLockedBy: '0x0000000000000000000000000000000000000000',
+					splits: [
+						{
+							toAddress: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
+							amount: 1000,
+							lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+						}
+					],
+					splitsLockedBy: '0x0000000000000000000000000000000000000000',
+					childrenPerWallet: -1,
+					childrenPerWalletLockedBy:
+						'0x0000000000000000000000000000000000000000',
+					totalChildren: 99,
+					totalChildrenLockedBy: '0x0000000000000000000000000000000000000000'
+				}
+			)
+		).wait()
+		assert.equal(status, 1)
+	})
 
 	// it('Can not mint as non-owner', async () => {
 	// 	const isMinter = await meemVite.hasRole(

@@ -9,7 +9,8 @@
 				"${workspaceRoot}/node_modules/.bin/hardhat",
 				"test",
 				"--network",
-				"hardhat"
+				"hardhat",
+				"${relativeFile}"
 			],
 			"runtimeExecutable": "${env:NVM_BIN}/node",
 			"console": "integratedTerminal",
