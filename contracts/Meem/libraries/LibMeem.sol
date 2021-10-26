@@ -6,7 +6,7 @@ import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 import '../interfaces/MeemStandard.sol';
-import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
@@ -37,7 +37,7 @@ library LibMeem {
 		view
 		returns (LibPart.Part[] memory)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		uint256 numSplits = s.meems[tokenId].properties.splits.length;
 		LibPart.Part[] memory parts = new LibPart.Part[](numSplits);
@@ -126,7 +126,7 @@ library LibMeem {
 		PropertyType propertyType,
 		Split memory split
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		require(props.splitsLockedBy == address(0), 'Splits are locked');
@@ -172,7 +172,7 @@ library LibMeem {
 		uint256 idx,
 		Split memory split
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		require(props.splitsLockedBy == address(0), 'Splits are locked');
@@ -192,7 +192,7 @@ library LibMeem {
 	}
 
 	function getMeem(uint256 tokenId) internal view returns (Meem storage) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.meems[tokenId];
 	}
 
@@ -201,7 +201,7 @@ library LibMeem {
 		view
 		returns (MeemProperties storage)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (propertyType == PropertyType.Meem) {
 			// return _properties[tokenId];
@@ -219,7 +219,7 @@ library LibMeem {
 		PropertyType propertyType,
 		MeemProperties memory mProperties
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
 		for (uint256 i = 0; i < mProperties.copyPermissions.length; i++) {
@@ -288,7 +288,7 @@ library LibMeem {
 	}
 
 	function ownerOf(uint256 _tokenId) internal view returns (address owner_) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		owner_ = s.meems[_tokenId].owner;
 		require(owner_ != address(0), 'LibMeem: invalid _tokenId');
 	}
@@ -363,7 +363,7 @@ library LibMeem {
 		address _to,
 		uint256 _tokenId
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		// remove
 		uint256 index = s.ownerTokenIdIndexes[_from][_tokenId];
@@ -389,7 +389,7 @@ library LibMeem {
 	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
 		internal
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 
 		if (newTotalChildren > -1) {
@@ -409,7 +409,7 @@ library LibMeem {
 	}
 
 	function lockTotalChildren(uint256 tokenId) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 
 		require(
@@ -424,7 +424,7 @@ library LibMeem {
 	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
 		internal
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 
 		if (newTotalChildren > -1) {
@@ -444,7 +444,7 @@ library LibMeem {
 	}
 
 	function lockChildrenPerWallet(uint256 tokenId) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
 
 		require(

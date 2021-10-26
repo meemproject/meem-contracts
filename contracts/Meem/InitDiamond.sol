@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import {AppStorage} from './libraries/LibAppStorage.sol';
+import {LibAppStorage} from './storage/LibAppStorage.sol';
 import {LibAccessControl} from './libraries/LibAccessControl.sol';
 import {LibDiamond} from './libraries/LibDiamond.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
@@ -19,8 +19,6 @@ import {ERC721URIStorage} from '@openzeppelin/contracts/token/ERC721/extensions/
 // import {ERC721Pausable} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol';
 
 contract InitDiamond {
-	AppStorage internal s;
-
 	struct Args {
 		string name;
 		string symbol;
@@ -46,6 +44,7 @@ contract InitDiamond {
 		ds.supportedInterfaces[type(IRoyaltiesProvider).interfaceId] = true;
 		ds.supportedInterfaces[type(IMeemStandard).interfaceId] = true;
 
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		s.proxyRegistryAddress = _args.proxyRegistryAddress;
 		s.name = _args.name;
 		s.symbol = _args.symbol;

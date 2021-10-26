@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibDiamond} from '../libraries/LibDiamond.sol';
-import {AppStorage, LibAppStorage} from '../libraries/LibAppStorage.sol';
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
@@ -12,10 +12,26 @@ import {Base64} from '../libraries/Base64.sol';
 import {ERC721Tradable, ProxyRegistry} from '../../common/ERC721Tradable.sol';
 
 contract ERC721Facet is ERC721Tradable {
-	constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {}
+	constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {
+		// _name = name_;
+		// _symbol = symbol_;
+	}
+
+	// function onERC721Received(
+	// 	address _operator,
+	// 	address _from,
+	// 	uint256 _tokenId,
+	// 	bytes calldata _data
+	// ) public override returns (bytes4) {}
+
+	function setContractURI(string memory newContractURI) public {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+		s.contractURI = newContractURI;
+	}
 
 	function contractURI() public view returns (string memory) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return
 			string(
 				abi.encodePacked(
@@ -134,7 +150,7 @@ contract ERC721Facet is ERC721Tradable {
 		override
 		returns (string memory)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.tokenURIs[tokenId];
 	}
 
@@ -145,7 +161,7 @@ contract ERC721Facet is ERC721Tradable {
 		override(ERC721Tradable)
 		returns (bool)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Whitelist OpenSea proxy contract for easy trading.
 		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
 		if (address(proxyRegistry.proxies(_owner)) == operator) {
@@ -184,7 +200,7 @@ contract ERC721Facet is ERC721Tradable {
 		address _to,
 		uint256 _tokenId
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
 		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
 		require(
