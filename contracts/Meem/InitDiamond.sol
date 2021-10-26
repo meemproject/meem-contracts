@@ -14,6 +14,8 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
 import {ERC721URIStorage} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
+import {ERC721MetadataStorage} from '../common/solidstate/token/ERC721/metadata/ERC721MetadataStorage.sol';
+import {OwnableStorage} from '../common/solidstate/access/OwnableStorage.sol';
 
 // import {ERC721Burnable} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
 // import {ERC721Pausable} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol';
@@ -46,9 +48,14 @@ contract InitDiamond {
 		ds.supportedInterfaces[type(IRoyaltiesProvider).interfaceId] = true;
 		ds.supportedInterfaces[type(IMeemStandard).interfaceId] = true;
 
+		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
+		l.name = _args.name;
+		l.symbol = _args.symbol;
+
+		OwnableStorage.Layout storage o = OwnableStorage.layout();
+		o.owner = msg.sender;
+
 		s.proxyRegistryAddress = _args.proxyRegistryAddress;
-		s.name = _args.name;
-		s.symbol = _args.symbol;
 		s.childDepth = _args.childDepth;
 		s.nonOwnerSplitAllocationAmount = _args.nonOwnerSplitAllocationAmount;
 		s.tokenCounter = 0;

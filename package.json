@@ -67,6 +67,7 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
+		"@solidstate/contracts": "^0.0.27",
 		"dotenv": "^10.0.0"
 	}
 }

@@ -4,7 +4,11 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+// import '@openzeppelin/contracts/access/Ownable.sol';
+// import {ERC721} from '../common/solidstate/token/ERC721/ERC721.sol';
+import {ERC721MetadataStorage} from '../common/solidstate/token/ERC721/metadata/ERC721MetadataStorage.sol';
+import {Ownable} from '../common/solidstate/access/Ownable.sol';
+import {ERC721Storage} from '../libraries/ERC721Storage.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 
@@ -29,16 +33,27 @@ abstract contract ERC721Tradable is
 {
 	using SafeMath for uint256;
 
-	address proxyRegistryAddress;
-	uint256 private _currentTokenId = 0;
+	// address proxyRegistryAddress;
+	// uint256 private _currentTokenId = 0;
 
 	constructor(
 		string memory _name,
 		string memory _symbol,
 		address _proxyRegistryAddress
 	) ERC721(_name, _symbol) {
-		proxyRegistryAddress = _proxyRegistryAddress;
+		ERC721Storage.Layout storage l = ERC721Storage.layout();
+		l.proxyRegistryAddress = _proxyRegistryAddress;
 		_initializeEIP712(_name);
+	}
+
+	function name() public view override returns (string memory) {
+		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
+		return l.name;
+	}
+
+	function symbol() public view override returns (string memory) {
+		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
+		return l.symbol;
 	}
 
 	function baseTokenURI() public pure virtual returns (string memory);
@@ -62,12 +77,14 @@ abstract contract ERC721Tradable is
 	function isApprovedForAll(address owner, address operator)
 		public
 		view
-		virtual
 		override
 		returns (bool)
 	{
 		// Whitelist OpenSea proxy contract for easy trading.
-		ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+		ERC721Storage.Layout storage l = ERC721Storage.layout();
+		ProxyRegistry proxyRegistry = ProxyRegistry(
+			address(l.proxyRegistryAddress)
+		);
 		if (address(proxyRegistry.proxies(owner)) == operator) {
 			return true;
 		}

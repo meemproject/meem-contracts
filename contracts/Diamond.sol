@@ -8,34 +8,13 @@ pragma solidity ^0.8.0;
 * Implementation of a diamond.
 /******************************************************************************/
 
-import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+// import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
 import {LibDiamond} from './Meem/libraries/LibDiamond.sol';
 import {IDiamondCut} from './Meem/interfaces/IDiamondCut.sol';
 import {ERC721Facet} from './Meem/facets/ERC721Facet.sol';
 
-contract Diamond is UUPSUpgradeable, ERC721Facet {
-	// constructor(address _contractOwner, address _diamondCutFacet) payable {
-	// 	LibDiamond.setContractOwner(_contractOwner);
-
-	// 	// Add the diamondCut external function from the diamondCutFacet
-	// 	IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
-	// 	bytes4[] memory functionSelectors = new bytes4[](1);
-	// 	functionSelectors[0] = IDiamondCut.diamondCut.selector;
-	// 	cut[0] = IDiamondCut.FacetCut({
-	// 		facetAddress: _diamondCutFacet,
-	// 		action: IDiamondCut.FacetCutAction.Add,
-	// 		functionSelectors: functionSelectors
-	// 	});
-	// 	LibDiamond.diamondCut(cut, address(0), '');
-	// }
-	// constructor
-
-	function initialize(address _contractOwner, address _diamondCutFacet)
-		public
-		initializer
-	{
-		__UUPSUpgradeable_init();
-
+contract Diamond is ERC721Facet {
+	constructor(address _contractOwner, address _diamondCutFacet) payable {
 		LibDiamond.setContractOwner(_contractOwner);
 
 		// Add the diamondCut external function from the diamondCutFacet
@@ -49,6 +28,26 @@ contract Diamond is UUPSUpgradeable, ERC721Facet {
 		});
 		LibDiamond.diamondCut(cut, address(0), '');
 	}
+
+	// function initialize(address _contractOwner, address _diamondCutFacet)
+	// 	public
+	// 	initializer
+	// {
+	// 	// __UUPSUpgradeable_init();
+
+	// 	LibDiamond.setContractOwner(_contractOwner);
+
+	// 	// Add the diamondCut external function from the diamondCutFacet
+	// 	IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+	// 	bytes4[] memory functionSelectors = new bytes4[](1);
+	// 	functionSelectors[0] = IDiamondCut.diamondCut.selector;
+	// 	cut[0] = IDiamondCut.FacetCut({
+	// 		facetAddress: _diamondCutFacet,
+	// 		action: IDiamondCut.FacetCutAction.Add,
+	// 		functionSelectors: functionSelectors
+	// 	});
+	// 	LibDiamond.diamondCut(cut, address(0), '');
+	// }
 
 	// function initialize() public initializer {
 	// 	__UUPSUpgradeable_init();
@@ -87,11 +86,11 @@ contract Diamond is UUPSUpgradeable, ERC721Facet {
 
 	receive() external payable {}
 
-	function _authorizeUpgrade(address newImplementation)
-		internal
-		virtual
-		override
-	{
-		LibDiamond.enforceIsContractOwner();
-	}
+	// function _authorizeUpgrade(address newImplementation)
+	// 	internal
+	// 	virtual
+	// 	override
+	// {
+	// 	LibDiamond.enforceIsContractOwner();
+	// }
 }

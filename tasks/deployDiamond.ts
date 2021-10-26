@@ -34,29 +34,30 @@ export async function deployDiamond(options: {
 
 	// deploy Diamond
 	const Diamond = await ethers.getContractFactory('Diamond')
-	// const diamond = await Diamond.deploy(
-	// 	contractOwner.address,
-	// 	diamondCutFacet.address
+	const diamond = await Diamond.deploy(
+		contractOwner.address,
+		diamondCutFacet.address
+	)
+	// const diamond = await upgrades.deployProxy(
+	// 	Diamond,
+	// 	[contractOwner.address, diamondCutFacet.address],
+	// 	{
+	// 		kind: 'uups',
+	// 		unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
+	// 	}
 	// )
-	const diamond = await upgrades.deployProxy(
-		Diamond,
-		[contractOwner.address, diamondCutFacet.address],
-		{
-			kind: 'uups',
-			unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
-		}
-	)
 	await diamond.deployed()
-	const implementationAddress = await getImplementationAddress(
-		ethers.provider,
-		diamond.address
-	)
-	console.log('Diamond deployed:', {
-		proxy: diamond.address,
-		implementationAddress
-	})
+	deployedContracts.Diamond = diamond.address
+	// const implementationAddress = await getImplementationAddress(
+	// 	ethers.provider,
+	// 	diamond.address
+	// )
+	// console.log('Diamond deployed:', {
+	// 	proxy: diamond.address,
+	// 	implementationAddress
+	// })
 	deployedContracts.DiamondProxy = diamond.address
-	deployedContracts.DiamondImplementation = implementationAddress
+	// deployedContracts.DiamondImplementation = implementationAddress
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
