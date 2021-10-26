@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
-import {AppStorage} from '../libraries/LibAppStorage.sol';
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemStandard} from '../interfaces/MeemStandard.sol';
@@ -12,8 +12,6 @@ import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemFacet is RoyaltiesV2, IMeemStandard {
-	AppStorage internal s;
-
 	function getRaribleV2Royalties(uint256 tokenId)
 		public
 		view
@@ -35,6 +33,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		MeemProperties memory mProperties,
 		MeemProperties memory mChildProperties
 	) public override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
@@ -65,6 +64,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	}
 
 	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		if (amount < 0 || amount > 10000) {
 			revert('Amount must be between 0 - 10000 basis points');
@@ -79,6 +79,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		override
 		returns (uint256)
 	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.nonOwnerSplitAllocationAmount;
 	}
 
@@ -88,6 +89,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		override
 		returns (uint256[] memory)
 	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.children[tokenId];
 	}
 
@@ -97,6 +99,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		override
 		returns (uint256)
 	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.children[tokenId].length;
 	}
 
@@ -203,16 +206,27 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	}
 
 	function setTokenCounter(uint256 tokenCounter) public {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		s.tokenCounter = tokenCounter;
 	}
 
 	function childDepth() public view override returns (uint256) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.childDepth;
 	}
 
 	function setChildDepth(uint256 newChildDepth) public override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		s.childDepth = newChildDepth;
+	}
+
+	function tokenIdsOfOwner(address _owner)
+		public
+		view
+		returns (uint256[] memory tokenIds_)
+	{
+		return LibERC721.tokenIdsOfOwner(_owner);
 	}
 }

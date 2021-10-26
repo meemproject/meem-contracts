@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol';
-import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 
 library LibAccessControl {
 	/**
@@ -87,7 +87,7 @@ library LibAccessControl {
 		view
 		returns (bool)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.roles[role].members[account];
 	}
 
@@ -120,7 +120,7 @@ library LibAccessControl {
 	 * To change a role's admin, use {_setRoleAdmin}.
 	 */
 	function getRoleAdmin(bytes32 role) internal view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.roles[role].adminRole;
 	}
 
@@ -242,14 +242,14 @@ library LibAccessControl {
 	 * Emits a {RoleAdminChanged} event.
 	 */
 	function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		bytes32 previousAdminRole = getRoleAdmin(role);
 		s.roles[role].adminRole = adminRole;
 		emit RoleAdminChanged(role, previousAdminRole, adminRole);
 	}
 
 	function _grantRole(bytes32 role, address account) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (!hasRole(role, account)) {
 			s.roles[role].members[account] = true;
 			emit RoleGranted(role, account, _msgSender());
@@ -257,7 +257,7 @@ library LibAccessControl {
 	}
 
 	function _revokeRole(bytes32 role, address account) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (hasRole(role, account)) {
 			s.roles[role].members[account] = false;
 			emit RoleRevoked(role, account, _msgSender());

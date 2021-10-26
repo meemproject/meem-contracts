@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
-import {AppStorage, LibAppStorage} from './LibAppStorage.sol';
+
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
@@ -37,7 +38,7 @@ library LibERC721 {
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() internal view returns (uint256) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// totalSupply_ = s.tokenIds.length;
 		// totalSupply_ = s.tokenCounter;
 		return s.tokenCounter;
@@ -47,7 +48,7 @@ library LibERC721 {
 	 * @dev See {IERC721-balanceOf}.
 	 */
 	function balanceOf(address owner) internal view returns (uint256) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(
 			owner != address(0),
 			'ERC721: balance query for the zero address'
@@ -65,7 +66,7 @@ library LibERC721 {
 		view
 		returns (uint256 tokenId_)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(_index < s.tokenCounter, 'ERC721: index beyond supply');
 		// tokenId_ = s.tokenIds[_index];
 		tokenId_ = _index;
@@ -83,7 +84,7 @@ library LibERC721 {
 		view
 		returns (uint256 tokenId_)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(
 			_index < s.ownerTokenIds[_owner].length,
 			'ERC721Facet: index beyond owner balance'
@@ -99,7 +100,7 @@ library LibERC721 {
 		view
 		returns (uint256[] memory tokenIds_)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		tokenIds_ = s.ownerTokenIds[_owner];
 	}
 
@@ -107,7 +108,7 @@ library LibERC721 {
 	 * @dev See {IERC721-ownerOf}.
 	 */
 	function ownerOf(uint256 tokenId) internal view returns (address) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = s.meems[tokenId].owner;
 		require(
 			owner != address(0),
@@ -120,7 +121,7 @@ library LibERC721 {
 	 * @dev See {IERC721Metadata-name}.
 	 */
 	function name() internal view returns (string memory) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.name;
 	}
 
@@ -128,12 +129,12 @@ library LibERC721 {
 	 * @dev See {IERC721Metadata-symbol}.
 	 */
 	function symbol() internal view returns (string memory) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.symbol;
 	}
 
 	function tokenURI(uint256 tokenId) internal view returns (string memory) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(
 			_exists(tokenId),
 			'ERC721Metadata: URI query for nonexistent token'
@@ -170,7 +171,7 @@ library LibERC721 {
 	 * @dev See {IERC721-getApproved}.
 	 */
 	function getApproved(uint256 tokenId) internal view returns (address) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(
 			_exists(tokenId),
 			'ERC721: approved query for nonexistent token'
@@ -183,7 +184,7 @@ library LibERC721 {
 	 * @dev See {IERC721-setApprovalForAll}.
 	 */
 	function setApprovalForAll(address operator, bool approved) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(operator != _msgSender(), 'ERC721: approve to caller');
 
 		s.operatorApprovals[_msgSender()][operator] = approved;
@@ -198,7 +199,7 @@ library LibERC721 {
 		view
 		returns (bool)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.operatorApprovals[owner][operator];
 	}
 
@@ -286,7 +287,7 @@ library LibERC721 {
 	 * and stop existing when they are burned (`_burn`).
 	 */
 	function _exists(uint256 tokenId) internal view returns (bool) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.meems[tokenId].owner != address(0);
 	}
 
@@ -355,7 +356,7 @@ library LibERC721 {
 	 * Emits a {Transfer} event.
 	 */
 	function _mint(address to, uint256 tokenId) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(to != address(0), 'ERC721: mint to the zero address');
 		require(!_exists(tokenId), 'ERC721: token already minted');
 
@@ -381,7 +382,7 @@ library LibERC721 {
 	 * Emits a {Transfer} event.
 	 */
 	function _burn(uint256 tokenId) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = ownerOf(tokenId);
 
 		_beforeTokenTransfer(owner, address(0), tokenId);
@@ -412,7 +413,7 @@ library LibERC721 {
 		address to,
 		uint256 tokenId
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(
 			ownerOf(tokenId) == from,
 			'ERC721: transfer of token that is not own'
@@ -438,7 +439,7 @@ library LibERC721 {
 	 * Emits a {Approval} event.
 	 */
 	function _approve(address to, uint256 tokenId) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		s.tokenApprovals[tokenId] = to;
 		emit Approval(ownerOf(tokenId), to, tokenId);
 	}
@@ -561,7 +562,7 @@ library LibERC721 {
 		address to,
 		uint256 tokenId
 	) internal view {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		require(
 			s.meems[tokenId].parent == address(this) ||

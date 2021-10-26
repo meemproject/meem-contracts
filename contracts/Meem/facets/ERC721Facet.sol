@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibDiamond} from '../libraries/LibDiamond.sol';
-import {AppStorage, LibAppStorage} from '../libraries/LibAppStorage.sol';
+import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
@@ -34,13 +34,13 @@ contract ERC721Facet is ERC721Tradable {
 	// ) public override returns (bytes4) {}
 
 	function setContractURI(string memory newContractURI) public {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
 		s.contractURI = newContractURI;
 	}
 
 	function contractURI() public view returns (string memory) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return
 			string(
 				abi.encodePacked(
@@ -48,26 +48,6 @@ contract ERC721Facet is ERC721Tradable {
 					Base64.encode(bytes(s.contractURI))
 				)
 			);
-	}
-
-	function DEFAULT_ADMIN_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.DEFAULT_ADMIN_ROLE;
-	}
-
-	function PAUSER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.PAUSER_ROLE;
-	}
-
-	function MINTER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.MINTER_ROLE;
-	}
-
-	function UPGRADER_ROLE() public view returns (bytes32) {
-		AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.UPGRADER_ROLE;
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
@@ -124,17 +104,6 @@ contract ERC721Facet is ERC721Tradable {
 		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
 	}
 
-	/// @notice Get all the Ids of NFTs owned by an address
-	/// @param _owner The address to check for the NFTs
-	/// @return tokenIds_ an array of unsigned integers,each representing the tokenId of each NFT
-	function tokenIdsOfOwner(address _owner)
-		public
-		view
-		returns (uint256[] memory tokenIds_)
-	{
-		return LibERC721.tokenIdsOfOwner(_owner);
-	}
-
 	// @notice Transfers the ownership of multiple  NFTs from one address to another at once
 	/// @dev Throws unless `LibMeta.msgSender()` is the current owner, an authorized
 	///  operator, or the approved address of each of the NFTs in `_tokenIds`. Throws if `_from` is
@@ -173,7 +142,7 @@ contract ERC721Facet is ERC721Tradable {
 		address _to,
 		uint256 _tokenId
 	) internal {
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
 		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
 		require(
@@ -222,7 +191,7 @@ contract ERC721Facet is ERC721Tradable {
 		override
 		returns (string memory)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.tokenURIs[tokenId];
 	}
 
@@ -233,7 +202,7 @@ contract ERC721Facet is ERC721Tradable {
 		override(ERC721Tradable)
 		returns (bool)
 	{
-		AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Whitelist OpenSea proxy contract for easy trading.
 		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
 		if (address(proxyRegistry.proxies(owner)) == operator) {
