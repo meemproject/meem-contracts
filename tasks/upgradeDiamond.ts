@@ -1,8 +1,6 @@
 import { getImplementationAddress } from '@openzeppelin/upgrades-core'
 import { task, types } from 'hardhat/config'
 
-type ContractName = 'Meem'
-
 interface Contract {
 	args?: (string | number | (() => string | undefined))[]
 	address?: string
@@ -10,51 +8,30 @@ interface Contract {
 	waitForConfirmation?: boolean
 }
 
-task('upgradeContract', 'Upgrade Meem')
-	.addParam(
-		'contractaddress',
-		'The originally deployed contract address',
-		undefined,
-		types.string,
-		false
-	)
-	.addParam(
-		'library',
-		'The MeemPropsLibrary address',
-		undefined,
-		types.string,
-		false
-	)
+task('upgradeDiamond', 'Upgrade Diamond')
+	.addParam('proxy', 'The proxy address', undefined, types.string, false)
 	.setAction(async (args, { ethers, upgrades }) => {
 		const [deployer] = await ethers.getSigners()
 		console.log('Deploying contracts with the account:', deployer.address)
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
-		const contracts: Record<ContractName, Contract> = {
-			Meem: {
-				libraries: {
-					MeemPropsLibrary: args.library
-				}
-			}
+		const contracts: Record<string, Contract> = {
+			Diamond: {}
 		}
 
-		const Meem = await ethers.getContractFactory('Meem', {
-			libraries: {
-				MeemPropsLibrary: args.library
-			}
-		})
-		const meem = await upgrades.upgradeProxy(args.contractaddress, Meem, {
-			unsafeAllow: ['external-library-linking']
+		const Diamond = await ethers.getContractFactory('Diamond')
+		const diamond = await upgrades.upgradeProxy(args.proxy, Diamond, {
+			unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
 		})
 
-		await meem.deployed()
-		console.log('Meem proxy deployed to: ', meem.address)
+		await diamond.deployed()
+		console.log('Diamond proxy deployed to: ', diamond.address)
 
 		try {
 			const implementationAddress = await getImplementationAddress(
 				ethers.provider,
-				meem.address
+				diamond.address
 			)
 
 			console.log('Meem implementation deployed to: ', implementationAddress)

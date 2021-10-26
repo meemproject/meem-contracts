@@ -11,13 +11,7 @@ interface Contract {
 }
 
 task('upgradeMeemFacet', 'Upgrade MeemFacet')
-	.addParam(
-		'diamond',
-		'The address of the deployed diamond',
-		undefined,
-		types.string,
-		false
-	)
+	.addParam('proxy', 'The proxy address', undefined, types.string, false)
 	.setAction(async (args, { ethers }) => {
 		const [deployer] = await ethers.getSigners()
 		console.log('Deploying contracts with the account:', deployer.address)
@@ -28,7 +22,7 @@ task('upgradeMeemFacet', 'Upgrade MeemFacet')
 		const meemFacet = await MeemFacet.deploy()
 		await meemFacet.deployed()
 
-		const diamondCut = await ethers.getContractAt('IDiamondCut', args.diamond)
+		const diamondCut = await ethers.getContractAt('IDiamondCut', args.proxy)
 		const tx = await diamondCut.diamondCut(
 			[
 				{
