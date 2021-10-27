@@ -1,7 +1,7 @@
 {
 	"name": "@meemproject/meem-gate-token",
 	"private": true,
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"description": "Meem Gate",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
