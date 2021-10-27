@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
+import 'hardhat/console.sol';
 
 library LibERC721 {
 	/**
@@ -90,18 +91,6 @@ library LibERC721 {
 			'ERC721Facet: index beyond owner balance'
 		);
 		tokenId_ = s.ownerTokenIds[_owner][_index];
-	}
-
-	/// @notice Get all the Ids of NFTs owned by an address
-	/// @param _owner The address to check for the NFTs
-	/// @return tokenIds_ an array of unsigned integers,each representing the tokenId of each NFT
-	function tokenIdsOfOwner(address _owner)
-		internal
-		view
-		returns (uint256[] memory tokenIds_)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		tokenIds_ = s.ownerTokenIds[_owner];
 	}
 
 	/**
@@ -369,7 +358,7 @@ library LibERC721 {
 		// s.balances[to] += 1;
 		// s.owners[tokenId] = to;
 		s.ownerTokenIds[to].push(tokenId);
-		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
+		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
 		s.meems[tokenId].owner = to;
 
 		emit Transfer(address(0), to, tokenId);
@@ -430,7 +419,6 @@ library LibERC721 {
 		_approve(address(0), tokenId);
 
 		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
-		// TODO: Remove token
 		LibArray.removeAt(s.ownerTokenIds[from], index);
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
@@ -465,7 +453,7 @@ library LibERC721 {
 		address to,
 		uint256 tokenId,
 		bytes memory _data
-	) private returns (bool) {
+	) internal returns (bool) {
 		if (isContract(to)) {
 			try
 				IERC721TokenReceiver(to).onERC721Received(

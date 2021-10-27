@@ -1,9 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers, waffle, upgrades } from 'hardhat'
-// import MeemArtifact from '../build/Meem.json'
-// import MeemPropsLibraryArtifact from '../build/MeemPropsLibrary.json'
+import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet, MeemFacet } from '../typechain'
 

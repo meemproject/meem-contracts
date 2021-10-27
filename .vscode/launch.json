@@ -8,8 +8,8 @@
 			"runtimeArgs": [
 				"${workspaceRoot}/node_modules/.bin/hardhat",
 				"test",
-				"--network",
-				"hardhat",
+				// "--network",
+				// "hardhat",
 				"${relativeFile}"
 			],
 			"runtimeExecutable": "${env:NVM_BIN}/node",

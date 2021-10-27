@@ -36,6 +36,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	) public override returns (uint256 tokenId_) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
+		LibMeem.requireValidMeem(parent, parentTokenId);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
 		s.tokenURIs[tokenId] = mTokenURI;
@@ -56,24 +57,20 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		// Keep track of children Meems
 		if (parent == address(this)) {
 			s.children[parentTokenId].push(tokenId);
+		} else {
+			s.wrappedNFTs[parent][parentTokenId] = true;
 		}
+
 		if (root == address(this)) {
 			s.decendants[rootTokenId].push(tokenId);
 		}
 
 		s.tokenCounter += 1;
 
-		// require(
-		// 	LibERC721._checkOnERC721Received(
-		// 		address(0),
-		// 		to,
-		// 		tokenId
-		// 	),
-		// 	'ERC721: transfer to non ERC721Receiver implementer'
-		// );
-
-		// s.ownerTokenIds[to].push(tokenId);
-		// s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
+		require(
+			LibERC721._checkOnERC721Received(address(0), to, tokenId, ''),
+			'ERC721: transfer to non ERC721Receiver implementer'
+		);
 
 		emit LibERC721.Transfer(address(0), to, tokenId);
 		return tokenId;
@@ -253,6 +250,7 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		view
 		returns (uint256[] memory tokenIds_)
 	{
-		return LibERC721.tokenIdsOfOwner(_owner);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.ownerTokenIds[_owner];
 	}
 }

@@ -455,4 +455,14 @@ library LibMeem {
 		s.meems[tokenId].properties.childrenPerWalletLockedBy = msg.sender;
 		emit ChildrenPerWalletLocked(tokenId, msg.sender);
 	}
+
+	function requireValidMeem(address parent, uint256 tokenId) internal view {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
+		if (parent != address(0)) {
+			if (s.wrappedNFTs[parent][tokenId] == true) {
+				revert('NFT has already been wrapped');
+			}
+		}
+	}
 }

@@ -5,6 +5,7 @@ import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet, MeemFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
+import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
@@ -45,9 +46,9 @@ describe('Meem', function Test() {
 					owner,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					0,
-					'0x0000000000000000000000000000000000000000',
+					zeroAddress,
 					0,
-					'0x0000000000000000000000000000000000000000',
+					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData
@@ -63,9 +64,9 @@ describe('Meem', function Test() {
 					owner,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					0,
-					'0x0000000000000000000000000000000000000000',
+					zeroAddress,
 					0,
-					'0x0000000000000000000000000000000000000000',
+					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData
@@ -172,9 +173,78 @@ describe('Meem', function Test() {
 		const ca = await erc721Facet.contractAddress()
 		console.log({ contractAddress: ca })
 
-		const transferResult = await erc721Facet
-			.connect(signers[0])
-			.transferFrom(signers[0].address, owner, 2)
-		console.log({ transferResult })
+		const transferResult = await (
+			await erc721Facet
+				.connect(signers[0])
+				.transferFrom(signers[0].address, owner, 2)
+		).wait()
+		assert.equal(transferResult.status, 1)
+	})
+
+	it('Can transfer original meem', async () => {
+		const { status } = await (
+			await meemFacet
+				.connect(signers[0])
+				.mint(
+					signers[0].address,
+					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					0,
+					zeroAddress,
+					0,
+					zeroAddress,
+					0,
+					meemMintData,
+					meemMintData
+				)
+		).wait()
+		assert.equal(status, 1)
+
+		const totalSupply = await erc721Facet.connect(signers[0]).totalSupply()
+		assert.equal(totalSupply.toNumber(), 4)
+
+		const transferResult = await (
+			await erc721Facet
+				.connect(signers[0])
+				.transferFrom(signers[0].address, owner, 3)
+		).wait()
+		assert.equal(transferResult.status, 1)
+	})
+
+	it('Can not mint meem w/ same external parent address', async () => {
+		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
+		// First one can mint
+		const { status } = await (
+			await meemFacet
+				.connect(signers[0])
+				.mint(
+					signers[0].address,
+					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					0,
+					otherAddress,
+					1,
+					otherAddress,
+					1,
+					meemMintData,
+					meemMintData
+				)
+		).wait()
+		assert.equal(status, 1)
+
+		// Second one fails
+		await assert.isRejected(
+			meemFacet
+				.connect(signers[0])
+				.mint(
+					owner,
+					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					0,
+					otherAddress,
+					1,
+					otherAddress,
+					1,
+					meemMintData,
+					meemMintData
+				)
+		)
 	})
 })

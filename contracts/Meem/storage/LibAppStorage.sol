@@ -63,6 +63,8 @@ library LibAppStorage {
 		mapping(uint256 => address) tokenApprovals;
 		/** Mapping from owner to operator approvals */
 		mapping(address => mapping(address => bool)) operatorApprovals;
+		// Mapping of parent address => tokenId
+		mapping(address => mapping(uint256 => bool)) wrappedNFTs;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {
