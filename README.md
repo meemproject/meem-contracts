@@ -27,6 +27,8 @@ MeemPropsLibrary: [](https://polygonscan.com/address/)
 }
 ```
 
+https://testnets.opensea.io/collection/meem-96ugziir6d
+
 ## Development
 
 By default all commands will use the local network. For other networks use the ```--network <network_name>``` flag. See the hardhat.config.ts file for network names.
