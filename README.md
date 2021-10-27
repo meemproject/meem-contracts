@@ -18,11 +18,11 @@ MeemPropsLibrary: [](https://polygonscan.com/address/)
 ```
 {
   deployedContracts: {
-    DiamondCutFacet: '0xbd62C82Bde3f60D5E3C36DB0D5D144B6da8325C7',
-    DiamondProxy: '0xe308ab2E0864a22ff10B61Ac7f447dd1d6307A63',
-    DiamondImplementation: '0xFd5aFd9D94f594Cb95963a56460C868c19f5BC39',
-    DiamondLoupeFacet: '0xB16cb6429503Aa529b8F81847EEE4f18cCC8ef4d',
-    MeemFacet: '0x7fca3F1325FA0B78D3A6bbE303279daacdF6d6eF'
+    DiamondCutFacet: '0x5A6A75a1Ea30f1D564bb36DE45292a236d74A98E',
+    DiamondProxy: '0xEBf9B4f3AeEEb1aEFbAf535DC8E353809a7Df6D4',
+    DiamondImplementation: '0x197b0716c9e260f9c7bC48781A7e59d6Dc15E513',
+    DiamondLoupeFacet: '0x27CCb33F5b7eec52A85c5dfE6eec4388fCe349E9',
+    MeemFacet: '0x80897317b9C8D9273b451688121D471c46844d51'
   }
 }
 ```
