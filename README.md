@@ -69,17 +69,19 @@ This will start up a local node using hardhat
 
 **You should only do this the first time. After that you should use upgrade to keep the same address**
 
-#### Deploy MeemPropsLibrary
+`yarn deployDiamond`
 
-```yarn deployLib```
+### Upgrade scripts
 
-#### Deploy Meem URI contract
+Upgrade the main Diamond contract which includes the ERC721Facet
 
-```yarn deploy --library <MeemPropsLibrary address>```
+`yarn upgradeDiamond`
 
-### Upgrade the contract
+`yarn upgradeAccessControlFacet`
 
-```yarn upgradeContract --contractaddress <address> --library <MeemPropsLibrary address>```
+`yarn upgradeMeemFacet`
+
+`yarn upgradeOwnershipFacet`
 
 ## Console Interaction
 
