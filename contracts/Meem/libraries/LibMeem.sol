@@ -394,8 +394,8 @@ library LibMeem {
 
 		if (newTotalChildren > -1) {
 			require(
-				uint256(newTotalChildren) <= s.children[tokenId].length,
-				'Total copies can not be less than the the existing number of copies'
+				uint256(newTotalChildren) >= s.children[tokenId].length,
+				'Total children must be greater than the existing number of copies'
 			);
 		}
 
@@ -426,13 +426,6 @@ library LibMeem {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		requireOwnsToken(tokenId);
-
-		if (newTotalChildren > -1) {
-			require(
-				uint256(newTotalChildren) <= s.children[tokenId].length,
-				'Total children can not be less than the the existing number of copies'
-			);
-		}
 
 		require(
 			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),

@@ -9,7 +9,7 @@ import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
-describe('Meem', function Test() {
+describe('Minting', function Test() {
 	let meemFacet: MeemFacet
 	let erc721Facet: Erc721Facet
 	let signers: SignerWithAddress[]
