@@ -26,53 +26,57 @@ export async function deployDiamond(options: {
 	console.log('Account balance:', (await contractOwner.getBalance()).toString())
 
 	// deploy DiamondCutFacet
-	const DiamondCutFacet = await ethers.getContractFactory('DiamondCutFacet')
-	const diamondCutFacet = await DiamondCutFacet.deploy()
-	await diamondCutFacet.deployed()
-	deployedContracts.DiamondCutFacet = diamondCutFacet.address
-	console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
+	// const DiamondCutFacet = await ethers.getContractFactory('DiamondCutFacet')
+	// const diamondCutFacet = await DiamondCutFacet.deploy()
+	// await diamondCutFacet.deployed()
+	// deployedContracts.DiamondCutFacet = diamondCutFacet.address
+	// console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
 
 	// deploy Diamond
-	const Diamond = await ethers.getContractFactory('Diamond')
+	const Diamond = await ethers.getContractFactory('MeemDiamond')
 	// const diamond = await Diamond.deploy(
 	// 	contractOwner.address,
 	// 	diamondCutFacet.address
 	// )
-	const diamond = await upgrades.deployProxy(
-		Diamond,
-		[contractOwner.address, diamondCutFacet.address],
-		{
-			kind: 'uups',
-			unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
-		}
-	)
+	const diamond = await Diamond.deploy()
+	// const diamond = await upgrades.deployProxy(
+	// 	Diamond,
+	// 	[contractOwner.address, diamondCutFacet.address],
+	// 	{
+	// 		kind: 'uups',
+	// 		unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
+	// 	}
+	// )
 	await diamond.deployed()
-	const implementationAddress = await getImplementationAddress(
-		ethers.provider,
-		diamond.address
-	)
-	console.log('Diamond deployed:', {
-		proxy: diamond.address,
-		implementationAddress
-	})
-	deployedContracts.DiamondProxy = diamond.address
-	deployedContracts.DiamondImplementation = implementationAddress
+	deployedContracts.proxy = diamond.address
+	// const implementationAddress = await getImplementationAddress(
+	// 	ethers.provider,
+	// 	diamond.address
+	// )
+	// console.log('Diamond deployed:', {
+	// 	proxy: diamond.address,
+	// 	implementationAddress
+	// })
+	// deployedContracts.DiamondProxy = diamond.address
+	// deployedContracts.DiamondImplementation = implementationAddress
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
 	// Read about how the diamondCut function works here: https://eips.ethereum.org/EIPS/eip-2535#addingreplacingremoving-functions
+
 	const DiamondInit = await ethers.getContractFactory('InitDiamond')
 	const diamondInit = await DiamondInit.deploy()
 	await diamondInit.deployed()
-	console.log('DiamondInit deployed:', diamondInit.address)
+	// console.log('DiamondInit deployed:', diamondInit.address)
 
 	// deploy facets
 	console.log('')
 	console.log('Deploying facets')
 
 	const facets: Record<string, Contract> = {
-		DiamondLoupeFacet: {},
+		// DiamondLoupeFacet: {},
 		// OwnershipFacet: {},
+		InitDiamond: {},
 		MeemFacet: {}
 		// ERC721Facet: {}
 	}
@@ -134,16 +138,13 @@ export async function deployDiamond(options: {
 		}
 	])
 	console.log({ functionCall })
-	const tx = await diamondCut.diamondCut(
-		cuts,
-		diamondInit.address,
-		functionCall
-	)
+	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall)
 	console.log('Diamond cut tx: ', tx.hash)
 	const receipt = await tx.wait()
 	if (!receipt.status) {
 		throw Error(`Diamond upgrade failed: ${tx.hash}`)
 	}
+
 	console.log('Completed diamond cut')
 	console.log({ deployedContracts })
 	return deployedContracts
