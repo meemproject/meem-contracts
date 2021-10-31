@@ -1,8 +1,8 @@
 {
-	"name": "@meemproject/meem-gate-token",
+	"name": "@meemproject/meem-contracts",
 	"private": true,
 	"version": "1.1.0",
-	"description": "Meem Gate",
+	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
 	"scripts": {
@@ -27,7 +27,8 @@
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
 		"release": "semantic-release",
 		"size": "hardhat size-contracts",
-		"createMeemABI": "tsnd --transpile-only scripts/createMeemABI.ts"
+		"createMeemABI": "tsnd --transpile-only scripts/createMeemABI.ts",
+		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs"
 	},
 	"devDependencies": {
 		"@float-capital/solidity-coverage": "^0.7.17",
@@ -64,11 +65,13 @@
 		"prettier": "^2.4.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.12",
 		"prompt": "^1.1.0",
+		"solidity-docgen": "^0.5.16",
 		"ts-node": "^10.0.0",
 		"ts-node-dev": "^1.1.8",
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
-		"dotenv": "^10.0.0"
+		"dotenv": "^10.0.0",
+		"solc-0.8": "npm:solc@^0.8.4"
 	}
 }

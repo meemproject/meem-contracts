@@ -77,11 +77,19 @@ Upgrade the main Diamond contract which includes the ERC721Facet
 
 `yarn upgradeDiamond`
 
+Upgrade individual facets
+
 `yarn upgradeAccessControlFacet`
 
 `yarn upgradeMeemFacet`
 
 `yarn upgradeOwnershipFacet`
+
+### Generate combined ABI
+
+Generate the `abi/Meem.json` file which combines all facets into a single definition. This ABI can then be used in other applications to make requests to the contract.
+
+`yarn createMeemABI`
 
 ## Console Interaction
 
@@ -92,7 +100,7 @@ This will open a hardhat console where you can interact directly with the smart 
 ### Get a meem instance for use in hardhat console
 
 ```
-const meem = await (await ethers.getContractFactory('Meem', { libraries: { MeemPropsLibrary: '<Library address>' }})).attach('<Contract_address>')
+const meem = await (await ethers.getContractFactory('MeemFacet')).attach('<Contract_address>')
 ```
 
 ### Mint a meem example

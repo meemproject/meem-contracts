@@ -212,22 +212,6 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		return LibMeem.getMeem(tokenId);
 	}
 
-	function getProperties(uint256 tokenId, PropertyType propertyType)
-		internal
-		view
-		returns (MeemProperties storage)
-	{
-		return LibMeem.getProperties(tokenId, propertyType);
-	}
-
-	function setProperties(
-		uint256 tokenId,
-		PropertyType propertyType,
-		MeemProperties memory mProperties
-	) internal {
-		LibMeem.setProperties(tokenId, propertyType, mProperties);
-	}
-
 	function setTokenCounter(uint256 tokenCounter) public {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
@@ -252,5 +236,21 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.ownerTokenIds[_owner];
+	}
+
+	function getProperties(uint256 tokenId, PropertyType propertyType)
+		internal
+		view
+		returns (MeemProperties storage)
+	{
+		return LibMeem.getProperties(tokenId, propertyType);
+	}
+
+	function setProperties(
+		uint256 tokenId,
+		PropertyType propertyType,
+		MeemProperties memory mProperties
+	) internal {
+		LibMeem.setProperties(tokenId, propertyType, mProperties);
 	}
 }

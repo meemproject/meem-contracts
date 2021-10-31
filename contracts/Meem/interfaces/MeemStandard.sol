@@ -4,7 +4,8 @@ pragma solidity ^0.8.4;
 enum Chain {
 	Ethereum,
 	Polygon,
-	Cardano
+	Cardano,
+	Solana
 }
 
 enum PermissionType {
