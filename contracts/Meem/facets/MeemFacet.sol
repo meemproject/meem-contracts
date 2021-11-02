@@ -202,11 +202,11 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 
-	function setContractURI(string memory newContractURI) public {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
-		s.contractURI = newContractURI;
-	}
+	// function setContractURI(string memory newContractURI) public {
+	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+	// 	LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
+	// 	s.contractURI = newContractURI;
+	// }
 
 	function getMeem(uint256 tokenId) public view returns (Meem memory) {
 		return LibMeem.getMeem(tokenId);
@@ -229,14 +229,14 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		s.childDepth = newChildDepth;
 	}
 
-	function tokenIdsOfOwner(address _owner)
-		public
-		view
-		returns (uint256[] memory tokenIds_)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.ownerTokenIds[_owner];
-	}
+	// function tokenIdsOfOwner(address _owner)
+	// 	public
+	// 	view
+	// 	returns (uint256[] memory tokenIds_)
+	// {
+	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+	// 	return s.ownerTokenIds[_owner];
+	// }
 
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal

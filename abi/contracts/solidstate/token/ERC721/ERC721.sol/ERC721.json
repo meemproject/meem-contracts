@@ -96,7 +96,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_owner",
+        "name": "account",
         "type": "address"
       }
     ],
@@ -104,47 +104,8 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "balance",
+        "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "baseTokenURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "contractAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "contractURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -229,34 +190,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_tokenIds",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "_data",
-        "type": "bytes"
-      }
-    ],
-    "name": "safeBatchTransferFrom",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "from",
         "type": "address"
       },
@@ -325,14 +258,20 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "newContractURI",
-        "type": "string"
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
       }
     ],
-    "name": "setContractURI",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -352,7 +291,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_index",
+        "name": "index",
         "type": "uint256"
       }
     ],
@@ -360,7 +299,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId_",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -371,12 +310,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_owner",
+        "name": "owner",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_index",
+        "name": "index",
         "type": "uint256"
       }
     ],
@@ -384,7 +323,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId_",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -416,7 +355,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "totalSupply_",
+        "name": "",
         "type": "uint256"
       }
     ],

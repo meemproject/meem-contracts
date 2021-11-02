@@ -77,8 +77,8 @@ export async function deployDiamond(options: {
 		// DiamondLoupeFacet: {},
 		// OwnershipFacet: {},
 		InitDiamond: {},
-		MeemFacet: {}
-		// ERC721Facet: {}
+		MeemFacet: {},
+		ERC721Facet: {}
 	}
 
 	const cuts = []
