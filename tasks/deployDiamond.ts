@@ -4,19 +4,12 @@ import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
 import fs from 'fs-extra'
 import { task } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
-import { FacetCutAction, getSelectors } from './lib/diamond'
-
-interface Contract {
-	args?: (string | number | (() => string | undefined))[]
-	address?: string
-	libraries?: Record<string, string>
-	waitForConfirmation?: boolean
-}
-
-export interface IDeployHistoryFacet {
-	address: string
-	functionSelectors: string[]
-}
+import {
+	Contract,
+	FacetCutAction,
+	getSelectors,
+	IDeployHistoryFacet
+} from './lib/diamond'
 
 export interface IDeployHistory {
 	[proxyAddress: string]: {
@@ -152,13 +145,13 @@ export async function deployDiamond(options: {
 			name: 'Meem',
 			symbol: 'MEEM',
 			childDepth: 1,
-			nonOwnerSplitAllocationAmount: 1000,
+			nonOwnerSplitAllocationAmount: 100,
 			proxyRegistryAddress,
 			contractURI:
-				'{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/5NP8PYN8","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": 1000, "fee_recipient": "0x40c6BeE45d94063c5B05144489cd8A9879899592"}'
+				'{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/5NP8PYN8","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": 100, "fee_recipient": "0x40c6BeE45d94063c5B05144489cd8A9879899592"}'
 		}
 	])
-	console.log({ functionCall })
+
 	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall)
 	console.log('Diamond cut tx: ', tx.hash)
 	const receipt = await tx.wait()
@@ -166,12 +159,13 @@ export async function deployDiamond(options: {
 		throw Error(`Diamond upgrade failed: ${tx.hash}`)
 	}
 
-	console.log('Completed diamond cut')
-	console.log({ deployedContracts })
-
 	await fs.ensureDir(diamondHistoryPath)
 	await fs.writeJSON(diamondHistoryFile, history, {
 		flag: 'w'
+	})
+
+	console.log({
+		deployedContracts
 	})
 
 	return deployedContracts

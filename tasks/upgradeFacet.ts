@@ -3,12 +3,7 @@ import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import { zeroAddress } from '../test/helpers/utils'
 import { IDeployHistory } from './deployDiamond'
-import {
-	FacetCutAction,
-	getSelector,
-	getSelectors,
-	getSighashes
-} from './lib/diamond'
+import { FacetCutAction, getSelectors } from './lib/diamond'
 
 interface Contract {
 	args?: (string | number | (() => string | undefined))[]
@@ -53,7 +48,7 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 		const facet = await Facet.deploy()
 		await facet.deployed()
 
-		console.log(`Deployed facet: ${facet.address}`)
+		console.log(`Deployed new ${facetName}: ${facet.address}`)
 
 		const facetSelectors = getSelectors(facet)
 
@@ -82,7 +77,6 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 
 		if (removeSelectors.length > 0) {
 			cuts.push({
-				// facetAddress: history[proxyAddress][facetName].address,
 				facetAddress: zeroAddress,
 				action: FacetCutAction.Remove,
 				functionSelectors: removeSelectors
@@ -105,13 +99,6 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			})
 		}
 
-		console.log({
-			removeSelectors,
-			replaceSelectors,
-			addSelectors,
-			cuts
-		})
-
 		const diamondCut = await ethers.getContractAt('IDiamondCut', args.proxy)
 		const tx = await diamondCut.diamondCut(
 			cuts,
@@ -119,24 +106,12 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			'0x',
 			{ gasLimit: 5000000 }
 		)
-		// const tx = await diamondCut.diamondCut(
-		// 	[
-		// 		{
-		// 			facetAddress: meemFacet.address,
-		// 			action: FacetCutAction.Replace,
-		// 			functionSelectors: getSelectors(meemFacet)
-		// 		}
-		// 	],
-		// 	ethers.constants.AddressZero,
-		// 	'0x',
-		// 	{ gasLimit: 5000000 }
-		// )
-		console.log('Diamond cut tx:', tx.hash)
+
 		const receipt = await tx.wait()
 		if (!receipt.status) {
 			throw Error(`Diamond upgrade failed: ${tx.hash}`)
 		}
-		console.log('Completed diamond cut: ', tx.hash)
+		console.log('Completed diamond cut w/ tx: ', tx.hash)
 
 		const previousDeploys = history[proxyAddress][facetName]
 			? [
@@ -158,4 +133,6 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 		await fs.writeJSON(diamondHistoryFile, history, {
 			flag: 'w'
 		})
+
+		console.log(`Upgrade history written to ${diamondHistoryFile}`)
 	})

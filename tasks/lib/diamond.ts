@@ -6,14 +6,23 @@ export enum FacetCutAction {
 	Remove = 2
 }
 
+export interface Contract {
+	args?: (string | number | (() => string | undefined))[]
+	address?: string
+	libraries?: Record<string, string>
+	waitForConfirmation?: boolean
+}
+
+export interface IDeployHistoryFacet {
+	address: string
+	functionSelectors: string[]
+}
+
 // get function selectors from ABI
 export function getSelectors(contract: Ethers.Contract): string[] {
 	const signatures: string[] = Object.keys(contract.interface.functions)
 
-	console.log({ signatures })
-
 	return signatures.reduce((acc: any[], val: string) => {
-		console.log({ val })
 		if (val !== 'init(bytes)') {
 			acc.push(contract.interface.getSighash(val))
 		}
@@ -22,7 +31,6 @@ export function getSelectors(contract: Ethers.Contract): string[] {
 }
 
 export function getSelector(func: string, ethers: any) {
-	console.log({ func })
 	const abiInterface = new ethers.utils.Interface([func])
 	return abiInterface.getSighash(ethers.utils.Fragment.from(func))
 }
