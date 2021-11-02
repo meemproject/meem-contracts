@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { ethers as Ethers } from 'ethers'
 
 export enum FacetCutAction {
 	Add = 0,
@@ -7,15 +7,33 @@ export enum FacetCutAction {
 }
 
 // get function selectors from ABI
-export function getSelectors(contract: ethers.Contract): any[] {
+export function getSelectors(contract: Ethers.Contract): string[] {
 	const signatures: string[] = Object.keys(contract.interface.functions)
 
+	console.log({ signatures })
+
 	return signatures.reduce((acc: any[], val: string) => {
+		console.log({ val })
 		if (val !== 'init(bytes)') {
 			acc.push(contract.interface.getSighash(val))
 		}
 		return acc
 	}, [])
+}
+
+export function getSelector(func: string, ethers: any) {
+	console.log({ func })
+	const abiInterface = new ethers.utils.Interface([func])
+	return abiInterface.getSighash(ethers.utils.Fragment.from(func))
+}
+
+export function getSighashes(selectors: string[], ethers: any): string[] {
+	if (selectors.length === 0) return []
+	const sighashes: string[] = []
+	selectors.forEach(selector => {
+		if (selector !== '') sighashes.push(getSelector(selector, ethers))
+	})
+	return sighashes
 }
 
 // // get function selector from function signature

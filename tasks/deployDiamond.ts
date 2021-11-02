@@ -1,5 +1,7 @@
+import path from 'path'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
+import fs from 'fs-extra'
 import { task } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import { FacetCutAction, getSelectors } from './lib/diamond'
@@ -11,13 +13,41 @@ interface Contract {
 	waitForConfirmation?: boolean
 }
 
+export interface IDeployHistoryFacet {
+	address: string
+	functionSelectors: string[]
+}
+
+export interface IDeployHistory {
+	[proxyAddress: string]: {
+		[facetName: string]: IDeployHistoryFacet & {
+			previousDeploys: IDeployHistoryFacet[]
+		}
+	}
+}
+
 export async function deployDiamond(options: {
 	ethers: HardhatEthersHelpers
 	upgrades: HardhatUpgrades
 	hardhatArguments?: HardhatArguments
 }) {
-	const deployedContracts: Record<string, string> = {}
 	const { ethers, hardhatArguments } = options
+	const deployedContracts: Record<string, string> = {}
+	const network = await ethers.provider.getNetwork()
+	const { chainId } = network
+	const diamondHistoryPath = path.join(process.cwd(), '.diamond')
+	const diamondHistoryFile = path.join(
+		process.cwd(),
+		'.diamond',
+		`${chainId}.json`
+	)
+	let history: IDeployHistory = {}
+	try {
+		history = await fs.readJSON(diamondHistoryFile)
+	} catch (e) {
+		console.log(e)
+	}
+
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
 	console.log('Deploying contracts with the account:', contractOwner.address)
@@ -31,6 +61,8 @@ export async function deployDiamond(options: {
 
 	await diamond.deployed()
 	deployedContracts.DiamondProxy = diamond.address
+
+	history[diamond.address] = {}
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
@@ -62,11 +94,29 @@ export async function deployDiamond(options: {
 		await facet.deployed()
 		console.log(`${facetName} deployed: ${facet.address}`)
 		deployedContracts[facetName] = facet.address
+		const functionSelectors = getSelectors(facet)
 		cuts.push({
 			facetAddress: facet.address,
 			action: FacetCutAction.Add,
-			functionSelectors: getSelectors(facet)
+			functionSelectors
 		})
+
+		const previousDeploys = history[diamond.address][facetName]
+			? [
+					...history[diamond.address][facetName].previousDeploys,
+					{
+						address: history[diamond.address][facetName].address,
+						functionSelectors:
+							history[diamond.address][facetName].functionSelectors
+					}
+			  ]
+			: []
+
+		history[diamond.address][facetName] = {
+			address: facet.address,
+			functionSelectors,
+			previousDeploys
+		}
 	}
 
 	// upgrade diamond with facets
@@ -118,6 +168,12 @@ export async function deployDiamond(options: {
 
 	console.log('Completed diamond cut')
 	console.log({ deployedContracts })
+
+	await fs.ensureDir(diamondHistoryPath)
+	await fs.writeJSON(diamondHistoryFile, history, {
+		flag: 'w'
+	})
+
 	return deployedContracts
 }
 
