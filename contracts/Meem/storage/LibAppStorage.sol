@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
-import {LibDiamond} from '../libraries/LibDiamond.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {Meem, Chain} from '../interfaces/MeemStandard.sol';
 
@@ -74,19 +73,3 @@ library LibAppStorage {
 		}
 	}
 }
-
-// contract Modifiers {
-// 	AppStorage internal s;
-// 	modifier onlyTokenOwner(uint256 _tokenId) {
-// 		require(
-// 			LibMeta.msgSender() == s.meems[_tokenId].owner,
-// 			'LibAppStorage: Only aavegotchi owner can call this function'
-// 		);
-// 		_;
-// 	}
-
-// 	modifier onlyContractOwner() {
-// 		LibDiamond.enforceIsContractOwner();
-// 		_;
-// 	}
-// }

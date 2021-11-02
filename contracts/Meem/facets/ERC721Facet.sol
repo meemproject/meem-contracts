@@ -2,7 +2,6 @@
 pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {LibDiamond} from '../libraries/LibDiamond.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';

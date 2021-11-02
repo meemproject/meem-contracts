@@ -3,17 +3,10 @@ pragma solidity ^0.8.4;
 
 import {LibAppStorage} from './storage/LibAppStorage.sol';
 import {LibAccessControl} from './libraries/LibAccessControl.sol';
-// import {LibDiamond} from './libraries/LibDiamond.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
-// import {IERC165} from './interfaces/IERC165.sol';
 import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
-// import {IERC173} from './interfaces/IERC173.sol';
 import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
 import {IMeemStandard} from './interfaces/MeemStandard.sol';
-// import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-// import {IERC721Metadata} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
-// import {IERC721Enumerable} from '@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol';
-// import {ERC721URIStorage} from '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 
 import '@solidstate/contracts/introspection/ERC165.sol';
 import '@solidstate/contracts/token/ERC721/IERC721.sol';
@@ -34,21 +27,6 @@ contract InitDiamond {
 	}
 
 	function init(Args memory _args) external {
-		// LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
-
-		// // adding ERC165 data
-		// ds.supportedInterfaces[type(IERC165).interfaceId] = true;
-		// ds.supportedInterfaces[type(IDiamondCut).interfaceId] = true;
-		// ds.supportedInterfaces[type(IDiamondLoupe).interfaceId] = true;
-		// ds.supportedInterfaces[type(IERC173).interfaceId] = true;
-		// ds.supportedInterfaces[type(IERC721).interfaceId] = true;
-		// ds.supportedInterfaces[type(IERC721Metadata).interfaceId] = true;
-		// ds.supportedInterfaces[type(IERC721Enumerable).interfaceId] = true;
-		// ds.supportedInterfaces[type(IERC721Enumerable).interfaceId] = true;
-		// ds.supportedInterfaces[type(ERC721URIStorage).interfaceId] = true;
-		// ds.supportedInterfaces[type(IRoyaltiesProvider).interfaceId] = true;
-		// ds.supportedInterfaces[type(IMeemStandard).interfaceId] = true;
-
 		ERC721MetadataStorage.Layout storage erc721 = ERC721MetadataStorage
 			.layout();
 		erc721.name = 'Meem';
