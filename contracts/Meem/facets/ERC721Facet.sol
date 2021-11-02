@@ -21,18 +21,6 @@ contract ERC721Facet is
 	IERC721Metadata,
 	ERC721BaseInternal
 {
-	// constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {
-	// 	// _name = name_;
-	// 	// _symbol = symbol_;
-	// }
-
-	// function onERC721Received(
-	// 	address _operator,
-	// 	address _from,
-	// 	uint256 _tokenId,
-	// 	bytes calldata _data
-	// ) public override returns (bytes4) {}
-
 	function setContractURI(string memory newContractURI) public {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
@@ -103,38 +91,6 @@ contract ERC721Facet is
 		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
 	}
 
-	// @notice Transfers the ownership of multiple  NFTs from one address to another at once
-	/// @dev Throws unless `LibMeta.msgSender()` is the current owner, an authorized
-	///  operator, or the approved address of each of the NFTs in `_tokenIds`. Throws if `_from` is
-	///  not the current owner. Throws if `_to` is the zero address. Throws if one of the NFTs in
-	///  `_tokenIds` is not a valid NFT. When transfer is complete, this function
-	///  checks if `_to` is a smart contract (code size > 0). If so, it calls
-	///  `onERC721Received` on `_to` and throws if the return value is not
-	///  `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
-	/// @param _from The current owner of the NFTs
-	/// @param _to The new owner
-	/// @param _tokenIds An array containing the identifiers of the NFTs to transfer
-	/// @param _data Additional data with no specified format, sent in call to `_to`
-	function safeBatchTransferFrom(
-		address _from,
-		address _to,
-		uint256[] calldata _tokenIds,
-		bytes calldata _data
-	) external {
-		address sender = LibMeta.msgSender();
-		for (uint256 index = 0; index < _tokenIds.length; index++) {
-			uint256 _tokenId = _tokenIds[index];
-			internalTransferFrom(sender, _from, _to, _tokenId);
-			LibERC721._checkOnERC721Received(
-				sender,
-				_from,
-				_to,
-				_tokenId,
-				_data
-			);
-		}
-	}
-
 	///@notice Return the universal name of the NFT
 	function name() public view override returns (string memory) {
 		return LibERC721.name();
@@ -159,34 +115,8 @@ contract ERC721Facet is
 		override
 		returns (string memory)
 	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.tokenURIs[tokenId];
+		return LibERC721.tokenURI(tokenId);
 	}
-
-	// function isApprovedForAll(address _owner, address operator)
-	// 	public
-	// 	view
-	// 	virtual
-	// 	returns (bool)
-	// {
-	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-	// 	// Whitelist OpenSea proxy contract for easy trading.
-	// 	ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
-	// 	if (address(proxyRegistry.proxies(_owner)) == operator) {
-	// 		return true;
-	// 	}
-
-	// 	return false;
-	// }
-
-	// function transferOwnership(address _newOwner) public override {
-	// 	LibDiamond.enforceIsContractOwner();
-	// 	LibDiamond.setContractOwner(_newOwner);
-	// }
-
-	// function owner() public view override returns (address owner_) {
-	// 	owner_ = LibDiamond.contractOwner();
-	// }
 
 	function _beforeTokenTransfer(
 		address from,
@@ -202,33 +132,6 @@ contract ERC721Facet is
 		LibERC721._transfer(from, to, tokenId);
 	}
 
-	function internalTransferFrom(
-		address _sender,
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
-		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
-		require(
-			_from == s.meems[_tokenId].owner,
-			'ERC721Facet: _from is not owner, transfer failed'
-		);
-		require(
-			_sender == _from ||
-				s.operators[_from][_sender] ||
-				_sender == s.approved[_tokenId],
-			'ERC721Facet: Not owner or approved to transfer'
-		);
-		LibMeem.transfer(_from, _to, _tokenId);
-		// LibERC721Marketplace.updateERC721Listing(
-		// 	address(this),
-		// 	_tokenId,
-		// 	_from
-		// );
-	}
-
 	function _exists(uint256 tokenId) internal view virtual returns (bool) {
 		return LibERC721._exists(tokenId);
 	}
@@ -240,14 +143,7 @@ contract ERC721Facet is
 		override
 		returns (bool)
 	{
-		require(
-			_exists(tokenId),
-			'ERC721: operator query for nonexistent token'
-		);
-		address _owner = ownerOf(tokenId);
-		return (spender == _owner ||
-			getApproved(tokenId) == spender ||
-			isApprovedForAll(_owner, spender));
+		return LibERC721._isApprovedOrOwner(spender, tokenId);
 	}
 
 	/**
@@ -271,7 +167,7 @@ contract ERC721Facet is
 		override
 		returns (bool)
 	{
-		return _isApprovedForAll(account, operator);
+		return LibERC721.isApprovedForAll(account, operator);
 	}
 
 	/**
@@ -282,12 +178,7 @@ contract ERC721Facet is
 		address to,
 		uint256 tokenId
 	) public payable override {
-		_handleTransferMessageValue(from, to, tokenId, msg.value);
-		require(
-			_isApprovedOrOwner(msg.sender, tokenId),
-			'ERC721: transfer caller is not owner or approved'
-		);
-		_transfer(from, to, tokenId);
+		return LibERC721.transferFrom(from, to, tokenId);
 	}
 
 	/**
@@ -298,7 +189,7 @@ contract ERC721Facet is
 		address to,
 		uint256 tokenId
 	) public payable override {
-		safeTransferFrom(from, to, tokenId, '');
+		return LibERC721.safeTransferFrom(from, to, tokenId);
 	}
 
 	/**
@@ -310,12 +201,7 @@ contract ERC721Facet is
 		uint256 tokenId,
 		bytes memory data
 	) public payable override {
-		_handleTransferMessageValue(from, to, tokenId, msg.value);
-		require(
-			_isApprovedOrOwner(msg.sender, tokenId),
-			'ERC721: transfer caller is not owner or approved'
-		);
-		_safeTransfer(from, to, tokenId, data);
+		return LibERC721._safeTransfer(from, to, tokenId, data);
 	}
 
 	/**
@@ -326,25 +212,14 @@ contract ERC721Facet is
 		payable
 		override
 	{
-		_handleApproveMessageValue(operator, tokenId, msg.value);
-		address owner = ownerOf(tokenId);
-		require(operator != owner, 'ERC721: approval to current owner');
-		require(
-			msg.sender == owner || isApprovedForAll(owner, msg.sender),
-			'ERC721: approve caller is not owner nor approved for all'
-		);
-		_approve(operator, tokenId);
+		return LibERC721.approve(operator, tokenId);
 	}
 
 	/**
 	 * @inheritdoc IERC721
 	 */
 	function setApprovalForAll(address operator, bool status) public override {
-		require(operator != msg.sender, 'ERC721: approve to caller');
-		ERC721BaseStorage.layout().operatorApprovals[msg.sender][
-			operator
-		] = status;
-		emit ApprovalForAll(msg.sender, operator, status);
+		return LibERC721.setApprovalForAll(operator, status);
 	}
 
 	/**
@@ -352,11 +227,11 @@ contract ERC721Facet is
 	 * @inheritdoc ERC721BaseInternal
 	 */
 	function _handleApproveMessageValue(
-		address,
-		uint256,
+		address operator,
+		uint256 tokenId,
 		uint256 value
 	) internal virtual override {
-		require(value == 0, 'ERC721: payable approve calls not supported');
+		return LibERC721._handleApproveMessageValue(operator, tokenId, value);
 	}
 
 	/**
@@ -364,11 +239,11 @@ contract ERC721Facet is
 	 * @inheritdoc ERC721BaseInternal
 	 */
 	function _handleTransferMessageValue(
-		address,
-		address,
-		uint256,
+		address from,
+		address to,
+		uint256 tokenId,
 		uint256 value
 	) internal virtual override {
-		require(value == 0, 'ERC721: payable transfer calls not supported');
+		return LibERC721._handleTransferMessageValue(from, to, tokenId, value);
 	}
 }

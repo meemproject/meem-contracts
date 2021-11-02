@@ -36,7 +36,7 @@ describe('General MeemFacet Tests', function Test() {
 	it('Can get nonOwnerSplitAllocationAmount', async () => {
 		const nonOwnerSplitAllocationAmount =
 			await meemFacet.nonOwnerSplitAllocationAmount()
-		assert.equal(nonOwnerSplitAllocationAmount.toNumber(), 1000)
+		assert.equal(nonOwnerSplitAllocationAmount.toNumber(), 100)
 	})
 
 	it('Can get contractURI', async () => {
@@ -51,7 +51,7 @@ describe('General MeemFacet Tests', function Test() {
 		assert.isAbove(json.description.length, 1)
 		assert.isAbove(json.image.length, 1)
 		assert.isAbove(json.image.length, 1)
-		assert.equal(json.seller_fee_basis_points, 1000)
+		assert.equal(json.seller_fee_basis_points, 100)
 		assert.equal(
 			json.fee_recipient,
 			'0x40c6BeE45d94063c5B05144489cd8A9879899592'

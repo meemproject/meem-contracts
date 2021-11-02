@@ -300,10 +300,10 @@ library LibERC721 {
 			_exists(tokenId),
 			'ERC721: operator query for nonexistent token'
 		);
-		address owner = ownerOf(tokenId);
-		return (spender == owner ||
+		address _owner = ownerOf(tokenId);
+		return (spender == _owner ||
 			getApproved(tokenId) == spender ||
-			isApprovedForAll(owner, spender));
+			isApprovedForAll(_owner, spender));
 	}
 
 	/**
@@ -598,5 +598,22 @@ library LibERC721 {
 			size := extcodesize(account)
 		}
 		return size > 0;
+	}
+
+	function _handleApproveMessageValue(
+		address,
+		uint256,
+		uint256 value
+	) internal pure {
+		require(value == 0, 'ERC721: payable approve calls not supported');
+	}
+
+	function _handleTransferMessageValue(
+		address,
+		address,
+		uint256,
+		uint256 value
+	) internal pure {
+		require(value == 0, 'ERC721: payable transfer calls not supported');
 	}
 }
