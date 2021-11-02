@@ -19,7 +19,7 @@
 		"upgradeFacet": "hardhat upgradeFacet",
 		"upgradeMeemFacet": "hardhat upgradeMeemFacet",
 		"upgradeERC721Facet": "hardhat upgradeERC721Facet",
-		"test": "hardhat test --network hardhat --no-compile",
+		"test": "hardhat test --network hardhat",
 		"coverage": "hardhat coverage",
 		"network": "hardhat node",
 		"console": "hardhat console",
