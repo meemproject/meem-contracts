@@ -6,7 +6,7 @@ import {LibAccessControl} from './libraries/LibAccessControl.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
 import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
 import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
-import {IMeemStandard} from './interfaces/MeemStandard.sol';
+import {IMeemBaseStandard, IMeemSplitsStandard, IMeemPermissionsStandard} from './interfaces/MeemStandard.sol';
 
 import '@solidstate/contracts/introspection/ERC165.sol';
 import '@solidstate/contracts/token/ERC721/IERC721.sol';
@@ -43,7 +43,15 @@ contract InitDiamond {
 			type(IRoyaltiesProvider).interfaceId,
 			true
 		);
-		erc165.setSupportedInterface(type(IMeemStandard).interfaceId, true);
+		erc165.setSupportedInterface(type(IMeemBaseStandard).interfaceId, true);
+		erc165.setSupportedInterface(
+			type(IMeemSplitsStandard).interfaceId,
+			true
+		);
+		erc165.setSupportedInterface(
+			type(IMeemPermissionsStandard).interfaceId,
+			true
+		);
 
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		s.proxyRegistryAddress = _args.proxyRegistryAddress;

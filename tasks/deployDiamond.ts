@@ -73,7 +73,9 @@ export async function deployDiamond(options: {
 	const facets: Record<string, Contract> = {
 		AccessControlFacet: {},
 		InitDiamond: {},
-		MeemFacet: {},
+		MeemBaseFacet: {},
+		MeemPermissionsFacet: {},
+		MeemSplitsFacet: {},
 		ERC721Facet: {}
 	}
 

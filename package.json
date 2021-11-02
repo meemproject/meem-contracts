@@ -10,7 +10,7 @@
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain",
 		"build:ts": "tsc -p .",
-		"build:sol": "hardhat compile",
+		"build:sol": "hardhat compile && yarn createMeemABI",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
 		"deployDiamond": "hardhat deployDiamond",
@@ -19,7 +19,7 @@
 		"upgradeFacet": "hardhat upgradeFacet",
 		"upgradeMeemFacet": "hardhat upgradeMeemFacet",
 		"upgradeERC721Facet": "hardhat upgradeERC721Facet",
-		"test": "hardhat test --network hardhat",
+		"test": "hardhat test --network hardhat --no-compile",
 		"coverage": "hardhat coverage",
 		"network": "hardhat node",
 		"console": "hardhat console",
@@ -30,6 +30,7 @@
 		"release": "semantic-release",
 		"size": "hardhat size-contracts",
 		"createMeemABI": "tsnd --transpile-only scripts/createMeemABI.ts",
+		"generateMeemTypes": "typechain --target ethers-v5  './types/Meem.json'",
 		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs"
 	},
 	"devDependencies": {

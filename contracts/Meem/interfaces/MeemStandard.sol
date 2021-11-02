@@ -64,23 +64,12 @@ struct Meem {
 	MeemProperties childProperties;
 }
 
-interface IMeemStandard {
-	event PermissionsSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		MeemPermission[] permission
-	);
-	event SplitsSet(uint256 tokenId, Split[] splits);
+interface IMeemBaseStandard {
 	event PropertiesSet(
 		uint256 tokenId,
 		PropertyType propertyType,
 		MeemProperties props
 	);
-	event TotalChildrenSet(uint256 tokenId, int256 newTotalChildren);
-	event TotalChildrenLocked(uint256 tokenId, address lockedBy);
-	event ChildrenPerWalletSet(uint256 tokenId, int256 newTotalChildren);
-	event ChildrenPerWalletLocked(uint256 tokenId, address lockedBy);
 
 	function mint(
 		address to,
@@ -112,19 +101,50 @@ interface IMeemStandard {
 
 	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
-	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
-		external;
+	function childDepth() external returns (uint256);
 
-	function lockTotalChildren(uint256 tokenId) external;
+	function setChildDepth(uint256 newChildDepth) external;
+}
 
-	function setChildrenPerWallet(uint256 tokenId, int256 newChildrenPerWallet)
-		external;
-
-	function lockChildrenPerWallet(uint256 tokenId) external;
+interface IMeemSplitsStandard {
+	event SplitsSet(uint256 tokenId, Split[] splits);
 
 	function setNonOwnerSplitAllocationAmount(uint256 amount) external;
 
 	function nonOwnerSplitAllocationAmount() external view returns (uint256);
+
+	function addSplit(
+		uint256 tokenId,
+		PropertyType propertyType,
+		Split memory split
+	) external;
+
+	function removeSplitAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		uint256 idx
+	) external;
+
+	function updateSplitAt(
+		uint256 tokenId,
+		PropertyType propertyType,
+		uint256 idx,
+		Split memory split
+	) external;
+}
+
+interface IMeemPermissionsStandard {
+	event TotalChildrenSet(uint256 tokenId, int256 newTotalChildren);
+	event TotalChildrenLocked(uint256 tokenId, address lockedBy);
+	event ChildrenPerWalletSet(uint256 tokenId, int256 newTotalChildren);
+	event ChildrenPerWalletLocked(uint256 tokenId, address lockedBy);
+
+	event PermissionsSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission[] permission
+	);
 
 	function addPermission(
 		uint256 tokenId,
@@ -148,26 +168,13 @@ interface IMeemStandard {
 		MeemPermission memory permission
 	) external;
 
-	function addSplit(
-		uint256 tokenId,
-		PropertyType propertyType,
-		Split memory split
-	) external;
+	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
+		external;
 
-	function removeSplitAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		uint256 idx
-	) external;
+	function lockTotalChildren(uint256 tokenId) external;
 
-	function updateSplitAt(
-		uint256 tokenId,
-		PropertyType propertyType,
-		uint256 idx,
-		Split memory split
-	) external;
+	function setChildrenPerWallet(uint256 tokenId, int256 newChildrenPerWallet)
+		external;
 
-	function childDepth() external returns (uint256);
-
-	function setChildDepth(uint256 newChildDepth) external;
+	function lockChildrenPerWallet(uint256 tokenId) external;
 }

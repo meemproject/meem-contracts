@@ -3,14 +3,14 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemFacet } from '../typechain'
+import { Erc721Facet, MeemBaseFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
 describe('Minting', function Test() {
-	let meemFacet: MeemFacet
+	let meemFacet: MeemBaseFacet
 	let erc721Facet: Erc721Facet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
@@ -28,9 +28,9 @@ describe('Minting', function Test() {
 		contractAddress = DiamondAddress
 
 		meemFacet = (await ethers.getContractAt(
-			'MeemFacet',
+			'MeemBaseFacet',
 			DiamondAddress
-		)) as MeemFacet
+		)) as MeemBaseFacet
 		erc721Facet = (await ethers.getContractAt(
 			// 'ERC721Facet',
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
