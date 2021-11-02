@@ -9,15 +9,11 @@ import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Base64} from '../libraries/Base64.sol';
-
-// import {ERC721} from '@solidstate/contracts/token/ERC721/ERC721.sol';
-import {IERC721} from '../../solidstate/token/ERC721/IERC721.sol';
-import {IERC721Enumerable} from '../../solidstate/token/ERC721/enumerable/IERC721Enumerable.sol';
-import {IERC721Metadata} from '../../solidstate/token/ERC721/metadata/IERC721Metadata.sol';
-import {ERC721BaseStorage} from '../../solidstate/token/ERC721/base/ERC721BaseStorage.sol';
-import {ERC721BaseInternal} from '../../solidstate/token/ERC721/base/ERC721BaseInternal.sol';
-
-// import {ERC721Tradable, ProxyRegistry} from '../../common/ERC721Tradable.sol';
+import {IERC721} from '../interfaces/IERC721.sol';
+import {ERC721BaseInternal} from '../interfaces/ERC721BaseInternal.sol';
+import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
+import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
+import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
 
 contract ERC721Facet is
 	IERC721,
@@ -237,22 +233,22 @@ contract ERC721Facet is
 		return LibERC721._exists(tokenId);
 	}
 
-	// function _isApprovedOrOwner(address spender, uint256 tokenId)
-	// 	internal
-	// 	view
-	// 	virtual
-	// 	override
-	// 	returns (bool)
-	// {
-	// 	require(
-	// 		_exists(tokenId),
-	// 		'ERC721: operator query for nonexistent token'
-	// 	);
-	// 	address _owner = ownerOf(tokenId);
-	// 	return (spender == _owner ||
-	// 		getApproved(tokenId) == spender ||
-	// 		isApprovedForAll(_owner, spender));
-	// }
+	function _isApprovedOrOwner(address spender, uint256 tokenId)
+		internal
+		view
+		virtual
+		override
+		returns (bool)
+	{
+		require(
+			_exists(tokenId),
+			'ERC721: operator query for nonexistent token'
+		);
+		address _owner = ownerOf(tokenId);
+		return (spender == _owner ||
+			getApproved(tokenId) == spender ||
+			isApprovedForAll(_owner, spender));
+	}
 
 	/**
 	 * @inheritdoc IERC721

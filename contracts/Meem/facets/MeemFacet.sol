@@ -229,14 +229,14 @@ contract MeemFacet is RoyaltiesV2, IMeemStandard {
 		s.childDepth = newChildDepth;
 	}
 
-	// function tokenIdsOfOwner(address _owner)
-	// 	public
-	// 	view
-	// 	returns (uint256[] memory tokenIds_)
-	// {
-	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-	// 	return s.ownerTokenIds[_owner];
-	// }
+	function tokenIdsOfOwner(address _owner)
+		public
+		view
+		returns (uint256[] memory tokenIds_)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.ownerTokenIds[_owner];
+	}
 
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal

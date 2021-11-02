@@ -10,7 +10,7 @@ interface Contract {
 	waitForConfirmation?: boolean
 }
 
-task('upgradeOwnershipFacet', 'Upgrade OwnershipFacet')
+task('upgradeERC721Facet', 'Upgrade ERC721Facet')
 	.addParam('proxy', 'The proxy address', undefined, types.string, false)
 	.setAction(async (args, { ethers }) => {
 		const [deployer] = await ethers.getSigners()
@@ -18,17 +18,17 @@ task('upgradeOwnershipFacet', 'Upgrade OwnershipFacet')
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
-		const OwnershipFacet = await ethers.getContractFactory('OwnershipFacet')
-		const ownershipFacet = await OwnershipFacet.deploy()
-		await ownershipFacet.deployed()
+		const ERC721Facet = await ethers.getContractFactory('ERC721Facet')
+		const erc721Facet = await ERC721Facet.deploy()
+		await erc721Facet.deployed()
 
 		const diamondCut = await ethers.getContractAt('IDiamondCut', args.proxy)
 		const tx = await diamondCut.diamondCut(
 			[
 				{
-					facetAddress: ownershipFacet.address,
+					facetAddress: erc721Facet.address,
 					action: FacetCutAction.Replace,
-					functionSelectors: getSelectors(ownershipFacet)
+					functionSelectors: getSelectors(erc721Facet)
 				}
 			],
 			ethers.constants.AddressZero,

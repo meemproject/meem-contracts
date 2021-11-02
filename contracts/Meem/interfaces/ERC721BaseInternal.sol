@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import {AddressUtils} from '../../../utils/AddressUtils.sol';
-import {EnumerableMap} from '../../../utils/EnumerableMap.sol';
-import {EnumerableSet} from '../../../utils/EnumerableSet.sol';
-import {IERC721Internal} from '../IERC721Internal.sol';
-import {IERC721Receiver} from '../IERC721Receiver.sol';
-import {ERC721BaseStorage} from './ERC721BaseStorage.sol';
+import {AddressUtils} from '@solidstate/contracts/utils/AddressUtils.sol';
+import {EnumerableMap} from '@solidstate/contracts/utils/EnumerableMap.sol';
+import {EnumerableSet} from '@solidstate/contracts/utils/EnumerableSet.sol';
+import {IERC721Internal} from '@solidstate/contracts/token/ERC721/IERC721Internal.sol';
+import {IERC721Receiver} from '@solidstate/contracts/token/ERC721/IERC721Receiver.sol';
+import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
 
 /**
  * @notice Base ERC721 internal functions

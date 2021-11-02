@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import {IERC165} from '../../introspection/IERC165.sol';
-import {IERC721Internal} from './IERC721Internal.sol';
+import {IERC721Internal} from '@solidstate/contracts/token/ERC721/IERC721Internal.sol';
 
 /**
  * @notice ERC721 interface

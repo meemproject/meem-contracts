@@ -17,6 +17,7 @@
 		"upgradeDiamond": "hardhat upgradeDiamond",
 		"upgradeAccessControlFacet": "hardhat upgradeAccessControlFacet",
 		"upgradeMeemFacet": "hardhat upgradeMeemFacet",
+		"upgradeERC721Facet": "hardhat upgradeERC721Facet",
 		"test": "hardhat test --network hardhat",
 		"coverage": "hardhat coverage",
 		"network": "hardhat node",

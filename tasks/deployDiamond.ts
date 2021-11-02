@@ -1,6 +1,5 @@
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
-import { getImplementationAddress } from '@openzeppelin/upgrades-core'
 import { task } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import { FacetCutAction, getSelectors } from './lib/diamond'
@@ -18,47 +17,20 @@ export async function deployDiamond(options: {
 	hardhatArguments?: HardhatArguments
 }) {
 	const deployedContracts: Record<string, string> = {}
-	const { ethers, upgrades, hardhatArguments } = options
+	const { ethers, hardhatArguments } = options
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
 	console.log('Deploying contracts with the account:', contractOwner.address)
 
 	console.log('Account balance:', (await contractOwner.getBalance()).toString())
 
-	// deploy DiamondCutFacet
-	// const DiamondCutFacet = await ethers.getContractFactory('DiamondCutFacet')
-	// const diamondCutFacet = await DiamondCutFacet.deploy()
-	// await diamondCutFacet.deployed()
-	// deployedContracts.DiamondCutFacet = diamondCutFacet.address
-	// console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
-
 	// deploy Diamond
 	const Diamond = await ethers.getContractFactory('MeemDiamond')
-	// const diamond = await Diamond.deploy(
-	// 	contractOwner.address,
-	// 	diamondCutFacet.address
-	// )
+
 	const diamond = await Diamond.deploy()
-	// const diamond = await upgrades.deployProxy(
-	// 	Diamond,
-	// 	[contractOwner.address, diamondCutFacet.address],
-	// 	{
-	// 		kind: 'uups',
-	// 		unsafeAllow: ['constructor', 'delegatecall', 'state-variable-assignment']
-	// 	}
-	// )
+
 	await diamond.deployed()
-	deployedContracts.proxy = diamond.address
-	// const implementationAddress = await getImplementationAddress(
-	// 	ethers.provider,
-	// 	diamond.address
-	// )
-	// console.log('Diamond deployed:', {
-	// 	proxy: diamond.address,
-	// 	implementationAddress
-	// })
-	// deployedContracts.DiamondProxy = diamond.address
-	// deployedContracts.DiamondImplementation = implementationAddress
+	deployedContracts.DiamondProxy = diamond.address
 
 	// deploy DiamondInit
 	// DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
@@ -67,15 +39,14 @@ export async function deployDiamond(options: {
 	const DiamondInit = await ethers.getContractFactory('InitDiamond')
 	const diamondInit = await DiamondInit.deploy()
 	await diamondInit.deployed()
-	// console.log('DiamondInit deployed:', diamondInit.address)
+	console.log('DiamondInit deployed:', diamondInit.address)
 
 	// deploy facets
 	console.log('')
 	console.log('Deploying facets')
 
 	const facets: Record<string, Contract> = {
-		// DiamondLoupeFacet: {},
-		// OwnershipFacet: {},
+		AccessControlFacet: {},
 		InitDiamond: {},
 		MeemFacet: {},
 		ERC721Facet: {}
