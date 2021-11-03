@@ -1,7 +1,7 @@
 import path from 'path'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
-import { ethers } from 'ethers'
+import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
 import { task } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
@@ -61,7 +61,7 @@ export async function deployDiamond(options: {
 	console.log('')
 	console.log('Deploying facets')
 
-	const facets: Record<string, ethers.Contract | null> = {
+	const facets: Record<string, Ethers.Contract | null> = {
 		AccessControlFacet: null,
 		InitDiamond: null,
 		MeemBaseFacet: null,
