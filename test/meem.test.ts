@@ -3,14 +3,14 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemFacet } from '../typechain'
+import { Erc721Facet, MeemBaseFacet } from '../typechain'
 
 chai.use(chaiAsPromised)
 
 // const { deployContract, link } = waffle
 
 describe('General MeemFacet Tests', function Test() {
-	let meemFacet: MeemFacet
+	let meemFacet: MeemBaseFacet
 	let erc721Facet: Erc721Facet
 	let signers: SignerWithAddress[]
 
@@ -23,20 +23,14 @@ describe('General MeemFacet Tests', function Test() {
 		})
 
 		meemFacet = (await ethers.getContractAt(
-			'MeemFacet',
+			'MeemBaseFacet',
 			DiamondAddress
-		)) as MeemFacet
+		)) as MeemBaseFacet
 		erc721Facet = (await ethers.getContractAt(
 			// 'ERC721Facet',
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
 			DiamondAddress
 		)) as Erc721Facet
-	})
-
-	it('Can get nonOwnerSplitAllocationAmount', async () => {
-		const nonOwnerSplitAllocationAmount =
-			await meemFacet.nonOwnerSplitAllocationAmount()
-		assert.equal(nonOwnerSplitAllocationAmount.toNumber(), 1000)
 	})
 
 	it('Can get contractURI', async () => {
@@ -51,7 +45,7 @@ describe('General MeemFacet Tests', function Test() {
 		assert.isAbove(json.description.length, 1)
 		assert.isAbove(json.image.length, 1)
 		assert.isAbove(json.image.length, 1)
-		assert.equal(json.seller_fee_basis_points, 1000)
+		assert.equal(json.seller_fee_basis_points, 100)
 		assert.equal(
 			json.fee_recipient,
 			'0x40c6BeE45d94063c5B05144489cd8A9879899592'

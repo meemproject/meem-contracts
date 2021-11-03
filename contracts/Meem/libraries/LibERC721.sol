@@ -3,6 +3,9 @@ pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibArray} from '../libraries/LibArray.sol';
+import {LibMeem} from '../libraries/LibMeem.sol';
+import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {Meem} from '../interfaces/MeemStandard.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 import 'hardhat/console.sol';
 
@@ -206,8 +209,9 @@ library LibERC721 {
 	) internal {
 		//solhint-disable-next-line max-line-length
 		require(
-			_isApprovedOrOwner(_msgSender(), tokenId),
-			'ERC721: transfer caller is not owner nor approved'
+			_isApprovedOrOwner(_msgSender(), tokenId) ||
+				_canFacilitateClaim(_msgSender(), tokenId),
+			'ERC721 transferFrom: transfer caller is not owner nor approved'
 		);
 
 		_transfer(from, to, tokenId);
@@ -300,10 +304,10 @@ library LibERC721 {
 			_exists(tokenId),
 			'ERC721: operator query for nonexistent token'
 		);
-		address owner = ownerOf(tokenId);
-		return (spender == owner ||
+		address _owner = ownerOf(tokenId);
+		return (spender == _owner ||
 			getApproved(tokenId) == spender ||
-			isApprovedForAll(owner, spender));
+			isApprovedForAll(_owner, spender));
 	}
 
 	/**
@@ -407,13 +411,16 @@ library LibERC721 {
 		uint256 tokenId
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		bool canFacilitateClaim = _canFacilitateClaim(_msgSender(), tokenId);
 		require(
-			ownerOf(tokenId) == from,
+			ownerOf(tokenId) == from || canFacilitateClaim,
 			'ERC721: transfer of token that is not own'
 		);
 		require(to != address(0), 'ERC721: transfer to the zero address');
 
-		_beforeTokenTransfer(from, to, tokenId);
+		if (!canFacilitateClaim) {
+			_beforeTokenTransfer(from, to, tokenId);
+		}
 
 		// Clear approvals from the previous owner
 		_approve(address(0), tokenId);
@@ -598,5 +605,43 @@ library LibERC721 {
 			size := extcodesize(account)
 		}
 		return size > 0;
+	}
+
+	function _handleApproveMessageValue(
+		address,
+		uint256,
+		uint256 value
+	) internal pure {
+		require(value == 0, 'ERC721: payable approve calls not supported');
+	}
+
+	function _handleTransferMessageValue(
+		address,
+		address,
+		uint256,
+		uint256 value
+	) internal pure {
+		require(value == 0, 'ERC721: payable transfer calls not supported');
+	}
+
+	function _canFacilitateClaim(address user, uint256 tokenId)
+		internal
+		view
+		returns (bool)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		Meem storage meem = LibMeem.getMeem(tokenId);
+		bool isAdmin = LibAccessControl.hasRole(s.DEFAULT_ADMIN_ROLE, user);
+		if (
+			!isAdmin ||
+			meem.parent == address(0) ||
+			meem.parent == address(this)
+		) {
+			// Meem is an original or a child of another meem and can only be transferred by the owner
+			return false;
+		}
+
+		return true;
 	}
 }

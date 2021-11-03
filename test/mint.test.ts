@@ -3,14 +3,14 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemFacet } from '../typechain'
+import { Erc721Facet, MeemBaseFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
 describe('Minting', function Test() {
-	let meemFacet: MeemFacet
+	let meemFacet: MeemBaseFacet
 	let erc721Facet: Erc721Facet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
@@ -28,9 +28,9 @@ describe('Minting', function Test() {
 		contractAddress = DiamondAddress
 
 		meemFacet = (await ethers.getContractAt(
-			'MeemFacet',
+			'MeemBaseFacet',
 			DiamondAddress
-		)) as MeemFacet
+		)) as MeemBaseFacet
 		erc721Facet = (await ethers.getContractAt(
 			// 'ERC721Facet',
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
@@ -38,7 +38,7 @@ describe('Minting', function Test() {
 		)) as Erc721Facet
 	})
 
-	it('Can not mint as non-owner', async () => {
+	it('Can not mint as non-minter role', async () => {
 		await assert.isRejected(
 			meemFacet
 				.connect(signers[1])
@@ -56,7 +56,7 @@ describe('Minting', function Test() {
 		)
 	})
 
-	it('Can mint as owner', async () => {
+	it('Can mint as minter role', async () => {
 		const { status } = await (
 			await meemFacet
 				.connect(signers[0])
@@ -87,12 +87,12 @@ describe('Minting', function Test() {
 		assert.equal(tokenIds[0].toNumber(), 0)
 	})
 
-	it('Can not transfer wMeem', async () => {
+	it('Can not transfer wMeem as non-admin', async () => {
 		const { status } = await (
 			await meemFacet
 				.connect(signers[0])
 				.mint(
-					signers[0].address,
+					signers[2].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					0,
 					parent,
@@ -105,29 +105,38 @@ describe('Minting', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const totalSupply = await erc721Facet.connect(signers[0]).totalSupply()
+		const totalSupply = await erc721Facet.connect(signers[2]).totalSupply()
 		assert.equal(totalSupply.toNumber(), 2)
 
-		const token0Owner = await erc721Facet.connect(signers[0]).ownerOf(1)
-		assert.equal(token0Owner, signers[0].address)
+		const token1Owner = await erc721Facet.connect(signers[2]).ownerOf(1)
+		assert.equal(token1Owner, signers[2].address)
 		const ownerBalance = await erc721Facet
-			.connect(signers[0])
-			.balanceOf(signers[0].address)
+			.connect(signers[2])
+			.balanceOf(signers[2].address)
 		assert.equal(ownerBalance.toNumber(), 1)
 
 		const tokenIds = await meemFacet
-			.connect(signers[0])
-			.tokenIdsOfOwner(signers[0].address)
+			.connect(signers[2])
+			.tokenIdsOfOwner(signers[2].address)
 
 		assert.equal(tokenIds[0].toNumber(), 1)
 
-		const meem = await meemFacet.connect(signers[0]).getMeem(1)
+		const meem = await meemFacet.connect(signers[2]).getMeem(1)
 		console.log({ meem, zero: meem[0] })
-		assert.equal(meem.owner, signers[0].address)
+		assert.equal(meem.owner, signers[2].address)
 
 		await assert.isRejected(
-			erc721Facet.connect(signers[0]).transferFrom(signers[0].address, owner, 1)
+			erc721Facet.connect(signers[2]).transferFrom(signers[2].address, owner, 1)
 		)
+	})
+
+	it('Can transfer wMeem as admin', async () => {
+		const transferResult = await (
+			await erc721Facet
+				.connect(signers[0])
+				.transferFrom(signers[2].address, owner, 1)
+		).wait()
+		assert.equal(transferResult.status, 1)
 	})
 
 	it('Can transfer child meem', async () => {
@@ -135,7 +144,7 @@ describe('Minting', function Test() {
 			await meemFacet
 				.connect(signers[0])
 				.mint(
-					signers[0].address,
+					signers[2].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					0,
 					contractAddress,
@@ -148,25 +157,9 @@ describe('Minting', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const totalSupply = await erc721Facet.connect(signers[0]).totalSupply()
-		assert.equal(totalSupply.toNumber(), 3)
-
-		const token0Owner = await erc721Facet.connect(signers[0]).ownerOf(1)
-		assert.equal(token0Owner, signers[0].address)
-		const ownerBalance = await erc721Facet
-			.connect(signers[0])
-			.balanceOf(signers[0].address)
-		assert.equal(ownerBalance.toNumber(), 2)
-
-		const tokenIds = await meemFacet
-			.connect(signers[0])
-			.tokenIdsOfOwner(signers[0].address)
-
-		assert.equal(tokenIds[1].toNumber(), 2)
-
-		const meem = await meemFacet.connect(signers[0]).getMeem(2)
+		let meem = await meemFacet.connect(signers[2]).getMeem(2)
 		console.log({ meem, contractAddress })
-		assert.equal(meem.owner, signers[0].address)
+		assert.equal(meem.owner, signers[2].address)
 		assert.equal(meem.parent, contractAddress)
 		assert.equal(meem.root, contractAddress)
 
@@ -175,10 +168,19 @@ describe('Minting', function Test() {
 
 		const transferResult = await (
 			await erc721Facet
-				.connect(signers[0])
-				.transferFrom(signers[0].address, owner, 2)
+				.connect(signers[2])
+				.transferFrom(signers[2].address, owner, 2)
 		).wait()
 		assert.equal(transferResult.status, 1)
+
+		meem = await meemFacet.connect(signers[2]).getMeem(2)
+		console.log({ meem, contractAddress })
+		assert.equal(meem.owner, owner)
+		assert.equal(meem.parent, contractAddress)
+		assert.equal(meem.root, contractAddress)
+
+		const o = await erc721Facet.ownerOf(2)
+		assert.equal(o, owner)
 	})
 
 	it('Can transfer original meem', async () => {

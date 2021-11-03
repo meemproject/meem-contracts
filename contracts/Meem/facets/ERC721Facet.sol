@@ -2,28 +2,24 @@
 pragma solidity ^0.8.4;
 
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {LibDiamond} from '../libraries/LibDiamond.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Base64} from '../libraries/Base64.sol';
-import {ERC721Tradable, ProxyRegistry} from '../../common/ERC721Tradable.sol';
+import {IERC721} from '../interfaces/IERC721.sol';
+import {ERC721BaseInternal} from '../interfaces/ERC721BaseInternal.sol';
+import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
+import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
+import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
 
-contract ERC721Facet is ERC721Tradable {
-	constructor() ERC721Tradable('Meem', 'MEEM', address(0)) {
-		// _name = name_;
-		// _symbol = symbol_;
-	}
-
-	// function onERC721Received(
-	// 	address _operator,
-	// 	address _from,
-	// 	uint256 _tokenId,
-	// 	bytes calldata _data
-	// ) public override returns (bytes4) {}
-
+contract ERC721Facet is
+	IERC721,
+	IERC721Enumerable,
+	IERC721Metadata,
+	ERC721BaseInternal
+{
 	function setContractURI(string memory newContractURI) public {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
@@ -94,38 +90,6 @@ contract ERC721Facet is ERC721Tradable {
 		return LibERC721.tokenOfOwnerByIndex(_owner, _index);
 	}
 
-	// @notice Transfers the ownership of multiple  NFTs from one address to another at once
-	/// @dev Throws unless `LibMeta.msgSender()` is the current owner, an authorized
-	///  operator, or the approved address of each of the NFTs in `_tokenIds`. Throws if `_from` is
-	///  not the current owner. Throws if `_to` is the zero address. Throws if one of the NFTs in
-	///  `_tokenIds` is not a valid NFT. When transfer is complete, this function
-	///  checks if `_to` is a smart contract (code size > 0). If so, it calls
-	///  `onERC721Received` on `_to` and throws if the return value is not
-	///  `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
-	/// @param _from The current owner of the NFTs
-	/// @param _to The new owner
-	/// @param _tokenIds An array containing the identifiers of the NFTs to transfer
-	/// @param _data Additional data with no specified format, sent in call to `_to`
-	function safeBatchTransferFrom(
-		address _from,
-		address _to,
-		uint256[] calldata _tokenIds,
-		bytes calldata _data
-	) external {
-		address sender = LibMeta.msgSender();
-		for (uint256 index = 0; index < _tokenIds.length; index++) {
-			uint256 _tokenId = _tokenIds[index];
-			internalTransferFrom(sender, _from, _to, _tokenId);
-			LibERC721._checkOnERC721Received(
-				sender,
-				_from,
-				_to,
-				_tokenId,
-				_data
-			);
-		}
-	}
-
 	///@notice Return the universal name of the NFT
 	function name() public view override returns (string memory) {
 		return LibERC721.name();
@@ -136,7 +100,7 @@ contract ERC721Facet is ERC721Tradable {
 		return LibERC721.symbol();
 	}
 
-	function baseTokenURI() public pure override returns (string memory) {
+	function baseTokenURI() public pure returns (string memory) {
 		return LibERC721.baseTokenURI();
 	}
 
@@ -150,34 +114,7 @@ contract ERC721Facet is ERC721Tradable {
 		override
 		returns (string memory)
 	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.tokenURIs[tokenId];
-	}
-
-	function isApprovedForAll(address _owner, address operator)
-		public
-		view
-		virtual
-		override(ERC721Tradable)
-		returns (bool)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		// Whitelist OpenSea proxy contract for easy trading.
-		ProxyRegistry proxyRegistry = ProxyRegistry(s.proxyRegistryAddress);
-		if (address(proxyRegistry.proxies(_owner)) == operator) {
-			return true;
-		}
-
-		return false;
-	}
-
-	function transferOwnership(address _newOwner) public override {
-		LibDiamond.enforceIsContractOwner();
-		LibDiamond.setContractOwner(_newOwner);
-	}
-
-	function owner() public view override returns (address owner_) {
-		owner_ = LibDiamond.contractOwner();
+		return LibERC721.tokenURI(tokenId);
 	}
 
 	function _beforeTokenTransfer(
@@ -194,40 +131,7 @@ contract ERC721Facet is ERC721Tradable {
 		LibERC721._transfer(from, to, tokenId);
 	}
 
-	function internalTransferFrom(
-		address _sender,
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(_to != address(0), "ERC721Facet: Can't transfer to 0 address");
-		require(_from != address(0), "ERC721Facet: _from can't be 0 address");
-		require(
-			_from == s.meems[_tokenId].owner,
-			'ERC721Facet: _from is not owner, transfer failed'
-		);
-		require(
-			_sender == _from ||
-				s.operators[_from][_sender] ||
-				_sender == s.approved[_tokenId],
-			'ERC721Facet: Not owner or approved to transfer'
-		);
-		LibMeem.transfer(_from, _to, _tokenId);
-		// LibERC721Marketplace.updateERC721Listing(
-		// 	address(this),
-		// 	_tokenId,
-		// 	_from
-		// );
-	}
-
-	function _exists(uint256 tokenId)
-		internal
-		view
-		virtual
-		override
-		returns (bool)
-	{
+	function _exists(uint256 tokenId) internal view virtual returns (bool) {
 		return LibERC721._exists(tokenId);
 	}
 
@@ -238,13 +142,107 @@ contract ERC721Facet is ERC721Tradable {
 		override
 		returns (bool)
 	{
-		require(
-			_exists(tokenId),
-			'ERC721: operator query for nonexistent token'
-		);
-		address _owner = ownerOf(tokenId);
-		return (spender == _owner ||
-			getApproved(tokenId) == spender ||
-			isApprovedForAll(_owner, spender));
+		return LibERC721._isApprovedOrOwner(spender, tokenId);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function getApproved(uint256 tokenId)
+		public
+		view
+		override
+		returns (address)
+	{
+		return _getApproved(tokenId);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function isApprovedForAll(address account, address operator)
+		public
+		view
+		override
+		returns (bool)
+	{
+		return LibERC721.isApprovedForAll(account, operator);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function transferFrom(
+		address from,
+		address to,
+		uint256 tokenId
+	) public payable override {
+		return LibERC721.transferFrom(from, to, tokenId);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function safeTransferFrom(
+		address from,
+		address to,
+		uint256 tokenId
+	) public payable override {
+		return LibERC721.safeTransferFrom(from, to, tokenId);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function safeTransferFrom(
+		address from,
+		address to,
+		uint256 tokenId,
+		bytes memory data
+	) public payable override {
+		return LibERC721._safeTransfer(from, to, tokenId, data);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function approve(address operator, uint256 tokenId)
+		public
+		payable
+		override
+	{
+		return LibERC721.approve(operator, tokenId);
+	}
+
+	/**
+	 * @inheritdoc IERC721
+	 */
+	function setApprovalForAll(address operator, bool status) public override {
+		return LibERC721.setApprovalForAll(operator, status);
+	}
+
+	/**
+	 * @notice ERC721 hook: revert if value is included in external approve function call
+	 * @inheritdoc ERC721BaseInternal
+	 */
+	function _handleApproveMessageValue(
+		address operator,
+		uint256 tokenId,
+		uint256 value
+	) internal virtual override {
+		return LibERC721._handleApproveMessageValue(operator, tokenId, value);
+	}
+
+	/**
+	 * @notice ERC721 hook: revert if value is included in external transfer function call
+	 * @inheritdoc ERC721BaseInternal
+	 */
+	function _handleTransferMessageValue(
+		address from,
+		address to,
+		uint256 tokenId,
+		uint256 value
+	) internal virtual override {
+		return LibERC721._handleTransferMessageValue(from, to, tokenId, value);
 	}
 }

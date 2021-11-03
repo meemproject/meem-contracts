@@ -1,22 +1,25 @@
 {
-	"name": "@meemproject/meem-gate-token",
+	"name": "@meemproject/meem-contracts",
 	"private": true,
 	"version": "1.1.0",
-	"description": "Meem Gate",
+	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
 	"scripts": {
-		"build": "concurrently -r \"yarn build:sol\" \"yarn build:ts\"",
+		"#build": "concurrently -r \"yarn build:sol\" \"yarn build:ts\"",
+		"build": "yarn build:sol && yarn build:ts",
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain",
 		"build:ts": "tsc -p .",
-		"build:sol": "hardhat compile",
+		"build:sol": "hardhat compile && yarn createMeemABI",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
 		"deployDiamond": "hardhat deployDiamond",
 		"upgradeDiamond": "hardhat upgradeDiamond",
 		"upgradeAccessControlFacet": "hardhat upgradeAccessControlFacet",
+		"upgradeFacet": "hardhat upgradeFacet",
 		"upgradeMeemFacet": "hardhat upgradeMeemFacet",
+		"upgradeERC721Facet": "hardhat upgradeERC721Facet",
 		"test": "hardhat test --network hardhat",
 		"coverage": "hardhat coverage",
 		"network": "hardhat node",
@@ -27,7 +30,9 @@
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
 		"release": "semantic-release",
 		"size": "hardhat size-contracts",
-		"createMeemABI": "tsnd --transpile-only scripts/createMeemABI.ts"
+		"createMeemABI": "tsnd --transpile-only scripts/createMeemABI.ts",
+		"generateMeemTypes": "typechain --target ethers-v5  './types/Meem.json'",
+		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs"
 	},
 	"devDependencies": {
 		"@float-capital/solidity-coverage": "^0.7.17",
@@ -38,6 +43,7 @@
 		"@openzeppelin/contracts": "^4.1.0",
 		"@openzeppelin/contracts-upgradeable": "^4.1.0",
 		"@openzeppelin/hardhat-upgrades": "^1.8.2",
+		"@solidstate/contracts": "^0.0.27",
 		"@typechain/ethers-v5": "^6.0.1",
 		"@types/chai": "^4.2.22",
 		"@types/chai-as-promised": "^7.1.4",
@@ -64,11 +70,13 @@
 		"prettier": "^2.4.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.12",
 		"prompt": "^1.1.0",
+		"solidity-docgen": "^0.5.16",
 		"ts-node": "^10.0.0",
 		"ts-node-dev": "^1.1.8",
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
-		"dotenv": "^10.0.0"
+		"dotenv": "^10.0.0",
+		"solc-0.8": "npm:solc@^0.8.4"
 	}
 }
