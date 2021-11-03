@@ -25,3 +25,6 @@ coverage/
 coverage.json
 
 # abi
+
+# Local network
+.diamond/31337.json

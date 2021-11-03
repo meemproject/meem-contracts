@@ -3,12 +3,14 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers, upgrades } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { MeemSplitsFacet } from '../typechain'
+import { AccessControlFacet, MeemSplitsFacet, Ownable } from '../typechain'
 
 chai.use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
 	let meemFacet: MeemSplitsFacet
+	let ownershipFacet: Ownable
+	let accessControlFacet: AccessControlFacet
 	let signers: SignerWithAddress[]
 
 	before(async () => {
@@ -23,6 +25,36 @@ describe('Contract Admin', function Test() {
 			'MeemSplitsFacet',
 			DiamondAddress
 		)) as MeemSplitsFacet
+
+		ownershipFacet = (await ethers.getContractAt(
+			'@solidstate/contracts/access/Ownable.sol:Ownable',
+			DiamondAddress
+		)) as Ownable
+
+		accessControlFacet = (await ethers.getContractAt(
+			'AccessControlFacet',
+			DiamondAddress
+		)) as AccessControlFacet
+	})
+
+	it('Assigns ownership to deployer', async () => {
+		const o = await ownershipFacet.owner()
+		assert.equal(o, signers[0].address)
+	})
+
+	it('Assigns roles to deployer', async () => {
+		const adminRole = await accessControlFacet.DEFAULT_ADMIN_ROLE()
+		const hasAdminRole = await accessControlFacet.hasRole(
+			signers[0].address,
+			adminRole
+		)
+		assert.isTrue(hasAdminRole)
+		const minterRole = await accessControlFacet.MINTER_ROLE()
+		const hasMinterRole = await accessControlFacet.hasRole(
+			signers[0].address,
+			minterRole
+		)
+		assert.isTrue(hasMinterRole)
 	})
 
 	it('Can set split amount as admin', async () => {

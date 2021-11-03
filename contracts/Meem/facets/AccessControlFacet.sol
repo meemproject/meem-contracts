@@ -56,7 +56,7 @@ contract AccessControlFacet {
 	/// @notice Grant a role to a user. The granting user must have the DEFAULT_ADMIN_ROLE
 	/// @param user The wallet address of the user to revoke the role from
 	/// @param role The role to revoke
-	function hasrole(address user, bytes32 role) public view returns (bool) {
+	function hasRole(address user, bytes32 role) public view returns (bool) {
 		return LibAccessControl.hasRole(role, user);
 	}
 }

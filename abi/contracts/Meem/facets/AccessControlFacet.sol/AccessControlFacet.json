@@ -82,7 +82,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "hasrole",
+    "name": "hasRole",
     "outputs": [
       {
         "internalType": "bool",
