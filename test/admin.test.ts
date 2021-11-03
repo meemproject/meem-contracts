@@ -12,6 +12,7 @@ describe('Contract Admin', function Test() {
 	let ownershipFacet: Ownable
 	let accessControlFacet: AccessControlFacet
 	let signers: SignerWithAddress[]
+	const someUser = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
 
 	before(async () => {
 		signers = await ethers.getSigners()
@@ -72,6 +73,42 @@ describe('Contract Admin', function Test() {
 	it('Can not set split amount as non-admin', async () => {
 		await assert.isRejected(
 			meemFacet.connect(signers[1]).setNonOwnerSplitAllocationAmount(100)
+		)
+	})
+
+	it('Can grant role as admin', async () => {
+		const minterRole = await accessControlFacet.MINTER_ROLE()
+		await accessControlFacet.connect(signers[0]).grantRole(someUser, minterRole)
+
+		const hasRole = await accessControlFacet
+			.connect(signers[0])
+			.hasRole(someUser, minterRole)
+		assert.isTrue(hasRole)
+	})
+
+	it('Can revoke role as admin', async () => {
+		const minterRole = await accessControlFacet.MINTER_ROLE()
+		await accessControlFacet
+			.connect(signers[0])
+			.revokeRole(someUser, minterRole)
+
+		const hasRole = await accessControlFacet
+			.connect(signers[0])
+			.hasRole(someUser, minterRole)
+		assert.isFalse(hasRole)
+	})
+
+	it('Can not grant role as non-admin', async () => {
+		const minterRole = await accessControlFacet.MINTER_ROLE()
+		await assert.isRejected(
+			accessControlFacet.connect(signers[1]).grantRole(someUser, minterRole)
+		)
+	})
+
+	it('Can not revoke role as non-admin', async () => {
+		const minterRole = await accessControlFacet.MINTER_ROLE()
+		await assert.isRejected(
+			accessControlFacet.connect(signers[1]).revokeRole(someUser, minterRole)
 		)
 	})
 })
