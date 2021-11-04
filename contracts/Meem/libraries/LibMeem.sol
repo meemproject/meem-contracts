@@ -2,12 +2,10 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
-
 import '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
+import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 library LibMeem {
@@ -57,13 +55,67 @@ library LibMeem {
 		return parts;
 	}
 
+	function mint(
+		address to,
+		string memory mTokenURI,
+		Chain chain,
+		address parent,
+		uint256 parentTokenId,
+		address root,
+		uint256 rootTokenId,
+		MeemProperties memory mProperties,
+		MeemProperties memory mChildProperties
+	) public returns (uint256 tokenId_) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.MINTER_ROLE);
+		LibMeem.requireValidMeem(parent, parentTokenId);
+		uint256 tokenId = s.tokenCounter;
+		LibERC721._safeMint(to, tokenId);
+		s.tokenURIs[tokenId] = mTokenURI;
+
+		// Initializes mapping w/ default values
+		delete s.meems[tokenId];
+
+		s.meems[tokenId].chain = chain;
+		s.meems[tokenId].parent = parent;
+		s.meems[tokenId].parentTokenId = parentTokenId;
+		s.meems[tokenId].root = root;
+		s.meems[tokenId].rootTokenId = rootTokenId;
+		s.meems[tokenId].owner = to;
+		s.allTokens.push(tokenId);
+		s.allTokensIndex[tokenId] = s.allTokens.length;
+
+		LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
+		LibMeem.setProperties(tokenId, PropertyType.Child, mChildProperties);
+
+		// Keep track of children Meems
+		if (parent == address(this)) {
+			s.children[parentTokenId].push(tokenId);
+		} else {
+			s.wrappedNFTs[parent][parentTokenId] = true;
+		}
+
+		if (root == address(this)) {
+			s.decendants[rootTokenId].push(tokenId);
+		}
+
+		s.tokenCounter += 1;
+
+		require(
+			LibERC721._checkOnERC721Received(address(0), to, tokenId, ''),
+			'ERC721: transfer to non ERC721Receiver implementer'
+		);
+
+		return tokenId;
+	}
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,
 		PermissionType permissionType,
 		MeemPermission memory permission
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		perms.push(permission);
@@ -77,7 +129,7 @@ library LibMeem {
 		PermissionType permissionType,
 		uint256 idx
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
 		permissionNotLocked(props, permissionType);
@@ -107,7 +159,7 @@ library LibMeem {
 		uint256 idx,
 		MeemPermission memory permission
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		permissionNotLocked(props, permissionType);
 
@@ -127,7 +179,7 @@ library LibMeem {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		require(props.splitsLockedBy == address(0), 'Splits are locked');
 		props.splits.push(split);
@@ -145,7 +197,7 @@ library LibMeem {
 		PropertyType propertyType,
 		uint256 idx
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		require(props.splitsLockedBy == address(0), 'Splits are locked');
 		require(
@@ -173,7 +225,7 @@ library LibMeem {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		require(props.splitsLockedBy == address(0), 'Splits are locked');
 		require(
@@ -254,15 +306,6 @@ library LibMeem {
 		);
 
 		emit PropertiesSet(tokenId, propertyType, props);
-	}
-
-	function requireOwnsToken(uint256 tokenId) internal view {
-		// require(
-		// 	ownerOf(tokenId) == msg.sender ||
-		// 		hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
-		// 	'Not owner of token'
-		// );
-		require(ownerOf(tokenId) == msg.sender, 'Not owner of token');
 	}
 
 	function permissionNotLocked(
@@ -358,39 +401,11 @@ library LibMeem {
 		revert('Invalid permission type');
 	}
 
-	function transfer(
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-
-		// remove
-		uint256 index = s.ownerTokenIdIndexes[_from][_tokenId];
-		uint256 lastIndex = s.ownerTokenIds[_from].length - 1;
-		if (index != lastIndex) {
-			uint256 lastTokenId = s.ownerTokenIds[_from][lastIndex];
-			s.ownerTokenIds[_from][index] = lastTokenId;
-			s.ownerTokenIdIndexes[_from][lastTokenId] = index;
-		}
-		s.ownerTokenIds[_from].pop();
-		delete s.ownerTokenIdIndexes[_from][_tokenId];
-		if (s.approved[_tokenId] != address(0)) {
-			delete s.approved[_tokenId];
-			emit LibERC721.Approval(_from, address(0), _tokenId);
-		}
-		// add
-		s.meems[_tokenId].owner = _to;
-		s.ownerTokenIdIndexes[_to][_tokenId] = s.ownerTokenIds[_to].length;
-		s.ownerTokenIds[_to].push(_tokenId);
-		emit LibERC721.Transfer(_from, _to, _tokenId);
-	}
-
 	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
 		internal
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
 		if (newTotalChildren > -1) {
 			require(
@@ -410,7 +425,7 @@ library LibMeem {
 
 	function lockTotalChildren(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
 		require(
 			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
@@ -425,7 +440,7 @@ library LibMeem {
 		internal
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
 		require(
 			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
@@ -438,7 +453,7 @@ library LibMeem {
 
 	function lockChildrenPerWallet(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
 		require(
 			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
@@ -452,7 +467,7 @@ library LibMeem {
 	function requireValidMeem(address parent, uint256 tokenId) internal view {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
-		if (parent != address(0)) {
+		if (parent != address(0) && parent != address(this)) {
 			if (s.wrappedNFTs[parent][tokenId] == true) {
 				revert('NFT has already been wrapped');
 			}

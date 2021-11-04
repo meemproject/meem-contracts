@@ -39,6 +39,21 @@ library LibERC721 {
 
 	bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
 
+	function requireOwnsToken(uint256 tokenId) internal view {
+		// require(
+		// 	ownerOf(tokenId) == msg.sender ||
+		// 		hasRole(ADMIN_ROLE, msg.sender),
+		// 	'Not owner of token'
+		// );
+		require(ownerOf(tokenId) == msg.sender, 'Not owner of token');
+	}
+
+	function burn(uint256 tokenId) internal {
+		requireOwnsToken(tokenId);
+		address owner = LibERC721.ownerOf(tokenId);
+		emit Transfer(owner, address(0), tokenId);
+	}
+
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() internal view returns (uint256) {
@@ -632,7 +647,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		Meem storage meem = LibMeem.getMeem(tokenId);
-		bool isAdmin = LibAccessControl.hasRole(s.DEFAULT_ADMIN_ROLE, user);
+		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, user);
 		if (
 			!isAdmin ||
 			meem.parent == address(0) ||

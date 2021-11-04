@@ -22,16 +22,6 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		return LibMeem.getRaribleV2Royalties(tokenId);
 	}
 
-	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
-		if (amount < 0 || amount > 10000) {
-			revert('Amount must be between 0 - 10000 basis points');
-		}
-
-		s.nonOwnerSplitAllocationAmount = amount;
-	}
-
 	function nonOwnerSplitAllocationAmount()
 		public
 		view

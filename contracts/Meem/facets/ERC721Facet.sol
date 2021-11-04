@@ -9,23 +9,11 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Base64} from '../libraries/Base64.sol';
 import {IERC721} from '../interfaces/IERC721.sol';
-import {ERC721BaseInternal} from '../interfaces/ERC721BaseInternal.sol';
 import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
 
-contract ERC721Facet is
-	IERC721,
-	IERC721Enumerable,
-	IERC721Metadata,
-	ERC721BaseInternal
-{
-	function setContractURI(string memory newContractURI) public {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
-		s.contractURI = newContractURI;
-	}
-
+contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	function contractURI() public view returns (string memory) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return
@@ -117,34 +105,6 @@ contract ERC721Facet is
 		return LibERC721.tokenURI(tokenId);
 	}
 
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal virtual override {}
-
-	function _transfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal override {
-		LibERC721._transfer(from, to, tokenId);
-	}
-
-	function _exists(uint256 tokenId) internal view virtual returns (bool) {
-		return LibERC721._exists(tokenId);
-	}
-
-	function _isApprovedOrOwner(address spender, uint256 tokenId)
-		internal
-		view
-		virtual
-		override
-		returns (bool)
-	{
-		return LibERC721._isApprovedOrOwner(spender, tokenId);
-	}
-
 	/**
 	 * @inheritdoc IERC721
 	 */
@@ -154,7 +114,7 @@ contract ERC721Facet is
 		override
 		returns (address)
 	{
-		return _getApproved(tokenId);
+		return LibERC721.getApproved(tokenId);
 	}
 
 	/**
@@ -221,28 +181,57 @@ contract ERC721Facet is
 		return LibERC721.setApprovalForAll(operator, status);
 	}
 
+	function burn(uint256 tokenId) public {
+		return LibERC721.burn(tokenId);
+	}
+
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal virtual {}
+
+	function _transfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal {
+		LibERC721._transfer(from, to, tokenId);
+	}
+
+	function _exists(uint256 tokenId) internal view virtual returns (bool) {
+		return LibERC721._exists(tokenId);
+	}
+
+	function _isApprovedOrOwner(address spender, uint256 tokenId)
+		internal
+		view
+		virtual
+		returns (bool)
+	{
+		return LibERC721._isApprovedOrOwner(spender, tokenId);
+	}
+
 	/**
 	 * @notice ERC721 hook: revert if value is included in external approve function call
-	 * @inheritdoc ERC721BaseInternal
 	 */
 	function _handleApproveMessageValue(
 		address operator,
 		uint256 tokenId,
 		uint256 value
-	) internal virtual override {
+	) internal virtual {
 		return LibERC721._handleApproveMessageValue(operator, tokenId, value);
 	}
 
 	/**
 	 * @notice ERC721 hook: revert if value is included in external transfer function call
-	 * @inheritdoc ERC721BaseInternal
 	 */
 	function _handleTransferMessageValue(
 		address from,
 		address to,
 		uint256 tokenId,
 		uint256 value
-	) internal virtual override {
+	) internal virtual {
 		return LibERC721._handleTransferMessageValue(from, to, tokenId, value);
 	}
 }

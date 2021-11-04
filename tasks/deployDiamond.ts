@@ -1,6 +1,5 @@
 import path from 'path'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import { HardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
 import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
 import { task } from 'hardhat/config'
@@ -21,7 +20,6 @@ export interface IDeployHistory {
 
 export async function deployDiamond(options: {
 	ethers: HardhatEthersHelpers
-	upgrades: HardhatUpgrades
 	hardhatArguments?: HardhatArguments
 }) {
 	const { ethers, hardhatArguments } = options
@@ -169,8 +167,8 @@ export async function deployDiamond(options: {
 }
 
 task('deployDiamond', 'Deploys Meem').setAction(
-	async (args, { ethers, upgrades, hardhatArguments }) => {
-		const result = await deployDiamond({ ethers, upgrades, hardhatArguments })
+	async (args, { ethers, hardhatArguments }) => {
+		const result = await deployDiamond({ ethers, hardhatArguments })
 		return result
 	}
 )

@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers, upgrades } from 'hardhat'
+import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { AccessControlFacet, MeemSplitsFacet, Ownable } from '../typechain'
 
@@ -18,8 +18,7 @@ describe('Contract Admin', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
-			ethers,
-			upgrades
+			ethers
 		})
 
 		meemFacet = (await ethers.getContractAt(
@@ -44,7 +43,7 @@ describe('Contract Admin', function Test() {
 	})
 
 	it('Assigns roles to deployer', async () => {
-		const adminRole = await accessControlFacet.DEFAULT_ADMIN_ROLE()
+		const adminRole = await accessControlFacet.ADMIN_ROLE()
 		const hasAdminRole = await accessControlFacet.hasRole(
 			signers[0].address,
 			adminRole
