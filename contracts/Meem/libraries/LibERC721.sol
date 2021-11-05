@@ -47,8 +47,7 @@ library LibERC721 {
 
 	function burn(uint256 tokenId) internal {
 		requireOwnsToken(tokenId);
-		address owner = LibERC721.ownerOf(tokenId);
-		emit Transfer(owner, address(0), tokenId);
+		_burn(tokenId);
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
@@ -406,7 +405,11 @@ library LibERC721 {
 		_approve(address(0), tokenId);
 
 		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
-		LibArray.removeAt(s.ownerTokenIds[owner], index);
+		s.ownerTokenIds[owner] = LibArray.removeAt(
+			s.ownerTokenIds[owner],
+			index
+		);
+		delete s.ownerTokenIdIndexes[owner][tokenId];
 		delete s.meems[tokenId];
 
 		emit Transfer(owner, address(0), tokenId);

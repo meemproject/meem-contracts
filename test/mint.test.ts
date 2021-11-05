@@ -64,7 +64,7 @@ describe('Minting', function Test() {
 			await meemFacet
 				.connect(signers[0])
 				.mint(
-					owner,
+					signers[4].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					0,
 					zeroAddress,
@@ -81,13 +81,30 @@ describe('Minting', function Test() {
 		assert.equal(totalSupply.toNumber(), 1)
 
 		const token0Owner = await erc721Facet.connect(signers[0]).ownerOf(token0)
-		assert.equal(token0Owner, owner)
-		const ownerBalance = await erc721Facet.connect(signers[0]).balanceOf(owner)
+		assert.equal(token0Owner, signers[4].address)
+		const ownerBalance = await erc721Facet
+			.connect(signers[0])
+			.balanceOf(signers[4].address)
 		assert.equal(ownerBalance.toNumber(), 1)
 
-		const tokenIds = await meemFacet.connect(signers[0]).tokenIdsOfOwner(owner)
+		const tokenIds = await meemFacet
+			.connect(signers[0])
+			.tokenIdsOfOwner(signers[4].address)
 
 		assert.equal(tokenIds[0].toNumber(), token0)
+	})
+
+	it('Can not burn token as non-owner', async () => {
+		await assert.isRejected(erc721Facet.connect(signers[1]).burn(token0))
+	})
+
+	it('Can burn token as owner', async () => {
+		await erc721Facet.connect(signers[4]).burn(token0)
+		const tokenIds = await meemFacet
+			.connect(signers[0])
+			.tokenIdsOfOwner(signers[4].address)
+
+		assert.equal(tokenIds.length, 0)
 	})
 
 	it('Can not transfer wMeem as non-admin', async () => {
@@ -253,5 +270,25 @@ describe('Minting', function Test() {
 					meemMintData
 				)
 		)
+	})
+
+	it('Can check if nft has been wrapped in a meem', async () => {
+		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
+
+		const isWrapped = await meemFacet
+			.connect(signers[0])
+			.isNFTWrapped(otherAddress, 1)
+
+		assert.isTrue(isWrapped)
+	})
+
+	it('Can check if nft has not been wrapped in a meem', async () => {
+		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
+
+		const isWrapped = await meemFacet
+			.connect(signers[0])
+			.isNFTWrapped(otherAddress, 2)
+
+		assert.isFalse(isWrapped)
 	})
 })

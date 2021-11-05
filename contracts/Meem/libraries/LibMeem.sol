@@ -147,7 +147,7 @@ library LibMeem {
 			perms[i] = perms[i + 1];
 		}
 
-		delete perms[perms.length - 1];
+		perms.pop();
 		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
 	}
 
@@ -217,7 +217,7 @@ library LibMeem {
 			props.splits[i] = props.splits[i + 1];
 		}
 
-		delete props.splits[props.splits.length - 1];
+		props.splits.pop();
 		emit SplitsSet(tokenId, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
@@ -462,5 +462,18 @@ library LibMeem {
 				revert NFTAlreadyWrapped(parent, tokenId);
 			}
 		}
+	}
+
+	function isNFTWrapped(address contractAddress, uint256 tokenId)
+		internal
+		view
+		returns (bool)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.wrappedNFTs[contractAddress][tokenId] == true) {
+			return true;
+		}
+
+		return false;
 	}
 }
