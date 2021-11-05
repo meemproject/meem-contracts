@@ -1,5 +1,91 @@
 [
   {
+    "inputs": [],
+    "name": "ERC721ReceiverNotImplemented",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPropertyType",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "requiredRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "MissingRequiredRole",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "parentAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "parentTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NFTAlreadyWrapped",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "parentAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "parentTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NoTransferWrappedNFT",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "ToAddressInvalid",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokenAlreadyExists",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokenNotFound",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {

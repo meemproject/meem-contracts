@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
+import {MissingRequiredRole, NoRenounceOthers} from './Errors.sol';
 
 library LibAccessControl {
 	/**
@@ -44,21 +45,6 @@ library LibAccessControl {
 	);
 
 	/**
-	 * @dev Modifier that checks that an account has a specific role. Reverts
-	 * with a standardized message including the required role.
-	 *
-	 * The format of the revert reason is given by the following regular expression:
-	 *
-	 *  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
-	 *
-	 * _Available since v4.1._
-	 */
-	modifier onlyRole(bytes32 role) {
-		_checkRole(role, _msgSender());
-		_;
-	}
-
-	/**
 	 * @dev See {IERC165-supportsInterface}.
 	 */
 	// function supportsInterface(bytes4 interfaceId)
@@ -74,7 +60,7 @@ library LibAccessControl {
 
 	function requireRole(bytes32 role) internal view {
 		if (!hasRole(role, msg.sender)) {
-			revert('Sender does not have required role');
+			revert MissingRequiredRole(role);
 		}
 	}
 
@@ -88,28 +74,6 @@ library LibAccessControl {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.roles[role].members[account];
-	}
-
-	/**
-	 * @dev Revert with a standard message if `account` is missing `role`.
-	 *
-	 * The format of the revert reason is given by the following regular expression:
-	 *
-	 *  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/
-	 */
-	function _checkRole(bytes32 role, address account) internal view {
-		if (!hasRole(role, account)) {
-			revert(
-				string(
-					abi.encodePacked(
-						'AccessControl: account ',
-						toHexString(uint160(account), 20),
-						' is missing role ',
-						toHexString(uint256(role), 32)
-					)
-				)
-			);
-		}
 	}
 
 	/**
@@ -133,10 +97,9 @@ library LibAccessControl {
 	 *
 	 * - the caller must have ``role``'s admin role.
 	 */
-	function grantRole(bytes32 role, address account)
-		internal
-		onlyRole(getRoleAdmin(role))
-	{
+	function grantRole(bytes32 role, address account) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		requireRole(s.ADMIN_ROLE);
 		_grantRole(role, account);
 	}
 
@@ -149,10 +112,9 @@ library LibAccessControl {
 	 *
 	 * - the caller must have ``role``'s admin role.
 	 */
-	function revokeRole(bytes32 role, address account)
-		internal
-		onlyRole(getRoleAdmin(role))
-	{
+	function revokeRole(bytes32 role, address account) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		requireRole(s.ADMIN_ROLE);
 		_revokeRole(role, account);
 	}
 
@@ -171,10 +133,9 @@ library LibAccessControl {
 	 * - the caller must be `account`.
 	 */
 	function renounceRole(bytes32 role, address account) internal {
-		require(
-			account == _msgSender(),
-			'AccessControl: can only renounce roles for self'
-		);
+		if (account != _msgSender()) {
+			revert NoRenounceOthers();
+		}
 
 		_revokeRole(role, account);
 	}

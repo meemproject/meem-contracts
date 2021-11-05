@@ -211,27 +211,4 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	{
 		return LibERC721._isApprovedOrOwner(spender, tokenId);
 	}
-
-	/**
-	 * @notice ERC721 hook: revert if value is included in external approve function call
-	 */
-	function _handleApproveMessageValue(
-		address operator,
-		uint256 tokenId,
-		uint256 value
-	) internal virtual {
-		return LibERC721._handleApproveMessageValue(operator, tokenId, value);
-	}
-
-	/**
-	 * @notice ERC721 hook: revert if value is included in external transfer function call
-	 */
-	function _handleTransferMessageValue(
-		address from,
-		address to,
-		uint256 tokenId,
-		uint256 value
-	) internal virtual {
-		return LibERC721._handleTransferMessageValue(from, to, tokenId, value);
-	}
 }

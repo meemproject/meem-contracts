@@ -1,5 +1,16 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "requiredRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "MissingRequiredRole",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "ADMIN_ROLE",
     "outputs": [
