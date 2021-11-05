@@ -16,7 +16,7 @@ export class Meem__factory {
 const _abi = [
   {
     inputs: [],
-    name: "DEFAULT_ADMIN_ROLE",
+    name: "ADMIN_ROLE",
     outputs: [
       {
         internalType: "bytes32",

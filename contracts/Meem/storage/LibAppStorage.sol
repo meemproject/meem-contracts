@@ -15,7 +15,7 @@ library LibAppStorage {
 	struct AppStorage {
 		address proxyRegistryAddress;
 		/** AccessControl Role: Admin */
-		bytes32 DEFAULT_ADMIN_ROLE;
+		bytes32 ADMIN_ROLE;
 		/** AccessControl Role: Pauser */
 		bytes32 PAUSER_ROLE;
 		/** AccessControl Role: Minter */
@@ -28,7 +28,6 @@ library LibAppStorage {
 		string name;
 		/** ERC721 Symbol */
 		string symbol;
-		// uint32[] tokenIds;
 		/** Mapping of addresses => all tokens they own */
 		mapping(address => uint256[]) ownerTokenIds;
 		/** Mapping of addresses => number of tokens owned */
@@ -53,17 +52,15 @@ library LibAppStorage {
 		mapping(uint256 => uint256[]) decendants;
 		/** Keeps track of assigned roles */
 		mapping(bytes32 => RoleData) roles;
-		/** Mapping from token ID to owner address */
-		// mapping(uint256 => address) owners;
-		// Mapping owner address to token count
-		// mapping(address => uint256) balances;
-
 		/** Mapping from token ID to approved address */
 		mapping(uint256 => address) tokenApprovals;
 		/** Mapping from owner to operator approvals */
 		mapping(address => mapping(address => bool)) operatorApprovals;
 		// Mapping of parent address => tokenId
 		mapping(address => mapping(uint256 => bool)) wrappedNFTs;
+		// All tokenIds that have been minted and the corresponding index in allTokens
+		uint256[] allTokens;
+		mapping(uint256 => uint256) allTokensIndex;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

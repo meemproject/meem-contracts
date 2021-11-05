@@ -59,16 +59,12 @@ contract InitDiamond {
 		s.symbol = _args.symbol;
 		s.childDepth = _args.childDepth;
 		s.nonOwnerSplitAllocationAmount = _args.nonOwnerSplitAllocationAmount;
-		s.tokenCounter = 0;
-		s.PAUSER_ROLE = keccak256('PAUSER_ROLE');
+		s.tokenCounter = 100000;
+		s.ADMIN_ROLE = keccak256('ADMIN_ROLE');
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
-		s.UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
-		s.DEFAULT_ADMIN_ROLE = keccak256('DEFAULT_ADMIN_ROLE');
 		s.contractURI = _args.contractURI;
 
-		LibAccessControl._grantRole(s.PAUSER_ROLE, msg.sender);
+		LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
 		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
-		LibAccessControl._grantRole(s.UPGRADER_ROLE, msg.sender);
-		LibAccessControl._grantRole(s.DEFAULT_ADMIN_ROLE, msg.sender);
 	}
 }

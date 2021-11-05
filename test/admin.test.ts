@@ -1,14 +1,14 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { ethers, upgrades } from 'hardhat'
+import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { AccessControlFacet, MeemSplitsFacet, Ownable } from '../typechain'
+import { AccessControlFacet, MeemAdminFacet, Ownable } from '../typechain'
 
 chai.use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
-	let meemFacet: MeemSplitsFacet
+	let adminFacet: MeemAdminFacet
 	let ownershipFacet: Ownable
 	let accessControlFacet: AccessControlFacet
 	let signers: SignerWithAddress[]
@@ -18,14 +18,13 @@ describe('Contract Admin', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
-			ethers,
-			upgrades
+			ethers
 		})
 
-		meemFacet = (await ethers.getContractAt(
-			'MeemSplitsFacet',
+		adminFacet = (await ethers.getContractAt(
+			'MeemAdminFacet',
 			DiamondAddress
-		)) as MeemSplitsFacet
+		)) as MeemAdminFacet
 
 		ownershipFacet = (await ethers.getContractAt(
 			'@solidstate/contracts/access/Ownable.sol:Ownable',
@@ -44,7 +43,7 @@ describe('Contract Admin', function Test() {
 	})
 
 	it('Assigns roles to deployer', async () => {
-		const adminRole = await accessControlFacet.DEFAULT_ADMIN_ROLE()
+		const adminRole = await accessControlFacet.ADMIN_ROLE()
 		const hasAdminRole = await accessControlFacet.hasRole(
 			signers[0].address,
 			adminRole
@@ -60,11 +59,11 @@ describe('Contract Admin', function Test() {
 
 	it('Can set split amount as admin', async () => {
 		const { status } = await (
-			await meemFacet.connect(signers[0]).setNonOwnerSplitAllocationAmount(100)
+			await adminFacet.connect(signers[0]).setNonOwnerSplitAllocationAmount(100)
 		).wait()
 		assert.equal(status, 1)
 
-		const splitAmount = await meemFacet
+		const splitAmount = await adminFacet
 			.connect(signers[0])
 			.nonOwnerSplitAllocationAmount()
 		assert.equal(splitAmount.toNumber(), 100)
@@ -72,7 +71,7 @@ describe('Contract Admin', function Test() {
 
 	it('Can not set split amount as non-admin', async () => {
 		await assert.isRejected(
-			meemFacet.connect(signers[1]).setNonOwnerSplitAllocationAmount(100)
+			adminFacet.connect(signers[1]).setNonOwnerSplitAllocationAmount(100)
 		)
 	})
 

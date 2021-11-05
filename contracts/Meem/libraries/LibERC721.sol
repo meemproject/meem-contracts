@@ -6,8 +6,8 @@ import {LibArray} from '../libraries/LibArray.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem} from '../interfaces/MeemStandard.sol';
+import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT} from '../libraries/Errors.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
-import 'hardhat/console.sol';
 
 library LibERC721 {
 	/**
@@ -39,6 +39,18 @@ library LibERC721 {
 
 	bytes4 internal constant ERC721_RECEIVED = 0x150b7a02;
 
+	function requireOwnsToken(uint256 tokenId) internal view {
+		if (ownerOf(tokenId) != msg.sender) {
+			revert NotTokenOwner(tokenId);
+		}
+	}
+
+	function burn(uint256 tokenId) internal {
+		requireOwnsToken(tokenId);
+		address owner = LibERC721.ownerOf(tokenId);
+		emit Transfer(owner, address(0), tokenId);
+	}
+
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() internal view returns (uint256) {
@@ -53,10 +65,9 @@ library LibERC721 {
 	 */
 	function balanceOf(address owner) internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(
-			owner != address(0),
-			'ERC721: balance query for the zero address'
-		);
+		if (owner == address(0)) {
+			revert InvalidZeroAddressQuery();
+		}
 		return s.ownerTokenIds[owner].length;
 	}
 
@@ -71,9 +82,10 @@ library LibERC721 {
 		returns (uint256 tokenId_)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(_index < s.tokenCounter, 'ERC721: index beyond supply');
-		// tokenId_ = s.tokenIds[_index];
-		tokenId_ = _index;
+		if (_index >= s.allTokens.length) {
+			revert IndexOutOfRange(_index, s.allTokens.length - 1);
+		}
+		tokenId_ = s.allTokens[_index];
 	}
 
 	/// @notice Enumerate NFTs assigned to an owner
@@ -89,10 +101,9 @@ library LibERC721 {
 		returns (uint256 tokenId_)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(
-			_index < s.ownerTokenIds[_owner].length,
-			'ERC721Facet: index beyond owner balance'
-		);
+		if (_index >= s.ownerTokenIds[_owner].length) {
+			revert IndexOutOfRange(_index, s.ownerTokenIds[_owner].length - 1);
+		}
 		tokenId_ = s.ownerTokenIds[_owner][_index];
 	}
 
@@ -102,10 +113,9 @@ library LibERC721 {
 	function ownerOf(uint256 tokenId) internal view returns (address) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = s.meems[tokenId].owner;
-		require(
-			owner != address(0),
-			'LibERC721: owner query for nonexistent token'
-		);
+		if (owner == address(0)) {
+			revert TokenNotFound(tokenId);
+		}
 		return owner;
 	}
 
@@ -127,10 +137,10 @@ library LibERC721 {
 
 	function tokenURI(uint256 tokenId) internal view returns (string memory) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(
-			_exists(tokenId),
-			'ERC721Metadata: URI query for nonexistent token'
-		);
+
+		if (!_exists(tokenId)) {
+			revert TokenNotFound(tokenId);
+		}
 
 		return s.tokenURIs[tokenId];
 	}
@@ -153,12 +163,14 @@ library LibERC721 {
 	 */
 	function approve(address to, uint256 tokenId) internal {
 		address owner = ownerOf(tokenId);
-		require(to != owner, 'ERC721: approval to current owner');
 
-		require(
-			_msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-			'ERC721: approve caller is not owner nor approved for all'
-		);
+		if (to == owner) {
+			revert NoApproveSelf();
+		}
+
+		if (_msgSender() != owner && !isApprovedForAll(owner, _msgSender())) {
+			revert NotApproved();
+		}
 
 		_approve(to, tokenId);
 	}
@@ -168,10 +180,10 @@ library LibERC721 {
 	 */
 	function getApproved(uint256 tokenId) internal view returns (address) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(
-			_exists(tokenId),
-			'ERC721: approved query for nonexistent token'
-		);
+
+		if (!_exists(tokenId)) {
+			revert TokenNotFound(tokenId);
+		}
 
 		return s.tokenApprovals[tokenId];
 	}
@@ -181,7 +193,10 @@ library LibERC721 {
 	 */
 	function setApprovalForAll(address operator, bool approved) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(operator != _msgSender(), 'ERC721: approve to caller');
+
+		if (operator == _msgSender()) {
+			revert NoApproveSelf();
+		}
 
 		s.operatorApprovals[_msgSender()][operator] = approved;
 		emit ApprovalForAll(_msgSender(), operator, approved);
@@ -207,12 +222,12 @@ library LibERC721 {
 		address to,
 		uint256 tokenId
 	) internal {
-		//solhint-disable-next-line max-line-length
-		require(
-			_isApprovedOrOwner(_msgSender(), tokenId) ||
-				_canFacilitateClaim(_msgSender(), tokenId),
-			'ERC721 transferFrom: transfer caller is not owner nor approved'
-		);
+		if (
+			!_isApprovedOrOwner(_msgSender(), tokenId) &&
+			!_canFacilitateClaim(_msgSender(), tokenId)
+		) {
+			revert NotApproved();
+		}
 
 		_transfer(from, to, tokenId);
 	}
@@ -237,10 +252,10 @@ library LibERC721 {
 		uint256 tokenId,
 		bytes memory _data
 	) internal {
-		require(
-			_isApprovedOrOwner(_msgSender(), tokenId),
-			'ERC721: transfer caller is not owner nor approved'
-		);
+		if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
+			revert NotApproved();
+		}
+
 		_safeTransfer(from, to, tokenId, _data);
 	}
 
@@ -269,10 +284,10 @@ library LibERC721 {
 		bytes memory _data
 	) internal {
 		_transfer(from, to, tokenId);
-		require(
-			_checkOnERC721Received(from, to, tokenId, _data),
-			'ERC721: transfer to non ERC721Receiver implementer'
-		);
+
+		if (!_checkOnERC721Received(from, to, tokenId, _data)) {
+			revert ERC721ReceiverNotImplemented();
+		}
 	}
 
 	/**
@@ -300,10 +315,9 @@ library LibERC721 {
 		view
 		returns (bool)
 	{
-		require(
-			_exists(tokenId),
-			'ERC721: operator query for nonexistent token'
-		);
+		if (!_exists(tokenId)) {
+			revert TokenNotFound(tokenId);
+		}
 		address _owner = ownerOf(tokenId);
 		return (spender == _owner ||
 			getApproved(tokenId) == spender ||
@@ -334,10 +348,10 @@ library LibERC721 {
 		bytes memory _data
 	) internal {
 		_mint(to, tokenId);
-		require(
-			_checkOnERC721Received(address(0), to, tokenId, _data),
-			'ERC721: transfer to non ERC721Receiver implementer'
-		);
+
+		if (!_checkOnERC721Received(address(0), to, tokenId, _data)) {
+			revert ERC721ReceiverNotImplemented();
+		}
 	}
 
 	/**
@@ -354,8 +368,14 @@ library LibERC721 {
 	 */
 	function _mint(address to, uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		require(to != address(0), 'ERC721: mint to the zero address');
-		require(!_exists(tokenId), 'ERC721: token already minted');
+
+		if (to == address(0)) {
+			revert ToAddressInvalid(to);
+		}
+
+		if (_exists(tokenId)) {
+			revert TokenAlreadyExists(tokenId);
+		}
 
 		_beforeTokenTransfer(address(0), to, tokenId);
 
@@ -412,11 +432,14 @@ library LibERC721 {
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		bool canFacilitateClaim = _canFacilitateClaim(_msgSender(), tokenId);
-		require(
-			ownerOf(tokenId) == from || canFacilitateClaim,
-			'ERC721: transfer of token that is not own'
-		);
-		require(to != address(0), 'ERC721: transfer to the zero address');
+
+		if (ownerOf(tokenId) != from && !canFacilitateClaim) {
+			revert NotTokenOwner(tokenId);
+		}
+
+		if (to == address(0)) {
+			revert ToAddressInvalid(address(0));
+		}
 
 		if (!canFacilitateClaim) {
 			_beforeTokenTransfer(from, to, tokenId);
@@ -473,9 +496,7 @@ library LibERC721 {
 				return retval == IERC721TokenReceiver.onERC721Received.selector;
 			} catch (bytes memory reason) {
 				if (reason.length == 0) {
-					revert(
-						'ERC721: transfer to non ERC721Receiver implementer'
-					);
+					revert ERC721ReceiverNotImplemented();
 				} else {
 					assembly {
 						revert(add(32, reason), mload(reason))
@@ -512,38 +533,6 @@ library LibERC721 {
 		}
 	}
 
-	// function _checkOnERC721Received(
-	// 	address from,
-	// 	address to,
-	// 	uint256 tokenId,
-	// 	bytes memory _data
-	// ) internal returns (bool) {
-	// 	if (to.isContract()) {
-	// 		try
-	// 			IERC721Receiver(to).onERC721Received(
-	// 				_msgSender(),
-	// 				from,
-	// 				tokenId,
-	// 				_data
-	// 			)
-	// 		returns (bytes4 retval) {
-	// 			return retval == IERC721Receiver.onERC721Received.selector;
-	// 		} catch (bytes memory reason) {
-	// 			if (reason.length == 0) {
-	// 				revert(
-	// 					'ERC721: transfer to non ERC721Receiver implementer'
-	// 				);
-	// 			} else {
-	// 				assembly {
-	// 					revert(add(32, reason), mload(reason))
-	// 				}
-	// 			}
-	// 		}
-	// 	} else {
-	// 		return true;
-	// 	}
-	// }
-
 	/**
 	 * @dev Hook that is called before any token transfer. This includes minting
 	 * and burning.
@@ -565,13 +554,19 @@ library LibERC721 {
 	) internal view {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		require(
-			s.meems[tokenId].parent == address(this) ||
-				s.meems[tokenId].parent == address(0),
-			'LibERC721: Only Meem copies or original works may be transferred'
-		);
+		if (
+			s.meems[tokenId].parent != address(this) &&
+			s.meems[tokenId].parent != address(0)
+		) {
+			revert NoTransferWrappedNFT(
+				s.meems[tokenId].parent,
+				s.meems[tokenId].parentTokenId
+			);
+		}
 
-		require(from != to, 'Token can not be transferred to self');
+		if (from == to) {
+			revert ToAddressInvalid(to);
+		}
 	}
 
 	function _msgSender() internal view returns (address) {
@@ -607,23 +602,6 @@ library LibERC721 {
 		return size > 0;
 	}
 
-	function _handleApproveMessageValue(
-		address,
-		uint256,
-		uint256 value
-	) internal pure {
-		require(value == 0, 'ERC721: payable approve calls not supported');
-	}
-
-	function _handleTransferMessageValue(
-		address,
-		address,
-		uint256,
-		uint256 value
-	) internal pure {
-		require(value == 0, 'ERC721: payable transfer calls not supported');
-	}
-
 	function _canFacilitateClaim(address user, uint256 tokenId)
 		internal
 		view
@@ -632,7 +610,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		Meem storage meem = LibMeem.getMeem(tokenId);
-		bool isAdmin = LibAccessControl.hasRole(s.DEFAULT_ADMIN_ROLE, user);
+		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, user);
 		if (
 			!isAdmin ||
 			meem.parent == address(0) ||

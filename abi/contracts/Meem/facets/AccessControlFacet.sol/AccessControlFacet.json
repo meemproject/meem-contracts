@@ -1,7 +1,18 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "requiredRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "MissingRequiredRole",
+    "type": "error"
+  },
+  {
     "inputs": [],
-    "name": "DEFAULT_ADMIN_ROLE",
+    "name": "ADMIN_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",
@@ -15,32 +26,6 @@
   {
     "inputs": [],
     "name": "MINTER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "PAUSER_ROLE",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "UPGRADER_ROLE",
     "outputs": [
       {
         "internalType": "bytes32",

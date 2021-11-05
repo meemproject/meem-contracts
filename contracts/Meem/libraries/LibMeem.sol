@@ -2,13 +2,12 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
-
 import '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
+import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -57,13 +56,66 @@ library LibMeem {
 		return parts;
 	}
 
+	function mint(
+		address to,
+		string memory mTokenURI,
+		Chain chain,
+		address parent,
+		uint256 parentTokenId,
+		address root,
+		uint256 rootTokenId,
+		MeemProperties memory mProperties,
+		MeemProperties memory mChildProperties
+	) internal returns (uint256 tokenId_) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.MINTER_ROLE);
+		LibMeem.requireValidMeem(parent, parentTokenId);
+		uint256 tokenId = s.tokenCounter;
+		LibERC721._safeMint(to, tokenId);
+		s.tokenURIs[tokenId] = mTokenURI;
+
+		// Initializes mapping w/ default values
+		delete s.meems[tokenId];
+
+		s.meems[tokenId].chain = chain;
+		s.meems[tokenId].parent = parent;
+		s.meems[tokenId].parentTokenId = parentTokenId;
+		s.meems[tokenId].root = root;
+		s.meems[tokenId].rootTokenId = rootTokenId;
+		s.meems[tokenId].owner = to;
+		s.allTokens.push(tokenId);
+		s.allTokensIndex[tokenId] = s.allTokens.length;
+
+		LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
+		LibMeem.setProperties(tokenId, PropertyType.Child, mChildProperties);
+
+		// Keep track of children Meems
+		if (parent == address(this)) {
+			s.children[parentTokenId].push(tokenId);
+		} else {
+			s.wrappedNFTs[parent][parentTokenId] = true;
+		}
+
+		if (root == address(this)) {
+			s.decendants[rootTokenId].push(tokenId);
+		}
+
+		s.tokenCounter += 1;
+
+		if (!LibERC721._checkOnERC721Received(address(0), to, tokenId, '')) {
+			revert ERC721ReceiverNotImplemented();
+		}
+
+		return tokenId;
+	}
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,
 		PermissionType permissionType,
 		MeemPermission memory permission
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		perms.push(permission);
@@ -77,19 +129,18 @@ library LibMeem {
 		PermissionType permissionType,
 		uint256 idx
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
 		permissionNotLocked(props, permissionType);
 
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
-		require(
-			perms[idx].lockedBy == address(0),
-			'Permission is locked at that index'
-		);
+		if (perms[idx].lockedBy != address(0)) {
+			revert PropertyLocked(perms[idx].lockedBy);
+		}
 
 		if (idx >= perms.length) {
-			revert('Index out of range');
+			revert IndexOutOfRange(idx, perms.length - 1);
 		}
 
 		for (uint256 i = idx; i < perms.length - 1; i++) {
@@ -107,15 +158,15 @@ library LibMeem {
 		uint256 idx,
 		MeemPermission memory permission
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 		permissionNotLocked(props, permissionType);
 
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
-		require(
-			perms[idx].lockedBy == address(0),
-			'Permission is locked at that index'
-		);
+
+		if (perms[idx].lockedBy != address(0)) {
+			revert PropertyLocked(perms[idx].lockedBy);
+		}
 
 		perms[idx] = permission;
 		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
@@ -127,13 +178,16 @@ library LibMeem {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
-		require(props.splitsLockedBy == address(0), 'Splits are locked');
+
+		if (props.splitsLockedBy != address(0)) {
+			revert PropertyLocked(props.splitsLockedBy);
+		}
 		props.splits.push(split);
 		validateSplits(
 			props,
-			ownerOf(tokenId),
+			LibERC721.ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
 		emit SplitsSet(tokenId, props.splits);
@@ -145,16 +199,18 @@ library LibMeem {
 		PropertyType propertyType,
 		uint256 idx
 	) internal {
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
-		require(props.splitsLockedBy == address(0), 'Splits are locked');
-		require(
-			props.splits[idx].lockedBy == address(0),
-			'Split at index is locked'
-		);
+		if (props.splitsLockedBy != address(0)) {
+			revert PropertyLocked(props.splitsLockedBy);
+		}
+
+		if (props.splits[idx].lockedBy != address(0)) {
+			revert PropertyLocked(props.splits[idx].lockedBy);
+		}
 
 		if (idx >= props.splits.length) {
-			revert('Index out of range');
+			revert IndexOutOfRange(idx, props.splits.length - 1);
 		}
 
 		for (uint256 i = idx; i < props.splits.length - 1; i++) {
@@ -173,18 +229,20 @@ library LibMeem {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
-		require(props.splitsLockedBy == address(0), 'Splits are locked');
-		require(
-			props.splits[idx].lockedBy == address(0),
-			'Split at index is locked'
-		);
+		if (props.splitsLockedBy != address(0)) {
+			revert PropertyLocked(props.splitsLockedBy);
+		}
+
+		if (props.splits[idx].lockedBy != address(0)) {
+			revert PropertyLocked(props.splits[idx].lockedBy);
+		}
 
 		props.splits[idx] = split;
 		validateSplits(
 			props,
-			ownerOf(tokenId),
+			LibERC721.ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
 		emit SplitsSet(tokenId, props.splits);
@@ -204,14 +262,12 @@ library LibMeem {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (propertyType == PropertyType.Meem) {
-			// return _properties[tokenId];
 			return s.meems[tokenId].properties;
 		} else if (propertyType == PropertyType.Child) {
-			// return _childProperties[tokenId];
 			return s.meems[tokenId].childProperties;
 		}
 
-		revert('Invalid property type');
+		revert InvalidPropertyType();
 	}
 
 	function setProperties(
@@ -249,20 +305,11 @@ library LibMeem {
 
 		validateSplits(
 			props,
-			ownerOf(tokenId),
+			LibERC721.ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
 
 		emit PropertiesSet(tokenId, propertyType, props);
-	}
-
-	function requireOwnsToken(uint256 tokenId) internal view {
-		// require(
-		// 	ownerOf(tokenId) == msg.sender ||
-		// 		hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
-		// 	'Not owner of token'
-		// );
-		require(ownerOf(tokenId) == msg.sender, 'Not owner of token');
 	}
 
 	function permissionNotLocked(
@@ -270,27 +317,18 @@ library LibMeem {
 		PermissionType permissionType
 	) internal view {
 		if (permissionType == PermissionType.Copy) {
-			require(
-				self.copyPermissionsLockedBy == address(0),
-				'Copy permissions are locked'
-			);
+			if (self.copyPermissionsLockedBy != address(0)) {
+				revert PropertyLocked(self.copyPermissionsLockedBy);
+			}
 		} else if (permissionType == PermissionType.Remix) {
-			require(
-				self.remixPermissionsLockedBy == address(0),
-				'Remix permissions are locked'
-			);
+			if (self.remixPermissionsLockedBy != address(0)) {
+				revert PropertyLocked(self.remixPermissionsLockedBy);
+			}
 		} else if (permissionType == PermissionType.Read) {
-			require(
-				self.readPermissionsLockedBy == address(0),
-				'Read permissions are locked'
-			);
+			if (self.readPermissionsLockedBy != address(0)) {
+				revert PropertyLocked(self.readPermissionsLockedBy);
+			}
 		}
-	}
-
-	function ownerOf(uint256 _tokenId) internal view returns (address owner_) {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		owner_ = s.meems[_tokenId].owner;
-		require(owner_ != address(0), 'LibMeem: invalid _tokenId');
 	}
 
 	function validateSplits(
@@ -336,73 +374,33 @@ library LibMeem {
 		PermissionType permissionType
 	) internal view returns (MeemPermission[] storage) {
 		if (permissionType == PermissionType.Copy) {
-			require(
-				self.copyPermissionsLockedBy == address(0),
-				'Copy permissions are locked'
-			);
 			return self.copyPermissions;
 		} else if (permissionType == PermissionType.Remix) {
-			require(
-				self.remixPermissionsLockedBy == address(0),
-				'Remix permissions are locked'
-			);
 			return self.remixPermissions;
 		} else if (permissionType == PermissionType.Read) {
-			require(
-				self.readPermissionsLockedBy == address(0),
-				'Read permissions are locked'
-			);
 			return self.readPermissions;
 		}
 
-		revert('Invalid permission type');
-	}
-
-	function transfer(
-		address _from,
-		address _to,
-		uint256 _tokenId
-	) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-
-		// remove
-		uint256 index = s.ownerTokenIdIndexes[_from][_tokenId];
-		uint256 lastIndex = s.ownerTokenIds[_from].length - 1;
-		if (index != lastIndex) {
-			uint256 lastTokenId = s.ownerTokenIds[_from][lastIndex];
-			s.ownerTokenIds[_from][index] = lastTokenId;
-			s.ownerTokenIdIndexes[_from][lastTokenId] = index;
-		}
-		s.ownerTokenIds[_from].pop();
-		delete s.ownerTokenIdIndexes[_from][_tokenId];
-		if (s.approved[_tokenId] != address(0)) {
-			delete s.approved[_tokenId];
-			emit LibERC721.Approval(_from, address(0), _tokenId);
-		}
-		// add
-		s.meems[_tokenId].owner = _to;
-		s.ownerTokenIdIndexes[_to][_tokenId] = s.ownerTokenIds[_to].length;
-		s.ownerTokenIds[_to].push(_tokenId);
-		emit LibERC721.Transfer(_from, _to, _tokenId);
+		revert InvalidPermissionType();
 	}
 
 	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
 		internal
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
 		if (newTotalChildren > -1) {
-			require(
-				uint256(newTotalChildren) >= s.children[tokenId].length,
-				'Total children must be greater than the existing number of copies'
-			);
+			if (uint256(newTotalChildren) < s.children[tokenId].length) {
+				revert InvalidTotalChildren(s.children[tokenId].length);
+			}
 		}
 
-		require(
-			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
-			'Total Children is locked'
-		);
+		if (s.meems[tokenId].properties.totalChildrenLockedBy != address(0)) {
+			revert PropertyLocked(
+				s.meems[tokenId].properties.totalChildrenLockedBy
+			);
+		}
 
 		s.meems[tokenId].properties.totalChildren = newTotalChildren;
 		emit TotalChildrenSet(tokenId, newTotalChildren);
@@ -410,12 +408,13 @@ library LibMeem {
 
 	function lockTotalChildren(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
-		require(
-			s.meems[tokenId].properties.totalChildrenLockedBy == address(0),
-			'Total Children is already locked'
-		);
+		if (s.meems[tokenId].properties.totalChildrenLockedBy != address(0)) {
+			revert PropertyLocked(
+				s.meems[tokenId].properties.totalChildrenLockedBy
+			);
+		}
 
 		s.meems[tokenId].properties.totalChildrenLockedBy = msg.sender;
 		emit TotalChildrenLocked(tokenId, msg.sender);
@@ -425,12 +424,15 @@ library LibMeem {
 		internal
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
-		require(
-			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
-			'Total Children is locked'
-		);
+		if (
+			s.meems[tokenId].properties.childrenPerWalletLockedBy != address(0)
+		) {
+			revert PropertyLocked(
+				s.meems[tokenId].properties.childrenPerWalletLockedBy
+			);
+		}
 
 		s.meems[tokenId].properties.childrenPerWallet = newTotalChildren;
 		emit ChildrenPerWalletSet(tokenId, newTotalChildren);
@@ -438,12 +440,15 @@ library LibMeem {
 
 	function lockChildrenPerWallet(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireOwnsToken(tokenId);
+		LibERC721.requireOwnsToken(tokenId);
 
-		require(
-			s.meems[tokenId].properties.childrenPerWalletLockedBy == address(0),
-			'Children per wallet is already locked'
-		);
+		if (
+			s.meems[tokenId].properties.childrenPerWalletLockedBy != address(0)
+		) {
+			revert PropertyLocked(
+				s.meems[tokenId].properties.childrenPerWalletLockedBy
+			);
+		}
 
 		s.meems[tokenId].properties.childrenPerWalletLockedBy = msg.sender;
 		emit ChildrenPerWalletLocked(tokenId, msg.sender);
@@ -452,9 +457,9 @@ library LibMeem {
 	function requireValidMeem(address parent, uint256 tokenId) internal view {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
-		if (parent != address(0)) {
+		if (parent != address(0) && parent != address(this)) {
 			if (s.wrappedNFTs[parent][tokenId] == true) {
-				revert('NFT has already been wrapped');
+				revert NFTAlreadyWrapped(parent, tokenId);
 			}
 		}
 	}

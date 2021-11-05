@@ -2,7 +2,6 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
@@ -20,16 +19,6 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		returns (LibPart.Part[] memory)
 	{
 		return LibMeem.getRaribleV2Royalties(tokenId);
-	}
-
-	function setNonOwnerSplitAllocationAmount(uint256 amount) public override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.DEFAULT_ADMIN_ROLE);
-		if (amount < 0 || amount > 10000) {
-			revert('Amount must be between 0 - 10000 basis points');
-		}
-
-		s.nonOwnerSplitAllocationAmount = amount;
 	}
 
 	function nonOwnerSplitAllocationAmount()

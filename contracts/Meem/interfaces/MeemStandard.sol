@@ -81,7 +81,7 @@ interface IMeemBaseStandard {
 		uint256 rootTokenId,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external returns (uint256 tokenId_);
+	) external;
 
 	// TODO: Implement child minting
 	// function mintChild(
@@ -102,14 +102,20 @@ interface IMeemBaseStandard {
 	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
 	function childDepth() external returns (uint256);
+}
+
+interface IMeemAdminStandard {
+	function setNonOwnerSplitAllocationAmount(uint256 amount) external;
 
 	function setChildDepth(uint256 newChildDepth) external;
+
+	function setTokenCounter(uint256 tokenCounter) external;
+
+	function setContractURI(string memory newContractURI) external;
 }
 
 interface IMeemSplitsStandard {
 	event SplitsSet(uint256 tokenId, Split[] splits);
-
-	function setNonOwnerSplitAllocationAmount(uint256 amount) external;
 
 	function nonOwnerSplitAllocationAmount() external view returns (uint256);
 
