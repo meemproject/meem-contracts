@@ -2,14 +2,12 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
-import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemPermissionsFacet is IMeemPermissionsStandard {

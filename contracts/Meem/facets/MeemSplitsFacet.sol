@@ -2,7 +2,6 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import {LibStrings} from '../libraries/LibStrings.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
