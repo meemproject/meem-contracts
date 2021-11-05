@@ -55,9 +55,7 @@ library LibERC721 {
 	///@return totalSupply_ the number of all NFTs that have been minted
 	function totalSupply() internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		// totalSupply_ = s.tokenIds.length;
-		// totalSupply_ = s.tokenCounter;
-		return s.tokenCounter;
+		return s.allTokens.length;
 	}
 
 	/**
