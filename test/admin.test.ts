@@ -3,12 +3,18 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { AccessControlFacet, MeemAdminFacet, Ownable } from '../typechain'
+import {
+	AccessControlFacet,
+	MeemAdminFacet,
+	MeemSplitsFacet,
+	Ownable
+} from '../typechain'
 
 chai.use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
 	let adminFacet: MeemAdminFacet
+	let meemSplitsFacet: MeemSplitsFacet
 	let ownershipFacet: Ownable
 	let accessControlFacet: AccessControlFacet
 	let signers: SignerWithAddress[]
@@ -20,6 +26,11 @@ describe('Contract Admin', function Test() {
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			ethers
 		})
+
+		meemSplitsFacet = (await ethers.getContractAt(
+			'MeemSplitsFacet',
+			DiamondAddress
+		)) as MeemSplitsFacet
 
 		adminFacet = (await ethers.getContractAt(
 			'MeemAdminFacet',
@@ -63,7 +74,7 @@ describe('Contract Admin', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const splitAmount = await adminFacet
+		const splitAmount = await meemSplitsFacet
 			.connect(signers[0])
 			.nonOwnerSplitAllocationAmount()
 		assert.equal(splitAmount.toNumber(), 100)
