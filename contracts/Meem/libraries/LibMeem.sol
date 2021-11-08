@@ -69,7 +69,7 @@ library LibMeem {
 	) internal returns (uint256 tokenId_) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
-		LibMeem.requireValidMeem(parent, parentTokenId);
+		LibMeem.requireValidMeem(chain, parent, parentTokenId);
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(to, tokenId);
 		s.tokenURIs[tokenId] = mTokenURI;
@@ -93,7 +93,7 @@ library LibMeem {
 		if (parent == address(this)) {
 			s.children[parentTokenId].push(tokenId);
 		} else {
-			s.wrappedNFTs[parent][parentTokenId] = true;
+			s.chainWrappedNFTs[chain][parent][parentTokenId] = true;
 		}
 
 		if (root == address(this)) {
@@ -454,23 +454,27 @@ library LibMeem {
 		emit ChildrenPerWalletLocked(tokenId, msg.sender);
 	}
 
-	function requireValidMeem(address parent, uint256 tokenId) internal view {
+	function requireValidMeem(
+		Chain chain,
+		address parent,
+		uint256 tokenId
+	) internal view {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
 		if (parent != address(0) && parent != address(this)) {
-			if (s.wrappedNFTs[parent][tokenId] == true) {
+			if (s.chainWrappedNFTs[chain][parent][tokenId] == true) {
 				revert NFTAlreadyWrapped(parent, tokenId);
 			}
 		}
 	}
 
-	function isNFTWrapped(address contractAddress, uint256 tokenId)
-		internal
-		view
-		returns (bool)
-	{
+	function isNFTWrapped(
+		Chain chainId,
+		address contractAddress,
+		uint256 tokenId
+	) internal view returns (bool) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		if (s.wrappedNFTs[contractAddress][tokenId] == true) {
+		if (s.chainWrappedNFTs[chainId][contractAddress][tokenId] == true) {
 			return true;
 		}
 

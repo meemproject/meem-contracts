@@ -61,6 +61,7 @@ library LibAppStorage {
 		// All tokenIds that have been minted and the corresponding index in allTokens
 		uint256[] allTokens;
 		mapping(uint256 => uint256) allTokensIndex;
+		mapping(Chain => mapping(address => mapping(uint256 => bool))) chainWrappedNFTs;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

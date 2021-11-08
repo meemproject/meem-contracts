@@ -5,6 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet, MeemBaseFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
+import { Chain } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -277,7 +278,7 @@ describe('Minting', function Test() {
 
 		const isWrapped = await meemFacet
 			.connect(signers[0])
-			.isNFTWrapped(otherAddress, 1)
+			.isNFTWrapped(Chain.Ethereum, otherAddress, 1)
 
 		assert.isTrue(isWrapped)
 	})
@@ -287,7 +288,7 @@ describe('Minting', function Test() {
 
 		const isWrapped = await meemFacet
 			.connect(signers[0])
-			.isNFTWrapped(otherAddress, 2)
+			.isNFTWrapped(Chain.Ethereum, otherAddress, 2)
 
 		assert.isFalse(isWrapped)
 	})

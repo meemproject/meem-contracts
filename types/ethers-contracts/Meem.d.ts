@@ -24,14 +24,13 @@ interface MeemInterface extends ethers.utils.Interface {
   functions: {
     "ADMIN_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
-    "PAUSER_ROLE()": FunctionFragment;
-    "UPGRADER_ROLE()": FunctionFragment;
     "grantRole(address,bytes32)": FunctionFragment;
-    "hasrole(address,bytes32)": FunctionFragment;
+    "hasRole(address,bytes32)": FunctionFragment;
     "revokeRole(address,bytes32)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseTokenURI()": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
     "contractAddress()": FunctionFragment;
     "contractURI()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -40,20 +39,22 @@ interface MeemInterface extends ethers.utils.Interface {
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setContractURI(string)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
+    "setChildDepth(uint256)": FunctionFragment;
+    "setContractURI(string)": FunctionFragment;
+    "setNonOwnerSplitAllocationAmount(uint256)": FunctionFragment;
+    "setTokenCounter(uint256)": FunctionFragment;
     "childDepth()": FunctionFragment;
     "childrenOf(uint256)": FunctionFragment;
     "getMeem(uint256)": FunctionFragment;
+    "isNFTWrapped(address,uint256)": FunctionFragment;
     "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)": FunctionFragment;
     "numChildrenOf(uint256)": FunctionFragment;
-    "setChildDepth(uint256)": FunctionFragment;
-    "setTokenCounter(uint256)": FunctionFragment;
     "tokenIdsOfOwner(address)": FunctionFragment;
     "addPermission(uint256,uint8,uint8,tuple)": FunctionFragment;
     "lockChildrenPerWallet(uint256)": FunctionFragment;
@@ -66,7 +67,6 @@ interface MeemInterface extends ethers.utils.Interface {
     "getRaribleV2Royalties(uint256)": FunctionFragment;
     "nonOwnerSplitAllocationAmount()": FunctionFragment;
     "removeSplitAt(uint256,uint8,uint256)": FunctionFragment;
-    "setNonOwnerSplitAllocationAmount(uint256)": FunctionFragment;
     "updateSplitAt(uint256,uint8,uint256,tuple)": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
     "diamondCut(tuple[],address,bytes)": FunctionFragment;
@@ -91,19 +91,11 @@ interface MeemInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "PAUSER_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "UPGRADER_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "grantRole",
     values: [string, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasrole",
+    functionFragment: "hasRole",
     values: [string, BytesLike]
   ): string;
   encodeFunctionData(
@@ -119,6 +111,7 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "baseTokenURI",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "contractAddress",
     values?: undefined
@@ -148,10 +141,6 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
-  encodeFunctionData(
-    functionFragment: "setContractURI",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "tokenByIndex",
@@ -174,6 +163,22 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setChildDepth",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setContractURI",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setNonOwnerSplitAllocationAmount",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTokenCounter",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "childDepth",
     values?: undefined
   ): string;
@@ -184,6 +189,10 @@ interface MeemInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getMeem",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isNFTWrapped",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -260,14 +269,6 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setChildDepth",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTokenCounter",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "tokenIdsOfOwner",
     values: [string]
   ): string;
@@ -341,10 +342,6 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setNonOwnerSplitAllocationAmount",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "updateSplitAt",
     values: [
       BigNumberish,
@@ -400,24 +397,13 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "ADMIN_ROLE",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "ADMIN_ROLE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "PAUSER_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "UPGRADER_ROLE",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasrole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -425,6 +411,7 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "baseTokenURI",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "contractAddress",
     data: BytesLike
@@ -451,10 +438,6 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setContractURI",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokenByIndex",
@@ -473,20 +456,32 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "childDepth", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "childrenOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getMeem", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "numChildrenOf",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setChildDepth",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setContractURI",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setNonOwnerSplitAllocationAmount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setTokenCounter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "childDepth", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "childrenOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getMeem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isNFTWrapped",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "numChildrenOf",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -532,10 +527,6 @@ interface MeemInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "removeSplitAt",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setNonOwnerSplitAllocationAmount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -665,14 +656,6 @@ export class Meem extends Contract {
 
     "MINTER_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
 
-    PAUSER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    "PAUSER_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
-
-    UPGRADER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    "UPGRADER_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
-
     grantRole(
       user: string,
       role: BytesLike,
@@ -685,13 +668,13 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    hasrole(
+    hasRole(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "hasrole(address,bytes32)"(
+    "hasRole(address,bytes32)"(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
@@ -734,6 +717,16 @@ export class Meem extends Contract {
     baseTokenURI(overrides?: CallOverrides): Promise<[string]>;
 
     "baseTokenURI()"(overrides?: CallOverrides): Promise<[string]>;
+
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "burn(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     contractAddress(overrides?: CallOverrides): Promise<[string]>;
 
@@ -806,16 +799,6 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setContractURI(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setContractURI(string)"(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     "symbol()"(overrides?: CallOverrides): Promise<[string]>;
@@ -872,6 +855,46 @@ export class Meem extends Contract {
       to: string,
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setChildDepth(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setChildDepth(uint256)"(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setContractURI(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setContractURI(string)"(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setNonOwnerSplitAllocationAmount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setNonOwnerSplitAllocationAmount(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setTokenCounter(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setTokenCounter(uint256)"(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     childDepth(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -1454,6 +1477,18 @@ export class Meem extends Contract {
       ]
     >;
 
+    isNFTWrapped(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "isNFTWrapped(address,uint256)"(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     mint(
       to: string,
       mTokenURI: string,
@@ -1601,26 +1636,6 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    setChildDepth(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setChildDepth(uint256)"(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setTokenCounter(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setTokenCounter(uint256)"(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     tokenIdsOfOwner(
       _owner: string,
@@ -1796,16 +1811,6 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setNonOwnerSplitAllocationAmount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setNonOwnerSplitAllocationAmount(uint256)"(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     updateSplitAt(
       tokenId: BigNumberish,
       propertyType: BigNumberish,
@@ -1953,14 +1958,6 @@ export class Meem extends Contract {
 
   "MINTER_ROLE()"(overrides?: CallOverrides): Promise<string>;
 
-  PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  "PAUSER_ROLE()"(overrides?: CallOverrides): Promise<string>;
-
-  UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  "UPGRADER_ROLE()"(overrides?: CallOverrides): Promise<string>;
-
   grantRole(
     user: string,
     role: BytesLike,
@@ -1973,13 +1970,13 @@ export class Meem extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  hasrole(
+  hasRole(
     user: string,
     role: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "hasrole(address,bytes32)"(
+  "hasRole(address,bytes32)"(
     user: string,
     role: BytesLike,
     overrides?: CallOverrides
@@ -2019,6 +2016,16 @@ export class Meem extends Contract {
   baseTokenURI(overrides?: CallOverrides): Promise<string>;
 
   "baseTokenURI()"(overrides?: CallOverrides): Promise<string>;
+
+  burn(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "burn(uint256)"(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   contractAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -2088,16 +2095,6 @@ export class Meem extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setContractURI(
-    newContractURI: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setContractURI(string)"(
-    newContractURI: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   symbol(overrides?: CallOverrides): Promise<string>;
 
   "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -2147,6 +2144,46 @@ export class Meem extends Contract {
     to: string,
     tokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setChildDepth(
+    newChildDepth: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setChildDepth(uint256)"(
+    newChildDepth: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setContractURI(
+    newContractURI: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setContractURI(string)"(
+    newContractURI: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setNonOwnerSplitAllocationAmount(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setNonOwnerSplitAllocationAmount(uint256)"(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setTokenCounter(
+    tokenCounter: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setTokenCounter(uint256)"(
+    tokenCounter: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   childDepth(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2725,6 +2762,18 @@ export class Meem extends Contract {
     }
   >;
 
+  isNFTWrapped(
+    contractAddress: string,
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "isNFTWrapped(address,uint256)"(
+    contractAddress: string,
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   mint(
     to: string,
     mTokenURI: string,
@@ -2872,26 +2921,6 @@ export class Meem extends Contract {
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  setChildDepth(
-    newChildDepth: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setChildDepth(uint256)"(
-    newChildDepth: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setTokenCounter(
-    tokenCounter: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setTokenCounter(uint256)"(
-    tokenCounter: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   tokenIdsOfOwner(
     _owner: string,
@@ -3061,16 +3090,6 @@ export class Meem extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setNonOwnerSplitAllocationAmount(
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setNonOwnerSplitAllocationAmount(uint256)"(
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   updateSplitAt(
     tokenId: BigNumberish,
     propertyType: BigNumberish,
@@ -3197,14 +3216,6 @@ export class Meem extends Contract {
 
     "MINTER_ROLE()"(overrides?: CallOverrides): Promise<string>;
 
-    PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    "PAUSER_ROLE()"(overrides?: CallOverrides): Promise<string>;
-
-    UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    "UPGRADER_ROLE()"(overrides?: CallOverrides): Promise<string>;
-
     grantRole(
       user: string,
       role: BytesLike,
@@ -3217,13 +3228,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    hasrole(
+    hasRole(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "hasrole(address,bytes32)"(
+    "hasRole(address,bytes32)"(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
@@ -3263,6 +3274,13 @@ export class Meem extends Contract {
     baseTokenURI(overrides?: CallOverrides): Promise<string>;
 
     "baseTokenURI()"(overrides?: CallOverrides): Promise<string>;
+
+    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "burn(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     contractAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -3332,16 +3350,6 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setContractURI(
-      newContractURI: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setContractURI(string)"(
-      newContractURI: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     symbol(overrides?: CallOverrides): Promise<string>;
 
     "symbol()"(overrides?: CallOverrides): Promise<string>;
@@ -3390,6 +3398,46 @@ export class Meem extends Contract {
       from: string,
       to: string,
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setChildDepth(
+      newChildDepth: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setChildDepth(uint256)"(
+      newChildDepth: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setContractURI(
+      newContractURI: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setContractURI(string)"(
+      newContractURI: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setNonOwnerSplitAllocationAmount(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setNonOwnerSplitAllocationAmount(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setTokenCounter(
+      tokenCounter: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setTokenCounter(uint256)"(
+      tokenCounter: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -3969,6 +4017,18 @@ export class Meem extends Contract {
       }
     >;
 
+    isNFTWrapped(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "isNFTWrapped(address,uint256)"(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     mint(
       to: string,
       mTokenURI: string,
@@ -4036,7 +4096,7 @@ export class Meem extends Contract {
         splitsLockedBy: string;
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
 
     "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
       to: string,
@@ -4105,7 +4165,7 @@ export class Meem extends Contract {
         splitsLockedBy: string;
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
 
     numChildrenOf(
       tokenId: BigNumberish,
@@ -4116,26 +4176,6 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    setChildDepth(
-      newChildDepth: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setChildDepth(uint256)"(
-      newChildDepth: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setTokenCounter(
-      tokenCounter: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setTokenCounter(uint256)"(
-      tokenCounter: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     tokenIdsOfOwner(
       _owner: string,
@@ -4304,16 +4344,6 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setNonOwnerSplitAllocationAmount(
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setNonOwnerSplitAllocationAmount(uint256)"(
-      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -4755,14 +4785,6 @@ export class Meem extends Contract {
 
     "MINTER_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    PAUSER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "PAUSER_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    UPGRADER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "UPGRADER_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     grantRole(
       user: string,
       role: BytesLike,
@@ -4775,13 +4797,13 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    hasrole(
+    hasRole(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hasrole(address,bytes32)"(
+    "hasRole(address,bytes32)"(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
@@ -4821,6 +4843,16 @@ export class Meem extends Contract {
     baseTokenURI(overrides?: CallOverrides): Promise<BigNumber>;
 
     "baseTokenURI()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "burn(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     contractAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -4893,16 +4925,6 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setContractURI(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setContractURI(string)"(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -4957,6 +4979,46 @@ export class Meem extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setChildDepth(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setChildDepth(uint256)"(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setContractURI(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setContractURI(string)"(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setNonOwnerSplitAllocationAmount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setNonOwnerSplitAllocationAmount(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setTokenCounter(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setTokenCounter(uint256)"(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     childDepth(overrides?: CallOverrides): Promise<BigNumber>;
 
     "childDepth()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -4977,6 +5039,18 @@ export class Meem extends Contract {
     ): Promise<BigNumber>;
 
     "getMeem(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isNFTWrapped(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "isNFTWrapped(address,uint256)"(
+      contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -5127,26 +5201,6 @@ export class Meem extends Contract {
     "numChildrenOf(uint256)"(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    setChildDepth(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setChildDepth(uint256)"(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setTokenCounter(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setTokenCounter(uint256)"(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     tokenIdsOfOwner(
@@ -5316,16 +5370,6 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setNonOwnerSplitAllocationAmount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "setNonOwnerSplitAllocationAmount(uint256)"(
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -5447,25 +5491,13 @@ export class Meem extends Contract {
   };
 
   populateTransaction: {
-    ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "ADMIN_ROLE()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    "ADMIN_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "MINTER_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PAUSER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "PAUSER_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    UPGRADER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "UPGRADER_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     grantRole(
       user: string,
@@ -5479,13 +5511,13 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    hasrole(
+    hasRole(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hasrole(address,bytes32)"(
+    "hasRole(address,bytes32)"(
       user: string,
       role: BytesLike,
       overrides?: CallOverrides
@@ -5528,6 +5560,16 @@ export class Meem extends Contract {
     baseTokenURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "baseTokenURI()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    burn(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "burn(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     contractAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -5602,16 +5644,6 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setContractURI(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setContractURI(string)"(
-      newContractURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -5666,6 +5698,46 @@ export class Meem extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    setChildDepth(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setChildDepth(uint256)"(
+      newChildDepth: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setContractURI(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setContractURI(string)"(
+      newContractURI: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setNonOwnerSplitAllocationAmount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setNonOwnerSplitAllocationAmount(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setTokenCounter(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setTokenCounter(uint256)"(
+      tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     childDepth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "childDepth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -5686,6 +5758,18 @@ export class Meem extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "getMeem(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isNFTWrapped(
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isNFTWrapped(address,uint256)"(
+      contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -5836,26 +5920,6 @@ export class Meem extends Contract {
     "numChildrenOf(uint256)"(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    setChildDepth(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setChildDepth(uint256)"(
-      newChildDepth: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setTokenCounter(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setTokenCounter(uint256)"(
-      tokenCounter: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     tokenIdsOfOwner(
@@ -6025,16 +6089,6 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setNonOwnerSplitAllocationAmount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "setNonOwnerSplitAllocationAmount(uint256)"(
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

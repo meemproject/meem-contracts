@@ -15,6 +15,17 @@ export class Meem__factory {
 
 const _abi = [
   {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "requiredRole",
+        type: "bytes32",
+      },
+    ],
+    name: "MissingRequiredRole",
+    type: "error",
+  },
+  {
     inputs: [],
     name: "ADMIN_ROLE",
     outputs: [
@@ -30,32 +41,6 @@ const _abi = [
   {
     inputs: [],
     name: "MINTER_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "PAUSER_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "UPGRADER_ROLE",
     outputs: [
       {
         internalType: "bytes32",
@@ -97,7 +82,7 @@ const _abi = [
         type: "bytes32",
       },
     ],
-    name: "hasrole",
+    name: "hasRole",
     outputs: [
       {
         internalType: "bool",
@@ -125,6 +110,91 @@ const _abi = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "ERC721ReceiverNotImplemented",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "idx",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "max",
+        type: "uint256",
+      },
+    ],
+    name: "IndexOutOfRange",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidZeroAddressQuery",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NoApproveSelf",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "parentAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "parentTokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NoTransferWrappedNFT",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotApproved",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NotTokenOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "ToAddressInvalid",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "TokenNotFound",
+    type: "error",
   },
   {
     anonymous: false,
@@ -249,6 +319,19 @@ const _abi = [
       },
     ],
     stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "burn",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -422,19 +505,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "string",
-        name: "newContractURI",
-        type: "string",
-      },
-    ],
-    name: "setContractURI",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "symbol",
     outputs: [
@@ -544,6 +614,171 @@ const _abi = [
     outputs: [],
     stateMutability: "payable",
     type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "minAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "maxAmount",
+        type: "uint256",
+      },
+    ],
+    name: "InvalidNonOwnerSplitAllocationAmount",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "requiredRole",
+        type: "bytes32",
+      },
+    ],
+    name: "MissingRequiredRole",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "newChildDepth",
+        type: "uint256",
+      },
+    ],
+    name: "setChildDepth",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "newContractURI",
+        type: "string",
+      },
+    ],
+    name: "setContractURI",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "setNonOwnerSplitAllocationAmount",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenCounter",
+        type: "uint256",
+      },
+    ],
+    name: "setTokenCounter",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "ERC721ReceiverNotImplemented",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidPropertyType",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "requiredRole",
+        type: "bytes32",
+      },
+    ],
+    name: "MissingRequiredRole",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "parentAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "parentTokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NFTAlreadyWrapped",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "parentAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "parentTokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NoTransferWrappedNFT",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "ToAddressInvalid",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "TokenAlreadyExists",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "TokenNotFound",
+    type: "error",
   },
   {
     anonymous: false,
@@ -1102,6 +1337,30 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "contractAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "isNFTWrapped",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "to",
         type: "address",
       },
@@ -1437,13 +1696,7 @@ const _abi = [
       },
     ],
     name: "mint",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId_",
-        type: "uint256",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -1469,32 +1722,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "newChildDepth",
-        type: "uint256",
-      },
-    ],
-    name: "setChildDepth",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenCounter",
-        type: "uint256",
-      },
-    ],
-    name: "setTokenCounter",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "_owner",
         type: "address",
@@ -1510,6 +1737,76 @@ const _abi = [
     ],
     stateMutability: "view",
     type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "idx",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "max",
+        type: "uint256",
+      },
+    ],
+    name: "IndexOutOfRange",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidPermissionType",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidPropertyType",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "currentTotalChildren",
+        type: "uint256",
+      },
+    ],
+    name: "InvalidTotalChildren",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NotTokenOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lockedBy",
+        type: "address",
+      },
+    ],
+    name: "PropertyLocked",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "TokenNotFound",
+    type: "error",
   },
   {
     anonymous: false,
@@ -1836,6 +2133,60 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "idx",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "max",
+        type: "uint256",
+      },
+    ],
+    name: "IndexOutOfRange",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidPropertyType",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NotTokenOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lockedBy",
+        type: "address",
+      },
+    ],
+    name: "PropertyLocked",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "TokenNotFound",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -2005,19 +2356,6 @@ const _abi = [
       },
     ],
     name: "removeSplitAt",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "setNonOwnerSplitAllocationAmount",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

@@ -52,7 +52,11 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 
 		const facetSelectors = getSelectors(facet)
 
-		const previousSelectors = history[proxyAddress][facetName].functionSelectors
+		const previousSelectors =
+			(history[proxyAddress] &&
+				history[proxyAddress][facetName] &&
+				history[proxyAddress][facetName].functionSelectors) ??
+			[]
 		const replaceSelectors: string[] = []
 		const addSelectors: string[] = []
 		const removeSelectors: string[] = []
@@ -113,16 +117,21 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 		}
 		console.log('Completed diamond cut w/ tx: ', tx.hash)
 
-		const previousDeploys = history[proxyAddress][facetName]
-			? [
-					...history[proxyAddress][facetName].previousDeploys,
-					{
-						address: history[proxyAddress][facetName].address,
-						functionSelectors:
-							history[proxyAddress][facetName].functionSelectors
-					}
-			  ]
-			: []
+		const previousDeploys =
+			history[proxyAddress] && history[proxyAddress][facetName]
+				? [
+						...history[proxyAddress][facetName].previousDeploys,
+						{
+							address: history[proxyAddress][facetName].address,
+							functionSelectors:
+								history[proxyAddress][facetName].functionSelectors
+						}
+				  ]
+				: []
+
+		if (!history[proxyAddress]) {
+			history[proxyAddress] = {}
+		}
 
 		history[proxyAddress][facetName] = {
 			address: facet.address,

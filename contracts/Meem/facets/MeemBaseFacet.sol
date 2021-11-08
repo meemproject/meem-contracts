@@ -74,11 +74,11 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		return s.ownerTokenIds[_owner];
 	}
 
-	function isNFTWrapped(address contractAddress, uint256 tokenId)
-		public
-		view
-		returns (bool)
-	{
-		return LibMeem.isNFTWrapped(contractAddress, tokenId);
+	function isNFTWrapped(
+		Chain chain,
+		address contractAddress,
+		uint256 tokenId
+	) public view returns (bool) {
+		return LibMeem.isNFTWrapped(chain, contractAddress, tokenId);
 	}
 }
