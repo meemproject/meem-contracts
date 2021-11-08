@@ -1336,6 +1336,11 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "enum Chain",
+        name: "chain",
+        type: "uint8",
+      },
+      {
         internalType: "address",
         name: "contractAddress",
         type: "address",

@@ -52,7 +52,7 @@ interface MeemInterface extends ethers.utils.Interface {
     "childDepth()": FunctionFragment;
     "childrenOf(uint256)": FunctionFragment;
     "getMeem(uint256)": FunctionFragment;
-    "isNFTWrapped(address,uint256)": FunctionFragment;
+    "isNFTWrapped(uint8,address,uint256)": FunctionFragment;
     "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)": FunctionFragment;
     "numChildrenOf(uint256)": FunctionFragment;
     "tokenIdsOfOwner(address)": FunctionFragment;
@@ -192,7 +192,7 @@ interface MeemInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "isNFTWrapped",
-    values: [string, BigNumberish]
+    values: [BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -1478,12 +1478,14 @@ export class Meem extends Contract {
     >;
 
     isNFTWrapped(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isNFTWrapped(address,uint256)"(
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -2763,12 +2765,14 @@ export class Meem extends Contract {
   >;
 
   isNFTWrapped(
+    chain: BigNumberish,
     contractAddress: string,
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isNFTWrapped(address,uint256)"(
+  "isNFTWrapped(uint8,address,uint256)"(
+    chain: BigNumberish,
     contractAddress: string,
     tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -4018,12 +4022,14 @@ export class Meem extends Contract {
     >;
 
     isNFTWrapped(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isNFTWrapped(address,uint256)"(
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -5044,12 +5050,14 @@ export class Meem extends Contract {
     ): Promise<BigNumber>;
 
     isNFTWrapped(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isNFTWrapped(address,uint256)"(
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -5763,12 +5771,14 @@ export class Meem extends Contract {
     ): Promise<PopulatedTransaction>;
 
     isNFTWrapped(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isNFTWrapped(address,uint256)"(
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
       contractAddress: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
