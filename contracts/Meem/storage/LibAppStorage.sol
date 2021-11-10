@@ -60,8 +60,16 @@ library LibAppStorage {
 		mapping(address => mapping(uint256 => bool)) wrappedNFTs;
 		// All tokenIds that have been minted and the corresponding index in allTokens
 		uint256[] allTokens;
+		// Index of tokenId => allTokens index
 		mapping(uint256 => uint256) allTokensIndex;
+		// Keep track of tokens that have already been wrapped
 		mapping(Chain => mapping(address => mapping(uint256 => bool))) chainWrappedNFTs;
+		// Mapping of (parent) tokenId to owners and the child tokenIds they own
+		mapping(uint256 => mapping(address => uint256[])) childrenOwnerTokens;
+		// Keep track of original Meems
+		uint256[] originalMeemTokens;
+		// Index of tokenId => allTokens index
+		mapping(uint256 => uint256) originalMeemTokensIndex;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

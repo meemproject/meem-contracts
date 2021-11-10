@@ -537,6 +537,16 @@
         "internalType": "struct MeemProperties",
         "name": "childProperties",
         "type": "tuple"
+      },
+      {
+        "internalType": "enum Chain",
+        "name": "rootChain",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
       }
     ],
     "name": "mint",
@@ -558,6 +568,30 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "ownedChildrenOf",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

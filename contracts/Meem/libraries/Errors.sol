@@ -39,3 +39,15 @@ error InvalidPropertyType();
 error InvalidPermissionType();
 
 error InvalidTotalChildren(uint256 currentTotalChildren);
+
+error TotalChildrenExceeded();
+
+error ChildrenPerWalletExceeded();
+
+error NoPermission();
+
+error InvalidChildGeneration();
+
+error InvalidParent();
+
+error ChildDepthExceeded();

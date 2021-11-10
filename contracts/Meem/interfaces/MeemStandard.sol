@@ -62,6 +62,8 @@ struct Meem {
 	uint256 rootTokenId;
 	MeemProperties properties;
 	MeemProperties childProperties;
+	Chain rootChain;
+	uint256 generation;
 }
 
 interface IMeemBaseStandard {
@@ -80,7 +82,9 @@ interface IMeemBaseStandard {
 		address root,
 		uint256 rootTokenId,
 		MeemProperties memory properties,
-		MeemProperties memory childProperties
+		MeemProperties memory childProperties,
+		Chain rootChain,
+		PermissionType permissionType
 	) external;
 
 	// TODO: Implement child minting
@@ -95,6 +99,11 @@ interface IMeemBaseStandard {
 
 	// Get children meems
 	function childrenOf(uint256 tokenId)
+		external
+		view
+		returns (uint256[] memory);
+
+	function ownedChildrenOf(uint256 tokenId, address owner)
 		external
 		view
 		returns (uint256[] memory);

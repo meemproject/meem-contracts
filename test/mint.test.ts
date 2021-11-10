@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet, MeemBaseFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain } from './helpers/meemStandard'
+import { Chain, PermissionType } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -49,13 +49,15 @@ describe('Minting', function Test() {
 				.mint(
 					owner,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Ethereum,
 					zeroAddress,
 					0,
 					zeroAddress,
 					0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
 				)
 		)
 	})
@@ -67,13 +69,15 @@ describe('Minting', function Test() {
 				.mint(
 					signers[4].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					zeroAddress,
 					0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Polygon,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)
@@ -93,19 +97,9 @@ describe('Minting', function Test() {
 			.tokenIdsOfOwner(signers[4].address)
 
 		assert.equal(tokenIds[0].toNumber(), token0)
-	})
 
-	it('Can not burn token as non-owner', async () => {
-		await assert.isRejected(erc721Facet.connect(signers[1]).burn(token0))
-	})
-
-	it('Can burn token as owner', async () => {
-		await erc721Facet.connect(signers[4]).burn(token0)
-		const tokenIds = await meemFacet
-			.connect(signers[0])
-			.tokenIdsOfOwner(signers[4].address)
-
-		assert.equal(tokenIds.length, 0)
+		const m = await meemFacet.getMeem(token0)
+		console.log(m)
 	})
 
 	it('Can not transfer wMeem as non-admin', async () => {
@@ -115,13 +109,15 @@ describe('Minting', function Test() {
 				.mint(
 					signers[2].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Ethereum,
 					parent,
 					0,
 					parent,
 					0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)
@@ -162,25 +158,30 @@ describe('Minting', function Test() {
 		assert.equal(transferResult.status, 1)
 	})
 
-	it('Can transfer child meem', async () => {
+	it('Can create and transfer child meem', async () => {
+		const m = await meemFacet.getMeem(token0)
+		console.log(m)
 		const { status } = await (
 			await meemFacet
 				.connect(signers[0])
 				.mint(
 					signers[2].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Polygon,
 					contractAddress,
-					0,
+					token0,
 					contractAddress,
-					0,
+					token0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Polygon,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)
 
 		let meem = await meemFacet.connect(signers[2]).getMeem(token2)
+		assert.equal(meem.generation.toNumber(), 1)
 		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, signers[2].address)
 		assert.equal(meem.parent, contractAddress)
@@ -213,13 +214,15 @@ describe('Minting', function Test() {
 				.mint(
 					signers[0].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Ethereum,
 					zeroAddress,
 					0,
 					zeroAddress,
 					0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)
@@ -244,13 +247,15 @@ describe('Minting', function Test() {
 				.mint(
 					signers[0].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Ethereum,
 					otherAddress,
 					1,
 					otherAddress,
 					1,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)
@@ -262,13 +267,15 @@ describe('Minting', function Test() {
 				.mint(
 					owner,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Ethereum,
 					otherAddress,
 					1,
 					otherAddress,
 					1,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
 				)
 		)
 	})
@@ -291,5 +298,57 @@ describe('Minting', function Test() {
 			.isNFTWrapped(Chain.Ethereum, otherAddress, 2)
 
 		assert.isFalse(isWrapped)
+	})
+
+	it('Can mint multiple children', async () => {
+		const { status } = await (
+			await meemFacet
+				.connect(signers[0])
+				.mint(
+					signers[5].address,
+					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					Chain.Polygon,
+					contractAddress,
+					token0,
+					contractAddress,
+					token0,
+					meemMintData,
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
+				)
+		).wait()
+		assert.equal(status, 1)
+
+		await (
+			await meemFacet
+				.connect(signers[0])
+				.mint(
+					signers[5].address,
+					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					Chain.Polygon,
+					contractAddress,
+					token0,
+					contractAddress,
+					token0,
+					meemMintData,
+					meemMintData,
+					Chain.Ethereum,
+					PermissionType.Copy
+				)
+		).wait()
+	})
+
+	it('Can not burn token as non-owner', async () => {
+		await assert.isRejected(erc721Facet.connect(signers[1]).burn(token0))
+	})
+
+	it('Can burn token as owner', async () => {
+		await erc721Facet.connect(signers[4]).burn(token0)
+		const tokenIds = await meemFacet
+			.connect(signers[0])
+			.tokenIdsOfOwner(signers[4].address)
+
+		assert.equal(tokenIds.length, 0)
 	})
 })

@@ -21,7 +21,9 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		address root,
 		uint256 rootTokenId,
 		MeemProperties memory mProperties,
-		MeemProperties memory mChildProperties
+		MeemProperties memory mChildProperties,
+		Chain rootChain,
+		PermissionType permissionType
 	) public override {
 		LibMeem.mint(
 			to,
@@ -32,7 +34,9 @@ contract MeemBaseFacet is IMeemBaseStandard {
 			root,
 			rootTokenId,
 			mProperties,
-			mChildProperties
+			mChildProperties,
+			rootChain,
+			permissionType
 		);
 	}
 
@@ -44,6 +48,16 @@ contract MeemBaseFacet is IMeemBaseStandard {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.children[tokenId];
+	}
+
+	function ownedChildrenOf(uint256 tokenId, address owner)
+		public
+		view
+		override
+		returns (uint256[] memory)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.childrenOwnerTokens[tokenId][owner];
 	}
 
 	function numChildrenOf(uint256 tokenId)
