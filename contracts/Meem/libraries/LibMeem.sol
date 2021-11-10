@@ -7,7 +7,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -358,15 +358,15 @@ library LibMeem {
 			}
 		}
 
-		require(
-			totalAmount <= 10000,
-			'Total basis points amount must be less than 10000 (100%)'
-		);
-
-		require(
-			totalAmountOfNonOwner >= nonOwnerSplitAllocationAmount,
-			'Split allocation for non-owner is too low'
-		);
+		if (
+			totalAmount > 10000 ||
+			totalAmountOfNonOwner < nonOwnerSplitAllocationAmount
+		) {
+			revert InvalidNonOwnerSplitAllocationAmount(
+				nonOwnerSplitAllocationAmount,
+				10000
+			);
+		}
 	}
 
 	function getPermissions(
