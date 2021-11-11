@@ -7,11 +7,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded} from '../libraries/Errors.sol';
-
-enum MeemError {
-	NFTAlreadyWrapped
-}
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -87,17 +83,6 @@ library LibMeem {
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
-		// Set generation of Meem
-		if (parent == address(this)) {
-			s.meems[tokenId].generation = s.meems[parentTokenId].generation + 1;
-		} else {
-			s.meems[tokenId].generation = 0;
-		}
-
-		if (s.meems[tokenId].generation > s.childDepth) {
-			revert ChildDepthExceeded();
-		}
-
 		s.meems[tokenId].chain = chain;
 		s.meems[tokenId].rootChain = rootChain;
 		s.meems[tokenId].parent = parent;
@@ -108,12 +93,46 @@ library LibMeem {
 		s.allTokens.push(tokenId);
 		s.allTokensIndex[tokenId] = s.allTokens.length;
 
-		LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
-		LibMeem.setProperties(tokenId, PropertyType.Child, mChildProperties);
+		// Set generation of Meem
+		if (parent == address(this)) {
+			s.meems[tokenId].generation = s.meems[parentTokenId].generation + 1;
+
+			// Merge parent childProperties into this child
+			LibMeem.setProperties(
+				tokenId,
+				PropertyType.Meem,
+				mProperties,
+				parentTokenId,
+				true
+			);
+			LibMeem.setProperties(
+				tokenId,
+				PropertyType.Child,
+				mChildProperties,
+				parentTokenId,
+				true
+			);
+		} else {
+			s.meems[tokenId].generation = 0;
+			LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
+			LibMeem.setProperties(
+				tokenId,
+				PropertyType.Child,
+				mChildProperties
+			);
+		}
+
+		if (s.meems[tokenId].generation > s.childDepth) {
+			revert ChildDepthExceeded();
+		}
 
 		// Keep track of children Meems
 		if (parent == address(this)) {
 			// Verify token exists
+			if (s.meems[parentTokenId].owner == address(0)) {
+				revert TokenNotFound(parentTokenId);
+			}
+			// Verify we can mint based on permissions
 			requireCanMintChildOf(to, permissionType, parentTokenId);
 			s.children[parentTokenId].push(tokenId);
 			s.childrenOwnerTokens[parentTokenId][to].push(tokenId);
@@ -299,38 +318,194 @@ library LibMeem {
 		revert InvalidPropertyType();
 	}
 
+	// Merges the base properties with any overrides
+	function mergeProperties(
+		MeemProperties memory baseProperties,
+		MeemProperties memory overrideProps
+	) internal pure returns (MeemProperties memory) {
+		MeemProperties memory mergedProps = baseProperties;
+
+		if (overrideProps.totalChildrenLockedBy != address(0)) {
+			mergedProps.totalChildrenLockedBy = overrideProps
+				.totalChildrenLockedBy;
+			mergedProps.totalChildren = overrideProps.totalChildren;
+		}
+
+		if (overrideProps.childrenPerWalletLockedBy != address(0)) {
+			mergedProps.childrenPerWalletLockedBy = overrideProps
+				.childrenPerWalletLockedBy;
+			mergedProps.childrenPerWallet = overrideProps.childrenPerWallet;
+		}
+
+		// Merge / validate properties
+		if (overrideProps.copyPermissionsLockedBy != address(0)) {
+			mergedProps.copyPermissionsLockedBy = overrideProps
+				.copyPermissionsLockedBy;
+			mergedProps.copyPermissions = overrideProps.copyPermissions;
+		} else {
+			validatePermissions(
+				mergedProps.copyPermissions,
+				overrideProps.copyPermissions
+			);
+		}
+
+		if (overrideProps.remixPermissionsLockedBy != address(0)) {
+			mergedProps.remixPermissionsLockedBy = overrideProps
+				.remixPermissionsLockedBy;
+			mergedProps.remixPermissions = overrideProps.remixPermissions;
+		} else {
+			validatePermissions(
+				mergedProps.remixPermissions,
+				overrideProps.remixPermissions
+			);
+		}
+
+		if (overrideProps.readPermissionsLockedBy != address(0)) {
+			mergedProps.readPermissionsLockedBy = overrideProps
+				.readPermissionsLockedBy;
+			mergedProps.readPermissions = overrideProps.readPermissions;
+		} else {
+			validatePermissions(
+				mergedProps.readPermissions,
+				overrideProps.readPermissions
+			);
+		}
+
+		// Validate splits
+		if (overrideProps.splitsLockedBy != address(0)) {
+			mergedProps.splitsLockedBy = overrideProps.splitsLockedBy;
+			mergedProps.splits = overrideProps.splits;
+		} else {
+			validateOverrideSplits(mergedProps.splits, overrideProps.splits);
+		}
+
+		return mergedProps;
+	}
+
+	function validatePermissions(
+		MeemPermission[] memory basePermissions,
+		MeemPermission[] memory overridePermissions
+	) internal pure {
+		for (uint256 i = 0; i < overridePermissions.length; i++) {
+			if (overridePermissions[i].lockedBy != address(0)) {
+				// Find the permission in basePermissions
+				bool wasFound = false;
+				for (uint256 j = 0; j < basePermissions.length; j++) {
+					if (
+						basePermissions[j].lockedBy ==
+						overridePermissions[i].lockedBy &&
+						basePermissions[j].permission ==
+						overridePermissions[i].permission &&
+						basePermissions[j].numTokens ==
+						overridePermissions[i].numTokens &&
+						addressArraysMatch(
+							basePermissions[j].addresses,
+							overridePermissions[i].addresses
+						)
+					) {
+						wasFound = true;
+						break;
+					}
+				}
+				if (!wasFound) {
+					revert MissingRequiredPermissions();
+				}
+			}
+		}
+	}
+
+	function validateOverrideSplits(
+		Split[] memory baseSplits,
+		Split[] memory overrideSplits
+	) internal pure {
+		for (uint256 i = 0; i < overrideSplits.length; i++) {
+			if (overrideSplits[i].lockedBy != address(0)) {
+				// Find the permission in basePermissions
+				bool wasFound = false;
+				for (uint256 j = 0; j < baseSplits.length; j++) {
+					if (
+						baseSplits[j].lockedBy == overrideSplits[i].lockedBy &&
+						baseSplits[j].amount == overrideSplits[i].amount &&
+						baseSplits[j].toAddress == overrideSplits[i].toAddress
+					) {
+						wasFound = true;
+						break;
+					}
+				}
+				if (!wasFound) {
+					revert MissingRequiredSplits();
+				}
+			}
+		}
+	}
+
+	function addressArraysMatch(address[] memory arr1, address[] memory arr2)
+		internal
+		pure
+		returns (bool)
+	{
+		if (arr1.length != arr2.length) {
+			return false;
+		}
+
+		for (uint256 i = 0; i < arr1.length; i++) {
+			if (arr1[i] != arr2[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	function setProperties(
 		uint256 tokenId,
 		PropertyType propertyType,
 		MeemProperties memory mProperties
 	) internal {
+		setProperties(tokenId, propertyType, mProperties, 0, false);
+	}
+
+	function setProperties(
+		uint256 tokenId,
+		PropertyType propertyType,
+		MeemProperties memory mProperties,
+		uint256 parentTokenId,
+		bool mergeParent
+	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemProperties storage props = getProperties(tokenId, propertyType);
-
-		for (uint256 i = 0; i < mProperties.copyPermissions.length; i++) {
-			props.copyPermissions.push(mProperties.copyPermissions[i]);
+		MeemProperties memory newProps = mProperties;
+		if (mergeParent) {
+			newProps = mergeProperties(
+				mProperties,
+				s.meems[parentTokenId].childProperties
+			);
 		}
 
-		for (uint256 i = 0; i < mProperties.remixPermissions.length; i++) {
-			props.remixPermissions.push(mProperties.remixPermissions[i]);
+		for (uint256 i = 0; i < newProps.copyPermissions.length; i++) {
+			props.copyPermissions.push(newProps.copyPermissions[i]);
 		}
 
-		for (uint256 i = 0; i < mProperties.readPermissions.length; i++) {
-			props.readPermissions.push(mProperties.readPermissions[i]);
+		for (uint256 i = 0; i < newProps.remixPermissions.length; i++) {
+			props.remixPermissions.push(newProps.remixPermissions[i]);
 		}
 
-		for (uint256 i = 0; i < mProperties.splits.length; i++) {
-			props.splits.push(mProperties.splits[i]);
+		for (uint256 i = 0; i < newProps.readPermissions.length; i++) {
+			props.readPermissions.push(newProps.readPermissions[i]);
 		}
 
-		props.totalChildren = mProperties.totalChildren;
-		props.totalChildrenLockedBy = mProperties.totalChildrenLockedBy;
-		props.childrenPerWallet = mProperties.childrenPerWallet;
-		props.childrenPerWalletLockedBy = mProperties.childrenPerWalletLockedBy;
-		props.copyPermissionsLockedBy = mProperties.copyPermissionsLockedBy;
-		props.remixPermissionsLockedBy = mProperties.remixPermissionsLockedBy;
-		props.readPermissionsLockedBy = mProperties.readPermissionsLockedBy;
-		props.splitsLockedBy = mProperties.splitsLockedBy;
+		for (uint256 i = 0; i < newProps.splits.length; i++) {
+			props.splits.push(newProps.splits[i]);
+		}
+
+		props.totalChildren = newProps.totalChildren;
+		props.totalChildrenLockedBy = newProps.totalChildrenLockedBy;
+		props.childrenPerWallet = newProps.childrenPerWallet;
+		props.childrenPerWalletLockedBy = newProps.childrenPerWalletLockedBy;
+		props.copyPermissionsLockedBy = newProps.copyPermissionsLockedBy;
+		props.remixPermissionsLockedBy = newProps.remixPermissionsLockedBy;
+		props.readPermissionsLockedBy = newProps.readPermissionsLockedBy;
+		props.splitsLockedBy = newProps.splitsLockedBy;
 
 		validateSplits(
 			props,

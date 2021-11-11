@@ -51,3 +51,7 @@ error InvalidChildGeneration();
 error InvalidParent();
 
 error ChildDepthExceeded();
+
+error MissingRequiredPermissions();
+
+error MissingRequiredSplits();

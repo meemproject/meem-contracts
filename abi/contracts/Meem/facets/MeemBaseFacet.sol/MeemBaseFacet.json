@@ -46,6 +46,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "MissingRequiredPermissions",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -54,6 +59,11 @@
       }
     ],
     "name": "MissingRequiredRole",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MissingRequiredSplits",
     "type": "error"
   },
   {
