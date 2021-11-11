@@ -53,17 +53,28 @@ struct MeemProperties {
 	address splitsLockedBy;
 }
 
-struct Meem {
+struct MeemBase {
 	address owner;
-	Chain chain;
+	Chain parentChain;
 	address parent;
 	uint256 parentTokenId;
+	Chain rootChain;
 	address root;
 	uint256 rootTokenId;
+	uint256 generation;
+}
+
+struct Meem {
+	address owner;
+	Chain parentChain;
+	address parent;
+	uint256 parentTokenId;
+	Chain rootChain;
+	address root;
+	uint256 rootTokenId;
+	uint256 generation;
 	MeemProperties properties;
 	MeemProperties childProperties;
-	Chain rootChain;
-	uint256 generation;
 }
 
 interface IMeemBaseStandard {
@@ -76,14 +87,14 @@ interface IMeemBaseStandard {
 	function mint(
 		address to,
 		string memory mTokenURI,
-		Chain chain,
+		Chain parentChain,
 		address parent,
 		uint256 parentTokenId,
+		Chain rootChain,
 		address root,
 		uint256 rootTokenId,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties,
-		Chain rootChain,
 		PermissionType permissionType
 	) external;
 

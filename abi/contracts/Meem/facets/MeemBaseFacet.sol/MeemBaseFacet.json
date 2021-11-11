@@ -362,7 +362,7 @@
           },
           {
             "internalType": "enum Chain",
-            "name": "chain",
+            "name": "parentChain",
             "type": "uint8"
           },
           {
@@ -376,6 +376,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "enum Chain",
+            "name": "rootChain",
+            "type": "uint8"
+          },
+          {
             "internalType": "address",
             "name": "root",
             "type": "address"
@@ -383,6 +388,11 @@
           {
             "internalType": "uint256",
             "name": "rootTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "generation",
             "type": "uint256"
           },
           {
@@ -684,16 +694,6 @@
             "internalType": "struct MeemProperties",
             "name": "childProperties",
             "type": "tuple"
-          },
-          {
-            "internalType": "enum Chain",
-            "name": "rootChain",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint256",
-            "name": "generation",
-            "type": "uint256"
           }
         ],
         "internalType": "struct Meem",
@@ -747,7 +747,7 @@
       },
       {
         "internalType": "enum Chain",
-        "name": "chain",
+        "name": "parentChain",
         "type": "uint8"
       },
       {
@@ -759,6 +759,11 @@
         "internalType": "uint256",
         "name": "parentTokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum Chain",
+        "name": "rootChain",
+        "type": "uint8"
       },
       {
         "internalType": "address",
@@ -1069,11 +1074,6 @@
         "internalType": "struct MeemProperties",
         "name": "mChildProperties",
         "type": "tuple"
-      },
-      {
-        "internalType": "enum Chain",
-        "name": "rootChain",
-        "type": "uint8"
       },
       {
         "internalType": "enum PermissionType",

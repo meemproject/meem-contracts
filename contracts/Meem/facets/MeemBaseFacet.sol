@@ -15,27 +15,27 @@ contract MeemBaseFacet is IMeemBaseStandard {
 	function mint(
 		address to,
 		string memory mTokenURI,
-		Chain chain,
+		Chain parentChain,
 		address parent,
 		uint256 parentTokenId,
+		Chain rootChain,
 		address root,
 		uint256 rootTokenId,
 		MeemProperties memory mProperties,
 		MeemProperties memory mChildProperties,
-		Chain rootChain,
 		PermissionType permissionType
 	) public override {
 		LibMeem.mint(
 			to,
 			mTokenURI,
-			chain,
+			parentChain,
 			parent,
 			parentTokenId,
+			rootChain,
 			root,
 			rootTokenId,
 			mProperties,
 			mChildProperties,
-			rootChain,
 			permissionType
 		);
 	}

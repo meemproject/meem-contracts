@@ -215,7 +215,7 @@
       },
       {
         "internalType": "enum Chain",
-        "name": "chain",
+        "name": "parentChain",
         "type": "uint8"
       },
       {
@@ -227,6 +227,11 @@
         "internalType": "uint256",
         "name": "parentTokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum Chain",
+        "name": "rootChain",
+        "type": "uint8"
       },
       {
         "internalType": "address",
@@ -537,11 +542,6 @@
         "internalType": "struct MeemProperties",
         "name": "childProperties",
         "type": "tuple"
-      },
-      {
-        "internalType": "enum Chain",
-        "name": "rootChain",
-        "type": "uint8"
       },
       {
         "internalType": "enum PermissionType",

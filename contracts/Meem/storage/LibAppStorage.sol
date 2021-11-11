@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import {LibMeta} from '../libraries/LibMeta.sol';
-import {Meem, Chain} from '../interfaces/MeemStandard.sol';
+import {MeemBase, MeemProperties, Chain} from '../interfaces/MeemStandard.sol';
 
 library LibAppStorage {
 	bytes32 constant DIAMOND_STORAGE_POSITION =
@@ -37,7 +37,9 @@ library LibAppStorage {
 		/** Mapping of address to operators */
 		mapping(address => mapping(address => bool)) operators;
 		/** Mapping of token => Meem data  */
-		mapping(uint256 => Meem) meems;
+		mapping(uint256 => MeemBase) meems;
+		mapping(uint256 => MeemProperties) meemProperties;
+		mapping(uint256 => MeemProperties) meemChildProperties;
 		/** The minimum amount that must be allocated to non-owners of a token in splits */
 		uint256 nonOwnerSplitAllocationAmount;
 		/** The contract URI. Used to describe this NFT collection */

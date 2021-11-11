@@ -413,9 +413,9 @@ library LibERC721 {
 			// Child meem
 		} else if (s.meems[tokenId].parent != address(this)) {
 			// Wrapped NFT
-			s.chainWrappedNFTs[s.meems[tokenId].chain][s.meems[tokenId].parent][
-					s.meems[tokenId].parentTokenId
-				] = false;
+			s.chainWrappedNFTs[s.meems[tokenId].parentChain][
+				s.meems[tokenId].parent
+			][s.meems[tokenId].parentTokenId] = false;
 		} else if (s.meems[tokenId].parent == address(0)) {
 			// Original
 			delete s.originalMeemTokens[
@@ -624,7 +624,7 @@ library LibERC721 {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		Meem storage meem = LibMeem.getMeem(tokenId);
+		Meem memory meem = LibMeem.getMeem(tokenId);
 		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, user);
 		if (
 			!isAdmin ||
