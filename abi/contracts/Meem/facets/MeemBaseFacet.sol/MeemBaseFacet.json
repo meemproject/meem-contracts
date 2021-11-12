@@ -1,6 +1,16 @@
 [
   {
     "inputs": [],
+    "name": "ChildDepthExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ChildrenPerWalletExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "ERC721ReceiverNotImplemented",
     "type": "error"
   },
@@ -22,7 +32,22 @@
   },
   {
     "inputs": [],
+    "name": "InvalidParent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPermissionType",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidPropertyType",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MissingRequiredPermissions",
     "type": "error"
   },
   {
@@ -34,6 +59,11 @@
       }
     ],
     "name": "MissingRequiredRole",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "MissingRequiredSplits",
     "type": "error"
   },
   {
@@ -50,6 +80,11 @@
       }
     ],
     "name": "NFTAlreadyWrapped",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoPermission",
     "type": "error"
   },
   {
@@ -99,6 +134,11 @@
       }
     ],
     "name": "TokenNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TotalChildrenExceeded",
     "type": "error"
   },
   {
@@ -322,7 +362,7 @@
           },
           {
             "internalType": "enum Chain",
-            "name": "chain",
+            "name": "parentChain",
             "type": "uint8"
           },
           {
@@ -336,6 +376,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "enum Chain",
+            "name": "rootChain",
+            "type": "uint8"
+          },
+          {
             "internalType": "address",
             "name": "root",
             "type": "address"
@@ -343,6 +388,11 @@
           {
             "internalType": "uint256",
             "name": "rootTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "generation",
             "type": "uint256"
           },
           {
@@ -697,7 +747,7 @@
       },
       {
         "internalType": "enum Chain",
-        "name": "chain",
+        "name": "parentChain",
         "type": "uint8"
       },
       {
@@ -709,6 +759,11 @@
         "internalType": "uint256",
         "name": "parentTokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum Chain",
+        "name": "rootChain",
+        "type": "uint8"
       },
       {
         "internalType": "address",
@@ -1019,6 +1074,11 @@
         "internalType": "struct MeemProperties",
         "name": "mChildProperties",
         "type": "tuple"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
       }
     ],
     "name": "mint",
@@ -1040,6 +1100,30 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "ownedChildrenOf",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

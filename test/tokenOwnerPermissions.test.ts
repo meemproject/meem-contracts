@@ -5,6 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemPermissionsFacet, MeemBaseFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
+import { Chain, PermissionType } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -39,13 +40,15 @@ describe('Token Owner Permissions', function Test() {
 				.mint(
 					signers[1].address,
 					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					meemMintData,
-					meemMintData
+					meemMintData,
+					PermissionType.Copy
 				)
 		).wait()
 		assert.equal(status, 1)

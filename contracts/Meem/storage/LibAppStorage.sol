@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import {LibMeta} from '../libraries/LibMeta.sol';
-import {Meem, Chain} from '../interfaces/MeemStandard.sol';
+import {MeemBase, MeemProperties, Chain} from '../interfaces/MeemStandard.sol';
 
 library LibAppStorage {
 	bytes32 constant DIAMOND_STORAGE_POSITION =
@@ -37,7 +37,9 @@ library LibAppStorage {
 		/** Mapping of address to operators */
 		mapping(address => mapping(address => bool)) operators;
 		/** Mapping of token => Meem data  */
-		mapping(uint256 => Meem) meems;
+		mapping(uint256 => MeemBase) meems;
+		mapping(uint256 => MeemProperties) meemProperties;
+		mapping(uint256 => MeemProperties) meemChildProperties;
 		/** The minimum amount that must be allocated to non-owners of a token in splits */
 		uint256 nonOwnerSplitAllocationAmount;
 		/** The contract URI. Used to describe this NFT collection */
@@ -60,8 +62,16 @@ library LibAppStorage {
 		mapping(address => mapping(uint256 => bool)) wrappedNFTs;
 		// All tokenIds that have been minted and the corresponding index in allTokens
 		uint256[] allTokens;
+		// Index of tokenId => allTokens index
 		mapping(uint256 => uint256) allTokensIndex;
+		// Keep track of tokens that have already been wrapped
 		mapping(Chain => mapping(address => mapping(uint256 => bool))) chainWrappedNFTs;
+		// Mapping of (parent) tokenId to owners and the child tokenIds they own
+		mapping(uint256 => mapping(address => uint256[])) childrenOwnerTokens;
+		// Keep track of original Meems
+		uint256[] originalMeemTokens;
+		// Index of tokenId => allTokens index
+		mapping(uint256 => uint256) originalMeemTokensIndex;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {
