@@ -52,11 +52,11 @@ describe('Minting', function Test() {
 					Chain.Ethereum,
 					zeroAddress,
 					0,
+					Chain.Ethereum,
 					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		)
@@ -72,11 +72,11 @@ describe('Minting', function Test() {
 					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -112,11 +112,11 @@ describe('Minting', function Test() {
 					Chain.Ethereum,
 					parent,
 					0,
+					Chain.Ethereum,
 					parent,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		).wait()
@@ -170,11 +170,11 @@ describe('Minting', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -217,11 +217,11 @@ describe('Minting', function Test() {
 					Chain.Ethereum,
 					zeroAddress,
 					0,
+					Chain.Ethereum,
 					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		).wait()
@@ -250,11 +250,11 @@ describe('Minting', function Test() {
 					Chain.Ethereum,
 					otherAddress,
 					1,
+					Chain.Ethereum,
 					otherAddress,
 					1,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		).wait()
@@ -270,11 +270,11 @@ describe('Minting', function Test() {
 					Chain.Ethereum,
 					otherAddress,
 					1,
+					Chain.Ethereum,
 					otherAddress,
 					1,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		)
@@ -310,11 +310,11 @@ describe('Minting', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		).wait()
@@ -329,11 +329,11 @@ describe('Minting', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Ethereum,
 					PermissionType.Copy
 				)
 		).wait()

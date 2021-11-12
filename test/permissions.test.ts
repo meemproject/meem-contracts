@@ -51,11 +51,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -74,11 +74,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -96,11 +96,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token1,
+					Chain.Polygon,
 					contractAddress,
 					token1,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -120,11 +120,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -139,11 +139,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token1,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -160,11 +160,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token2,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -180,11 +180,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					{ ...meemMintData, totalChildren: 1 },
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -199,11 +199,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					{ ...meemMintData, totalChildren: 1 },
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -218,11 +218,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					{ ...meemMintData, totalChildren: 1 },
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -238,11 +238,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					{ ...meemMintData, childrenPerWallet: 1 },
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -257,11 +257,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -276,11 +276,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -295,11 +295,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -313,6 +313,7 @@ describe('Minting Permissions', function Test() {
 				Chain.Polygon,
 				zeroAddress,
 				0,
+				Chain.Polygon,
 				zeroAddress,
 				0,
 				{
@@ -327,7 +328,6 @@ describe('Minting Permissions', function Test() {
 					]
 				},
 				meemMintData,
-				Chain.Polygon,
 				PermissionType.Copy
 			)
 		).wait()
@@ -342,11 +342,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -361,11 +361,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -379,6 +379,7 @@ describe('Minting Permissions', function Test() {
 				Chain.Polygon,
 				zeroAddress,
 				0,
+				Chain.Polygon,
 				zeroAddress,
 				0,
 				{
@@ -393,7 +394,6 @@ describe('Minting Permissions', function Test() {
 					]
 				},
 				meemMintData,
-				Chain.Polygon,
 				PermissionType.Copy
 			)
 		).wait()
@@ -408,11 +408,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -427,11 +427,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -446,11 +446,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)
@@ -464,6 +464,7 @@ describe('Minting Permissions', function Test() {
 				Chain.Polygon,
 				zeroAddress,
 				0,
+				Chain.Polygon,
 				zeroAddress,
 				0,
 				{
@@ -484,7 +485,6 @@ describe('Minting Permissions', function Test() {
 					]
 				},
 				meemMintData,
-				Chain.Polygon,
 				PermissionType.Copy
 			)
 		).wait()
@@ -499,11 +499,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -518,11 +518,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()
@@ -537,11 +537,11 @@ describe('Minting Permissions', function Test() {
 					Chain.Polygon,
 					contractAddress,
 					token0,
+					Chain.Polygon,
 					contractAddress,
 					token0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		)

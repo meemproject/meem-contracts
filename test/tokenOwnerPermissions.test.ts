@@ -43,11 +43,11 @@ describe('Token Owner Permissions', function Test() {
 					Chain.Polygon,
 					zeroAddress,
 					0,
+					Chain.Polygon,
 					zeroAddress,
 					0,
 					meemMintData,
 					meemMintData,
-					Chain.Polygon,
 					PermissionType.Copy
 				)
 		).wait()

@@ -3,7 +3,7 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemBaseFacet } from '../typechain'
+import { Erc721Facet } from '../typechain'
 
 chai.use(chaiAsPromised)
 
