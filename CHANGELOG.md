@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/meemproject/meem-contracts/compare/v1.2.5...v1.3.0) (2021-11-12)
+
+
+### Features
+
+* meem generation, root chainId, permissions checks for children ([1336486](https://github.com/meemproject/meem-contracts/commit/1336486))
+
 ## [1.2.5](https://github.com/meemproject/meem-contracts/compare/v1.2.4...v1.2.5) (2021-11-10)
 
 ## [1.2.4](https://github.com/meemproject/meem-contracts/compare/v1.2.3...v1.2.4) (2021-11-08)
