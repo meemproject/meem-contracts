@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/meemproject/meem-contracts/compare/v1.3.0...v1.4.0) (2021-11-15)
+
+
+### Features
+
+* handle rinkeby; add mintedAt property ([aa110a9](https://github.com/meemproject/meem-contracts/commit/aa110a9))
+
 # [1.3.0](https://github.com/meemproject/meem-contracts/compare/v1.2.5...v1.3.0) (2021-11-12)
 
 
