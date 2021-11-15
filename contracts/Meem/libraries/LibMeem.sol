@@ -84,6 +84,7 @@ library LibMeem {
 		s.meems[tokenId].root = root;
 		s.meems[tokenId].rootTokenId = rootTokenId;
 		s.meems[tokenId].owner = to;
+		s.meems[tokenId].mintedAt = block.timestamp;
 		s.allTokens.push(tokenId);
 		s.allTokensIndex[tokenId] = s.allTokens.length;
 
@@ -303,7 +304,8 @@ library LibMeem {
 			s.meems[tokenId].rootTokenId,
 			s.meems[tokenId].generation,
 			s.meemProperties[tokenId],
-			s.meemChildProperties[tokenId]
+			s.meemChildProperties[tokenId],
+			s.meems[tokenId].mintedAt
 		);
 
 		return meem;

@@ -5,7 +5,8 @@ enum Chain {
 	Ethereum,
 	Polygon,
 	Cardano,
-	Solana
+	Solana,
+	Rinkeby
 }
 
 enum PermissionType {
@@ -62,6 +63,7 @@ struct MeemBase {
 	address root;
 	uint256 rootTokenId;
 	uint256 generation;
+	uint256 mintedAt;
 }
 
 struct Meem {
@@ -75,6 +77,7 @@ struct Meem {
 	uint256 generation;
 	MeemProperties properties;
 	MeemProperties childProperties;
+	uint256 mintedAt;
 }
 
 interface IMeemBaseStandard {
