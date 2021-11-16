@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/meemproject/meem-contracts/compare/v1.4.0...v1.5.0) (2021-11-16)
+
+
+### Features
+
+* keep track of wrapped meem tokenIds ([c3a6761](https://github.com/meemproject/meem-contracts/commit/c3a6761))
+
 # [1.4.0](https://github.com/meemproject/meem-contracts/compare/v1.3.0...v1.4.0) (2021-11-15)
 
 
