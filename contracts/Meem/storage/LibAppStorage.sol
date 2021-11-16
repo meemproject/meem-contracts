@@ -65,7 +65,7 @@ library LibAppStorage {
 		// Index of tokenId => allTokens index
 		mapping(uint256 => uint256) allTokensIndex;
 		// Keep track of tokens that have already been wrapped
-		mapping(Chain => mapping(address => mapping(uint256 => bool))) chainWrappedNFTs;
+		mapping(Chain => mapping(address => mapping(uint256 => uint256))) chainWrappedNFTs;
 		// Mapping of (parent) tokenId to owners and the child tokenIds they own
 		mapping(uint256 => mapping(address => uint256[])) childrenOwnerTokens;
 		// Keep track of original Meems

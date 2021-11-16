@@ -9,6 +9,12 @@ import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits} from '../libraries/Errors.sol';
 
+struct WrappedItem {
+	Chain chain;
+	address contractAddress;
+	uint256 tokenId;
+}
+
 library LibMeem {
 	// Rarible royalties event
 	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
@@ -133,7 +139,7 @@ library LibMeem {
 			s.childrenOwnerTokens[parentTokenId][to].push(tokenId);
 		} else if (parent != address(0)) {
 			// Keep track of wrapped NFTs
-			s.chainWrappedNFTs[parentChain][parent][parentTokenId] = true;
+			s.chainWrappedNFTs[parentChain][parent][parentTokenId] = tokenId;
 		} else if (parent == address(0)) {
 			s.originalMeemTokensIndex[tokenId] = s.originalMeemTokens.length;
 			s.originalMeemTokens.push(tokenId);
@@ -671,7 +677,7 @@ library LibMeem {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
 		if (parent != address(0) && parent != address(this)) {
-			if (s.chainWrappedNFTs[chain][parent][tokenId] == true) {
+			if (s.chainWrappedNFTs[chain][parent][tokenId] != 0) {
 				revert NFTAlreadyWrapped(parent, tokenId);
 				// revert('NFT_ALREADY_WRAPPED');
 			}
@@ -684,11 +690,28 @@ library LibMeem {
 		uint256 tokenId
 	) internal view returns (bool) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		if (s.chainWrappedNFTs[chainId][contractAddress][tokenId] == true) {
+		if (s.chainWrappedNFTs[chainId][contractAddress][tokenId] != 0) {
 			return true;
 		}
 
 		return false;
+	}
+
+	function wrappedTokens(WrappedItem[] memory items)
+		internal
+		view
+		returns (uint256[] memory)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		uint256[] memory result;
+
+		for (uint256 i = 0; i < items.length; i++) {
+			result[i] = s.chainWrappedNFTs[items[i].chain][
+				items[i].contractAddress
+			][items[i].tokenId];
+		}
+
+		return result;
 	}
 
 	// Checks if "to" can mint a child of tokenId

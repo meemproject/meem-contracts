@@ -78,21 +78,4 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.childDepth;
 	}
-
-	function tokenIdsOfOwner(address _owner)
-		public
-		view
-		returns (uint256[] memory tokenIds_)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.ownerTokenIds[_owner];
-	}
-
-	function isNFTWrapped(
-		Chain chain,
-		address contractAddress,
-		uint256 tokenId
-	) public view returns (bool) {
-		return LibMeem.isNFTWrapped(chain, contractAddress, tokenId);
-	}
 }

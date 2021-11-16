@@ -415,7 +415,7 @@ library LibERC721 {
 			// Wrapped NFT
 			s.chainWrappedNFTs[s.meems[tokenId].parentChain][
 				s.meems[tokenId].parent
-			][s.meems[tokenId].parentTokenId] = false;
+			][s.meems[tokenId].parentTokenId] = 0;
 		} else if (s.meems[tokenId].parent == address(0)) {
 			// Original
 			delete s.originalMeemTokens[

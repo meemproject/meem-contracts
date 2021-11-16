@@ -52,10 +52,9 @@ interface MeemInterface extends ethers.utils.Interface {
     "childDepth()": FunctionFragment;
     "childrenOf(uint256)": FunctionFragment;
     "getMeem(uint256)": FunctionFragment;
-    "isNFTWrapped(uint8,address,uint256)": FunctionFragment;
-    "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)": FunctionFragment;
+    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)": FunctionFragment;
     "numChildrenOf(uint256)": FunctionFragment;
-    "tokenIdsOfOwner(address)": FunctionFragment;
+    "ownedChildrenOf(uint256,address)": FunctionFragment;
     "addPermission(uint256,uint8,uint8,tuple)": FunctionFragment;
     "lockChildrenPerWallet(uint256)": FunctionFragment;
     "lockTotalChildren(uint256)": FunctionFragment;
@@ -191,16 +190,13 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isNFTWrapped",
-    values: [BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "mint",
     values: [
       string,
       string,
       BigNumberish,
       string,
+      BigNumberish,
       BigNumberish,
       string,
       BigNumberish,
@@ -261,7 +257,8 @@ interface MeemInterface extends ethers.utils.Interface {
         readPermissionsLockedBy: string;
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
-      }
+      },
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
@@ -269,8 +266,8 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "tokenIdsOfOwner",
-    values: [string]
+    functionFragment: "ownedChildrenOf",
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "addPermission",
@@ -475,17 +472,13 @@ interface MeemInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "childDepth", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "childrenOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getMeem", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "isNFTWrapped",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "numChildrenOf",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "tokenIdsOfOwner",
+    functionFragment: "ownedChildrenOf",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -921,7 +914,9 @@ export class Meem extends Contract {
           number,
           string,
           BigNumber,
+          number,
           string,
+          BigNumber,
           BigNumber,
           [
             BigNumber,
@@ -1052,14 +1047,17 @@ export class Meem extends Contract {
               lockedBy: string;
             })[];
             splitsLockedBy: string;
-          }
+          },
+          BigNumber
         ] & {
           owner: string;
-          chain: number;
+          parentChain: number;
           parent: string;
           parentTokenId: BigNumber;
+          rootChain: number;
           root: string;
           rootTokenId: BigNumber;
+          generation: BigNumber;
           properties: [
             BigNumber,
             string,
@@ -1190,6 +1188,7 @@ export class Meem extends Contract {
             })[];
             splitsLockedBy: string;
           };
+          mintedAt: BigNumber;
         }
       ]
     >;
@@ -1204,7 +1203,9 @@ export class Meem extends Contract {
           number,
           string,
           BigNumber,
+          number,
           string,
+          BigNumber,
           BigNumber,
           [
             BigNumber,
@@ -1335,14 +1336,17 @@ export class Meem extends Contract {
               lockedBy: string;
             })[];
             splitsLockedBy: string;
-          }
+          },
+          BigNumber
         ] & {
           owner: string;
-          chain: number;
+          parentChain: number;
           parent: string;
           parentTokenId: BigNumber;
+          rootChain: number;
           root: string;
           rootTokenId: BigNumber;
+          generation: BigNumber;
           properties: [
             BigNumber,
             string,
@@ -1473,30 +1477,18 @@ export class Meem extends Contract {
             })[];
             splitsLockedBy: string;
           };
+          mintedAt: BigNumber;
         }
       ]
     >;
 
-    isNFTWrapped(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    "isNFTWrapped(uint8,address,uint256)"(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     mint(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -1557,15 +1549,17 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
+    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -1626,6 +1620,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -1639,15 +1634,17 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    tokenIdsOfOwner(
-      _owner: string,
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { tokenIds_: BigNumber[] }>;
+    ): Promise<[BigNumber[]]>;
 
-    "tokenIdsOfOwner(address)"(
-      _owner: string,
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { tokenIds_: BigNumber[] }>;
+    ): Promise<[BigNumber[]]>;
 
     addPermission(
       tokenId: BigNumberish,
@@ -2211,7 +2208,9 @@ export class Meem extends Contract {
       number,
       string,
       BigNumber,
+      number,
       string,
+      BigNumber,
       BigNumber,
       [
         BigNumber,
@@ -2342,14 +2341,17 @@ export class Meem extends Contract {
           lockedBy: string;
         })[];
         splitsLockedBy: string;
-      }
+      },
+      BigNumber
     ] & {
       owner: string;
-      chain: number;
+      parentChain: number;
       parent: string;
       parentTokenId: BigNumber;
+      rootChain: number;
       root: string;
       rootTokenId: BigNumber;
+      generation: BigNumber;
       properties: [
         BigNumber,
         string,
@@ -2480,6 +2482,7 @@ export class Meem extends Contract {
         })[];
         splitsLockedBy: string;
       };
+      mintedAt: BigNumber;
     }
   >;
 
@@ -2492,7 +2495,9 @@ export class Meem extends Contract {
       number,
       string,
       BigNumber,
+      number,
       string,
+      BigNumber,
       BigNumber,
       [
         BigNumber,
@@ -2623,14 +2628,17 @@ export class Meem extends Contract {
           lockedBy: string;
         })[];
         splitsLockedBy: string;
-      }
+      },
+      BigNumber
     ] & {
       owner: string;
-      chain: number;
+      parentChain: number;
       parent: string;
       parentTokenId: BigNumber;
+      rootChain: number;
       root: string;
       rootTokenId: BigNumber;
+      generation: BigNumber;
       properties: [
         BigNumber,
         string,
@@ -2761,29 +2769,17 @@ export class Meem extends Contract {
         })[];
         splitsLockedBy: string;
       };
+      mintedAt: BigNumber;
     }
   >;
-
-  isNFTWrapped(
-    chain: BigNumberish,
-    contractAddress: string,
-    tokenId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "isNFTWrapped(uint8,address,uint256)"(
-    chain: BigNumberish,
-    contractAddress: string,
-    tokenId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
 
   mint(
     to: string,
     mTokenURI: string,
-    chain: BigNumberish,
+    parentChain: BigNumberish,
     parent: string,
     parentTokenId: BigNumberish,
+    rootChain: BigNumberish,
     root: string,
     rootTokenId: BigNumberish,
     mProperties: {
@@ -2844,15 +2840,17 @@ export class Meem extends Contract {
       splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
       splitsLockedBy: string;
     },
+    permissionType: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
+  "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
     to: string,
     mTokenURI: string,
-    chain: BigNumberish,
+    parentChain: BigNumberish,
     parent: string,
     parentTokenId: BigNumberish,
+    rootChain: BigNumberish,
     root: string,
     rootTokenId: BigNumberish,
     mProperties: {
@@ -2913,6 +2911,7 @@ export class Meem extends Contract {
       splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
       splitsLockedBy: string;
     },
+    permissionType: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -2926,13 +2925,15 @@ export class Meem extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  tokenIdsOfOwner(
-    _owner: string,
+  ownedChildrenOf(
+    tokenId: BigNumberish,
+    owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
-  "tokenIdsOfOwner(address)"(
-    _owner: string,
+  "ownedChildrenOf(uint256,address)"(
+    tokenId: BigNumberish,
+    owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
@@ -3468,7 +3469,9 @@ export class Meem extends Contract {
         number,
         string,
         BigNumber,
+        number,
         string,
+        BigNumber,
         BigNumber,
         [
           BigNumber,
@@ -3599,14 +3602,17 @@ export class Meem extends Contract {
             lockedBy: string;
           })[];
           splitsLockedBy: string;
-        }
+        },
+        BigNumber
       ] & {
         owner: string;
-        chain: number;
+        parentChain: number;
         parent: string;
         parentTokenId: BigNumber;
+        rootChain: number;
         root: string;
         rootTokenId: BigNumber;
+        generation: BigNumber;
         properties: [
           BigNumber,
           string,
@@ -3737,6 +3743,7 @@ export class Meem extends Contract {
           })[];
           splitsLockedBy: string;
         };
+        mintedAt: BigNumber;
       }
     >;
 
@@ -3749,7 +3756,9 @@ export class Meem extends Contract {
         number,
         string,
         BigNumber,
+        number,
         string,
+        BigNumber,
         BigNumber,
         [
           BigNumber,
@@ -3880,14 +3889,17 @@ export class Meem extends Contract {
             lockedBy: string;
           })[];
           splitsLockedBy: string;
-        }
+        },
+        BigNumber
       ] & {
         owner: string;
-        chain: number;
+        parentChain: number;
         parent: string;
         parentTokenId: BigNumber;
+        rootChain: number;
         root: string;
         rootTokenId: BigNumber;
+        generation: BigNumber;
         properties: [
           BigNumber,
           string,
@@ -4018,29 +4030,17 @@ export class Meem extends Contract {
           })[];
           splitsLockedBy: string;
         };
+        mintedAt: BigNumber;
       }
     >;
-
-    isNFTWrapped(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    "isNFTWrapped(uint8,address,uint256)"(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     mint(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -4101,15 +4101,17 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
+    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -4170,6 +4172,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -4183,13 +4186,15 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    tokenIdsOfOwner(
-      _owner: string,
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    "tokenIdsOfOwner(address)"(
-      _owner: string,
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
@@ -5049,26 +5054,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    isNFTWrapped(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "isNFTWrapped(uint8,address,uint256)"(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     mint(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -5129,15 +5121,17 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
+    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -5198,6 +5192,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -5211,13 +5206,15 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    tokenIdsOfOwner(
-      _owner: string,
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "tokenIdsOfOwner(address)"(
-      _owner: string,
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -5770,26 +5767,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    isNFTWrapped(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "isNFTWrapped(uint8,address,uint256)"(
-      chain: BigNumberish,
-      contractAddress: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     mint(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -5850,15 +5834,17 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "mint(address,string,uint8,address,uint256,address,uint256,tuple,tuple)"(
+    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
       to: string,
       mTokenURI: string,
-      chain: BigNumberish,
+      parentChain: BigNumberish,
       parent: string,
       parentTokenId: BigNumberish,
+      rootChain: BigNumberish,
       root: string,
       rootTokenId: BigNumberish,
       mProperties: {
@@ -5919,6 +5905,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -5932,13 +5919,15 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    tokenIdsOfOwner(
-      _owner: string,
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "tokenIdsOfOwner(address)"(
-      _owner: string,
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
