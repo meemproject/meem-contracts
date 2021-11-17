@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/meemproject/meem-contracts/compare/v1.5.0...v1.6.0) (2021-11-17)
+
+
+### Features
+
+* bulk check if tokens have been wrapped ([c94200e](https://github.com/meemproject/meem-contracts/commit/c94200e))
+
 # [1.5.0](https://github.com/meemproject/meem-contracts/compare/v1.4.0...v1.5.0) (2021-11-16)
 
 
