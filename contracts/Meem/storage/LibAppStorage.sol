@@ -58,12 +58,12 @@ library LibAppStorage {
 		mapping(uint256 => address) tokenApprovals;
 		/** Mapping from owner to operator approvals */
 		mapping(address => mapping(address => bool)) operatorApprovals;
-		// Mapping of parent address => tokenId
-		mapping(address => mapping(uint256 => bool)) wrappedNFTs;
 		// All tokenIds that have been minted and the corresponding index in allTokens
 		uint256[] allTokens;
 		// Index of tokenId => allTokens index
 		mapping(uint256 => uint256) allTokensIndex;
+		// Keep track of whether a tokenId has been minted
+		mapping(uint256 => bool) mintedTokens;
 		// Keep track of tokens that have already been wrapped
 		mapping(Chain => mapping(address => mapping(uint256 => uint256))) chainWrappedNFTs;
 		// Mapping of (parent) tokenId to owners and the child tokenIds they own

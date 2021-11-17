@@ -47,7 +47,29 @@ library LibERC721 {
 
 	function burn(uint256 tokenId) internal {
 		requireOwnsToken(tokenId);
-		_burn(tokenId);
+
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		address owner = ownerOf(tokenId);
+
+		_beforeTokenTransfer(owner, address(0), tokenId);
+
+		// Clear approvals
+		_approve(address(0), tokenId);
+
+		// Make zero address new owner
+		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
+		s.ownerTokenIds[owner] = LibArray.removeAt(
+			s.ownerTokenIds[owner],
+			index
+		);
+		delete s.ownerTokenIdIndexes[owner][tokenId];
+
+		s.ownerTokenIds[address(0)].push(tokenId);
+		s.ownerTokenIdIndexes[address(0)][tokenId] =
+			s.ownerTokenIds[address(0)].length -
+			1;
+
+		emit Transfer(owner, address(0), tokenId);
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
@@ -297,7 +319,7 @@ library LibERC721 {
 	 */
 	function _exists(uint256 tokenId) internal view returns (bool) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.meems[tokenId].owner != address(0);
+		return s.mintedTokens[tokenId];
 	}
 
 	/**
@@ -376,57 +398,13 @@ library LibERC721 {
 
 		_beforeTokenTransfer(address(0), to, tokenId);
 
-		// s.balances[to] += 1;
-		// s.owners[tokenId] = to;
+		s.allTokens.push(tokenId);
+		s.allTokensIndex[tokenId] = s.allTokens.length;
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
-		s.meems[tokenId].owner = to;
+		s.mintedTokens[tokenId] = true;
 
 		emit Transfer(address(0), to, tokenId);
-	}
-
-	/**
-	 * @dev Destroys `tokenId`.
-	 * The approval is cleared when the token is burned.
-	 *
-	 * Requirements:
-	 *
-	 * - `tokenId` must exist.
-	 *
-	 * Emits a {Transfer} event.
-	 */
-	function _burn(uint256 tokenId) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		address owner = ownerOf(tokenId);
-
-		_beforeTokenTransfer(owner, address(0), tokenId);
-
-		// Clear approvals
-		_approve(address(0), tokenId);
-
-		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
-		s.ownerTokenIds[owner] = LibArray.removeAt(
-			s.ownerTokenIds[owner],
-			index
-		);
-		if (s.meems[tokenId].parent == address(this)) {
-			// Child meem
-		} else if (s.meems[tokenId].parent != address(this)) {
-			// Wrapped NFT
-			s.chainWrappedNFTs[s.meems[tokenId].parentChain][
-				s.meems[tokenId].parent
-			][s.meems[tokenId].parentTokenId] = 0;
-		} else if (s.meems[tokenId].parent == address(0)) {
-			// Original
-			delete s.originalMeemTokens[
-				s.originalMeemTokensIndex[s.meems[tokenId].parentTokenId]
-			];
-		}
-
-		delete s.ownerTokenIdIndexes[owner][tokenId];
-		delete s.meems[tokenId];
-
-		emit Transfer(owner, address(0), tokenId);
 	}
 
 	/**

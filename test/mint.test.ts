@@ -3,7 +3,7 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemBaseFacet } from '../typechain'
+import { Erc721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { Chain, PermissionType } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
@@ -12,6 +12,7 @@ chai.use(chaiAsPromised)
 
 describe('Minting', function Test() {
 	let meemFacet: MeemBaseFacet
+	let queryFacet: MeemQueryFacet
 	let erc721Facet: Erc721Facet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
@@ -40,6 +41,10 @@ describe('Minting', function Test() {
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
 			DiamondAddress
 		)) as Erc721Facet
+		queryFacet = (await ethers.getContractAt(
+			'MeemQueryFacet',
+			contractAddress
+		)) as MeemQueryFacet
 	})
 
 	it('Can not mint as non-minter role', async () => {
@@ -92,13 +97,13 @@ describe('Minting', function Test() {
 			.balanceOf(signers[4].address)
 		assert.equal(ownerBalance.toNumber(), 1)
 
-		const tokenIds = await meemFacet
+		const tokenIds = await queryFacet
 			.connect(signers[0])
 			.tokenIdsOfOwner(signers[4].address)
 
 		assert.equal(tokenIds[0].toNumber(), token0)
 
-		const m = await meemFacet.getMeem(token0)
+		const m = await queryFacet.getMeem(token0)
 		console.log(m)
 	})
 
@@ -132,13 +137,13 @@ describe('Minting', function Test() {
 			.balanceOf(signers[2].address)
 		assert.equal(ownerBalance.toNumber(), 1)
 
-		const tokenIds = await meemFacet
+		const tokenIds = await queryFacet
 			.connect(signers[2])
 			.tokenIdsOfOwner(signers[2].address)
 
 		assert.equal(tokenIds[0].toNumber(), token1)
 
-		const meem = await meemFacet.connect(signers[2]).getMeem(token1)
+		const meem = await queryFacet.connect(signers[2]).getMeem(token1)
 		console.log({ meem, zero: meem[0] })
 		assert.equal(meem.owner, signers[2].address)
 
@@ -159,7 +164,7 @@ describe('Minting', function Test() {
 	})
 
 	it('Can create and transfer child meem', async () => {
-		const m = await meemFacet.getMeem(token0)
+		const m = await queryFacet.getMeem(token0)
 		console.log(m)
 		const { status } = await (
 			await meemFacet
@@ -180,7 +185,7 @@ describe('Minting', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		let meem = await meemFacet.connect(signers[2]).getMeem(token2)
+		let meem = await queryFacet.connect(signers[2]).getMeem(token2)
 		assert.equal(meem.generation.toNumber(), 1)
 		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, signers[2].address)
@@ -197,7 +202,7 @@ describe('Minting', function Test() {
 		).wait()
 		assert.equal(transferResult.status, 1)
 
-		meem = await meemFacet.connect(signers[2]).getMeem(token2)
+		meem = await queryFacet.connect(signers[2]).getMeem(token2)
 		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, owner)
 		assert.equal(meem.parent, contractAddress)
@@ -283,7 +288,7 @@ describe('Minting', function Test() {
 	it('Can check if nft has been wrapped in a meem', async () => {
 		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
 
-		const isWrapped = await meemFacet
+		const isWrapped = await queryFacet
 			.connect(signers[0])
 			.isNFTWrapped(Chain.Ethereum, otherAddress, 1)
 
@@ -293,7 +298,7 @@ describe('Minting', function Test() {
 	it('Can check if nft has not been wrapped in a meem', async () => {
 		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
 
-		const isWrapped = await meemFacet
+		const isWrapped = await queryFacet
 			.connect(signers[0])
 			.isNFTWrapped(Chain.Ethereum, otherAddress, 2)
 
@@ -345,10 +350,15 @@ describe('Minting', function Test() {
 
 	it('Can burn token as owner', async () => {
 		await erc721Facet.connect(signers[4]).burn(token0)
-		const tokenIds = await meemFacet
+		const tokenIds = await queryFacet
 			.connect(signers[0])
 			.tokenIdsOfOwner(signers[4].address)
 
 		assert.equal(tokenIds.length, 0)
+
+		const burnedTokenIds = await queryFacet
+			.connect(signers[0])
+			.tokenIdsOfOwner(zeroAddress)
+		assert.equal(burnedTokenIds[0].toNumber(), token0)
 	})
 })

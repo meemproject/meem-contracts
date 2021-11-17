@@ -3,7 +3,7 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { MeemAdminFacet, MeemBaseFacet } from '../typechain'
+import { MeemAdminFacet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { Chain, Permission, PermissionType } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
@@ -13,6 +13,7 @@ chai.use(chaiAsPromised)
 describe('Minting Permissions', function Test() {
 	let meemFacet: MeemBaseFacet
 	let meemAdminFacet: MeemAdminFacet
+	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
 	const owner = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
@@ -32,13 +33,17 @@ describe('Minting Permissions', function Test() {
 
 		meemFacet = (await ethers.getContractAt(
 			'MeemBaseFacet',
-			DiamondAddress
+			contractAddress
 		)) as MeemBaseFacet
 
 		meemAdminFacet = (await ethers.getContractAt(
 			'MeemAdminFacet',
-			DiamondAddress
+			contractAddress
 		)) as MeemAdminFacet
+		queryFacet = (await ethers.getContractAt(
+			'MeemQueryFacet',
+			contractAddress
+		)) as MeemQueryFacet
 	})
 
 	async function mintZeroMeem() {
@@ -84,7 +89,7 @@ describe('Minting Permissions', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const m1 = await meemFacet.getMeem(token1)
+		const m1 = await queryFacet.getMeem(token1)
 		assert.equal(m1.generation.toNumber(), 1)
 
 		await assert.isRejected(
@@ -148,7 +153,7 @@ describe('Minting Permissions', function Test() {
 				)
 		).wait()
 
-		const m2 = await meemFacet.getMeem(token2)
+		const m2 = await queryFacet.getMeem(token2)
 		assert.equal(m2.generation.toNumber(), 2)
 
 		await assert.isRejected(

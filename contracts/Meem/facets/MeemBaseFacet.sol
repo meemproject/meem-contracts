@@ -39,43 +39,4 @@ contract MeemBaseFacet is IMeemBaseStandard {
 			permissionType
 		);
 	}
-
-	function childrenOf(uint256 tokenId)
-		public
-		view
-		override
-		returns (uint256[] memory)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.children[tokenId];
-	}
-
-	function ownedChildrenOf(uint256 tokenId, address owner)
-		public
-		view
-		override
-		returns (uint256[] memory)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.childrenOwnerTokens[tokenId][owner];
-	}
-
-	function numChildrenOf(uint256 tokenId)
-		public
-		view
-		override
-		returns (uint256)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.children[tokenId].length;
-	}
-
-	function getMeem(uint256 tokenId) public view returns (Meem memory) {
-		return LibMeem.getMeem(tokenId);
-	}
-
-	function childDepth() public view override returns (uint256) {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.childDepth;
-	}
 }

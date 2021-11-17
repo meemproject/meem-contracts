@@ -5,6 +5,7 @@ import erc721ABI from '../abi/contracts/Meem/facets/ERC721Facet.sol/ERC721Facet.
 import meemAdminABI from '../abi/contracts/Meem/facets/MeemAdminFacet.sol/MeemAdminFacet.json'
 import meemBaseABI from '../abi/contracts/Meem/facets/MeemBaseFacet.sol/MeemBaseFacet.json'
 import meemPermissionsABI from '../abi/contracts/Meem/facets/MeemPermissionsFacet.sol/MeemPermissionsFacet.json'
+import meemQueryABI from '../abi/contracts/Meem/facets/MeemQueryFacet.sol/MeemQueryFacet.json'
 import meemSplitsABI from '../abi/contracts/Meem/facets/MeemSplitsFacet.sol/MeemSplitsFacet.json'
 import meemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
 
@@ -14,6 +15,7 @@ const combinedABI = [
 	...meemAdminABI,
 	...meemBaseABI,
 	...meemPermissionsABI,
+	...meemQueryABI,
 	...meemSplitsABI,
 	...meemDiamondABI
 ]

@@ -80,6 +80,12 @@ struct Meem {
 	uint256 mintedAt;
 }
 
+struct WrappedItem {
+	Chain chain;
+	address contractAddress;
+	uint256 tokenId;
+}
+
 interface IMeemBaseStandard {
 	event PropertiesSet(
 		uint256 tokenId,
@@ -110,7 +116,9 @@ interface IMeemBaseStandard {
 	// 	MeemProperties memory properties,
 	// 	MeemProperties memory childProperties
 	// ) external;
+}
 
+interface IMeemQueryStandard {
 	// Get children meems
 	function childrenOf(uint256 tokenId)
 		external
@@ -125,6 +133,22 @@ interface IMeemBaseStandard {
 	function numChildrenOf(uint256 tokenId) external view returns (uint256);
 
 	function childDepth() external returns (uint256);
+
+	function tokenIdsOfOwner(address _owner)
+		external
+		view
+		returns (uint256[] memory tokenIds_);
+
+	function isNFTWrapped(
+		Chain chain,
+		address contractAddress,
+		uint256 tokenId
+	) external view returns (bool);
+
+	function wrappedTokens(WrappedItem[] memory items)
+		external
+		view
+		returns (uint256[] memory);
 }
 
 interface IMeemAdminStandard {

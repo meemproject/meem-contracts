@@ -66,6 +66,7 @@ export async function deployDiamond(options: {
 		MeemAdminFacet: null,
 		MeemBaseFacet: null,
 		MeemPermissionsFacet: null,
+		MeemQueryFacet: null,
 		MeemSplitsFacet: null
 	}
 

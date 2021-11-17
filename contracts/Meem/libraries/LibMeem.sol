@@ -9,12 +9,6 @@ import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits} from '../libraries/Errors.sol';
 
-struct WrappedItem {
-	Chain chain;
-	address contractAddress;
-	uint256 tokenId;
-}
-
 library LibMeem {
 	// Rarible royalties event
 	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
@@ -91,8 +85,6 @@ library LibMeem {
 		s.meems[tokenId].rootTokenId = rootTokenId;
 		s.meems[tokenId].owner = to;
 		s.meems[tokenId].mintedAt = block.timestamp;
-		s.allTokens.push(tokenId);
-		s.allTokensIndex[tokenId] = s.allTokens.length;
 
 		// Set generation of Meem
 		if (parent == address(this)) {
@@ -703,7 +695,7 @@ library LibMeem {
 		returns (uint256[] memory)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		uint256[] memory result;
+		uint256[] memory result = new uint256[](items.length);
 
 		for (uint256 i = 0; i < items.length; i++) {
 			result[i] = s.chainWrappedNFTs[items[i].chain][

@@ -3,7 +3,11 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { MeemPermissionsFacet, MeemBaseFacet } from '../typechain'
+import {
+	MeemPermissionsFacet,
+	MeemBaseFacet,
+	MeemQueryFacet
+} from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { Chain, PermissionType } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
@@ -13,6 +17,7 @@ chai.use(chaiAsPromised)
 describe('Token Owner Permissions', function Test() {
 	let meemPermissionsFacet: MeemPermissionsFacet
 	let meemFacet: MeemBaseFacet
+	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 
 	const token0 = 100000
@@ -33,6 +38,11 @@ describe('Token Owner Permissions', function Test() {
 			'MeemBaseFacet',
 			DiamondAddress
 		)) as MeemBaseFacet
+
+		queryFacet = (await ethers.getContractAt(
+			'MeemQueryFacet',
+			DiamondAddress
+		)) as MeemQueryFacet
 
 		const { status } = await (
 			await meemFacet
@@ -62,7 +72,7 @@ describe('Token Owner Permissions', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const meem = await meemFacet.connect(signers[1]).getMeem(token0)
+		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
 		console.log({ meem })
 		assert.equal(meem.properties.totalChildren.toNumber(), 5000)
 	})
@@ -92,7 +102,7 @@ describe('Token Owner Permissions', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const meem = await meemFacet.connect(signers[1]).getMeem(token0)
+		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
 		console.log({ meem })
 		assert.equal(meem.properties.totalChildren.toNumber(), 5000)
 	})
