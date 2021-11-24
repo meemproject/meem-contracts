@@ -14,6 +14,22 @@ Meem Implementation: [](https://polygonscan.com/address/)
 
 MeemPropsLibrary: [](https://polygonscan.com/address/)
 
+```
+{
+  deployedContracts: {
+    DiamondProxy: '0xbbc36838b7b9C5A052f51477FEA23F1Ec4aAcf0c',
+    AccessControlFacet: '0xE43B2C94170D019aa70D67d5D88E9D71AAc7eB41',
+    ERC721Facet: '0xab21bE5C64134D739b24B8509cb04C4747425360',
+    InitDiamond: '0x4C43e2554e71Fb1ff66e1Dd9F6886Eb01455B559',
+    MeemAdminFacet: '0x1B5062905613885e61D82b54A7EB316eeDCd6eC5',
+    MeemBaseFacet: '0x089F1f6EC208412DAf8c391De21FCaF126a6f8Ca',
+    MeemPermissionsFacet: '0x20e3132a5968C9265Fb7Af476dCC1a2B281e9D70',
+    MeemQueryFacet: '0xEC1763C310fBAbdA82898771038ce67BD0128E98',
+    MeemSplitsFacet: '0x9ff2359b0aDcf5Eba72b3907b2a33255605d6e92'
+  }
+}
+```
+
 
 ### Rinkeby Testnet
 
