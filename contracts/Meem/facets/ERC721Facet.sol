@@ -184,6 +184,11 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		return LibERC721.burn(tokenId);
 	}
 
+	function ownerTokens(address owner) public view returns (uint256[] memory) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.ownerTokenIds[owner];
+	}
+
 	function _beforeTokenTransfer(
 		address from,
 		address to,

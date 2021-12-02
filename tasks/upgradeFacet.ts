@@ -46,6 +46,9 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 
 		const Facet = await ethers.getContractFactory(facetName)
 		const facet = await Facet.deploy()
+		console.log(
+			`Deploying new facet w/ tx hash: ${facet.deployTransaction.hash}`
+		)
 		await facet.deployed()
 
 		console.log(`Deployed new ${facetName}: ${facet.address}`)
@@ -110,6 +113,8 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			'0x',
 			{ gasLimit: 5000000 }
 		)
+
+		console.log(`Initiated diamond cut transaction: ${tx.hash}`)
 
 		const receipt = await tx.wait()
 		if (!receipt.status) {
