@@ -21,6 +21,7 @@ interface ICut {
 task('upgradeFacet', 'Upgrade MeemFacet')
 	.addParam('proxy', 'The proxy address', undefined, types.string, false)
 	.addParam('facet', 'The facet name', undefined, types.string, false)
+	.addParam('gwei', 'The gwei price', undefined, types.int, false)
 	.setAction(async (args, { ethers }) => {
 		const facetName = args.facet
 		const proxyAddress = args.proxy
@@ -39,13 +40,17 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			console.log(e)
 		}
 
+		const wei = args.gwei ? args.gwei * 1000000000 : undefined
+
 		const [deployer] = await ethers.getSigners()
 		console.log('Deploying contracts with the account:', deployer.address)
 
 		console.log('Account balance:', (await deployer.getBalance()).toString())
 
 		const Facet = await ethers.getContractFactory(facetName)
-		const facet = await Facet.deploy()
+		const facet = await Facet.deploy({
+			gasPrice: wei
+		})
 		console.log(
 			`Deploying new facet w/ tx hash: ${facet.deployTransaction.hash}`
 		)
@@ -111,7 +116,7 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			cuts,
 			ethers.constants.AddressZero,
 			'0x',
-			{ gasLimit: 5000000 }
+			{ gasLimit: 5000000, gasPrice: wei }
 		)
 
 		console.log(`Initiated diamond cut transaction: ${tx.hash}`)
