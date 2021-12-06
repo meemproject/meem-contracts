@@ -41,7 +41,12 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		return s.children[tokenId].length;
 	}
 
-	function getMeem(uint256 tokenId) public view returns (Meem memory) {
+	function getMeem(uint256 tokenId)
+		public
+		view
+		override
+		returns (Meem memory)
+	{
 		return LibMeem.getMeem(tokenId);
 	}
 
@@ -58,6 +63,15 @@ contract MeemQueryFacet is IMeemQueryStandard {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.ownerTokenIds[_owner];
+	}
+
+	function tokenIdOfOwnerIndex(address _owner, uint256 tokenId)
+		public
+		view
+		returns (uint256)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.ownerTokenIdIndexes[_owner][tokenId];
 	}
 
 	function isNFTWrapped(

@@ -149,6 +149,8 @@ interface IMeemQueryStandard {
 		external
 		view
 		returns (uint256[] memory);
+
+	function getMeem(uint256 tokenId) external view returns (Meem memory);
 }
 
 interface IMeemAdminStandard {

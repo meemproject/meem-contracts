@@ -444,7 +444,7 @@ library LibERC721 {
 		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
 		LibArray.removeAt(s.ownerTokenIds[from], index);
 		s.ownerTokenIds[to].push(tokenId);
-		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length;
+		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
 		s.meems[tokenId].owner = to;
 
 		emit Transfer(from, to, tokenId);
