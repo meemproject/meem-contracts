@@ -387,6 +387,11 @@
             "internalType": "uint256",
             "name": "mintedAt",
             "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "data",
+            "type": "string"
           }
         ],
         "internalType": "struct Meem",

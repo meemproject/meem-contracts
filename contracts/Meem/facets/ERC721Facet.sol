@@ -13,7 +13,7 @@ import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC7
 import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
 
 contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
-	function contractURI() public view returns (string memory) {
+	function contractURI() external view returns (string memory) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return
 			string(
@@ -24,13 +24,18 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 			);
 	}
 
-	function contractAddress() public view returns (address) {
+	function contractAddress() external view returns (address) {
 		return address(this);
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
 	///@return totalSupply_ the number of all NFTs that have been minted
-	function totalSupply() public view override returns (uint256 totalSupply_) {
+	function totalSupply()
+		external
+		view
+		override
+		returns (uint256 totalSupply_)
+	{
 		return LibERC721.totalSupply();
 	}
 
@@ -40,7 +45,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	/// @return tokenId_ The token identifier for the `_index`th NFT,
 	///  (sort order not specified)
 	function tokenByIndex(uint256 _index)
-		public
+		external
 		view
 		override
 		returns (uint256 tokenId_)
@@ -48,12 +53,12 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		return LibERC721.tokenByIndex(_index);
 	}
 
-	function ownerOf(uint256 tokenId) public view override returns (address) {
+	function ownerOf(uint256 tokenId) external view override returns (address) {
 		return LibERC721.ownerOf(tokenId);
 	}
 
 	function balanceOf(address _owner)
-		public
+		external
 		view
 		override
 		returns (uint256 balance)
@@ -69,7 +74,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	/// @return tokenId_ The token identifier for the `_index`th NFT assigned to `_owner`,
 	///   (sort order not specified)
 	function tokenOfOwnerByIndex(address _owner, uint256 _index)
-		public
+		external
 		view
 		override
 		returns (uint256 tokenId_)
@@ -78,16 +83,16 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	}
 
 	///@notice Return the universal name of the NFT
-	function name() public view override returns (string memory) {
+	function name() external view override returns (string memory) {
 		return LibERC721.name();
 	}
 
 	/// @notice An abbreviated name for NFTs in this contract
-	function symbol() public view override returns (string memory) {
+	function symbol() external view override returns (string memory) {
 		return LibERC721.symbol();
 	}
 
-	function baseTokenURI() public pure returns (string memory) {
+	function baseTokenURI() external pure returns (string memory) {
 		return LibERC721.baseTokenURI();
 	}
 
@@ -96,7 +101,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	///  3986. The URI may point to a JSON file that conforms to the "ERC721
 	///  Metadata JSON Schema".
 	function tokenURI(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (string memory)
@@ -108,7 +113,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	 * @inheritdoc IERC721
 	 */
 	function getApproved(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (address)
@@ -120,7 +125,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	 * @inheritdoc IERC721
 	 */
 	function isApprovedForAll(address account, address operator)
-		public
+		external
 		view
 		override
 		returns (bool)
@@ -135,7 +140,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		address from,
 		address to,
 		uint256 tokenId
-	) public payable override {
+	) external payable override {
 		return LibERC721.transferFrom(from, to, tokenId);
 	}
 
@@ -146,7 +151,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		address from,
 		address to,
 		uint256 tokenId
-	) public payable override {
+	) external payable override {
 		return LibERC721.safeTransferFrom(from, to, tokenId);
 	}
 
@@ -158,7 +163,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		address to,
 		uint256 tokenId,
 		bytes memory data
-	) public payable override {
+	) external payable override {
 		return LibERC721._safeTransfer(from, to, tokenId, data);
 	}
 
@@ -166,7 +171,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	 * @inheritdoc IERC721
 	 */
 	function approve(address operator, uint256 tokenId)
-		public
+		external
 		payable
 		override
 	{
@@ -176,15 +181,22 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	/**
 	 * @inheritdoc IERC721
 	 */
-	function setApprovalForAll(address operator, bool status) public override {
+	function setApprovalForAll(address operator, bool status)
+		external
+		override
+	{
 		return LibERC721.setApprovalForAll(operator, status);
 	}
 
-	function burn(uint256 tokenId) public {
+	function burn(uint256 tokenId) external {
 		return LibERC721.burn(tokenId);
 	}
 
-	function ownerTokens(address owner) public view returns (uint256[] memory) {
+	function ownerTokens(address owner)
+		external
+		view
+		returns (uint256[] memory)
+	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.ownerTokenIds[owner];
 	}

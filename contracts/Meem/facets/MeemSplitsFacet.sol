@@ -13,7 +13,7 @@ import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 	function getRaribleV2Royalties(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (LibPart.Part[] memory)
@@ -22,7 +22,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 	}
 
 	function nonOwnerSplitAllocationAmount()
-		public
+		external
 		view
 		override
 		returns (uint256)
@@ -35,7 +35,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		uint256 tokenId,
 		PropertyType propertyType,
 		Split memory split
-	) public override {
+	) external override {
 		LibMeem.addSplit(tokenId, propertyType, split);
 	}
 
@@ -43,7 +43,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		uint256 tokenId,
 		PropertyType propertyType,
 		uint256 idx
-	) public override {
+	) external override {
 		LibMeem.removeSplitAt(tokenId, propertyType, idx);
 	}
 
@@ -52,7 +52,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		PropertyType propertyType,
 		uint256 idx,
 		Split memory split
-	) public override {
+	) external override {
 		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 }

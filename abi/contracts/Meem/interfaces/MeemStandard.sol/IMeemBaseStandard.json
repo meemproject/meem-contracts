@@ -172,44 +172,61 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "mTokenURI",
-        "type": "string"
-      },
-      {
-        "internalType": "enum Chain",
-        "name": "parentChain",
-        "type": "uint8"
-      },
-      {
-        "internalType": "address",
-        "name": "parent",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "parentTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum Chain",
-        "name": "rootChain",
-        "type": "uint8"
-      },
-      {
-        "internalType": "address",
-        "name": "root",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "rootTokenId",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "mTokenURI",
+            "type": "string"
+          },
+          {
+            "internalType": "enum Chain",
+            "name": "parentChain",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "parent",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "parentTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum Chain",
+            "name": "rootChain",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "root",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rootTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum PermissionType",
+            "name": "permissionType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "data",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct MeemMintParameters",
+        "name": "params",
+        "type": "tuple"
       },
       {
         "components": [
@@ -510,11 +527,6 @@
         "internalType": "struct MeemProperties",
         "name": "childProperties",
         "type": "tuple"
-      },
-      {
-        "internalType": "enum PermissionType",
-        "name": "permissionType",
-        "type": "uint8"
       }
     ],
     "name": "mint",

@@ -9,14 +9,14 @@ import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 contract AccessControlFacet {
 	/// @notice An admin of the contract.
 	/// @return Hashed value that represents this role.
-	function ADMIN_ROLE() public view returns (bytes32) {
+	function ADMIN_ROLE() external view returns (bytes32) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.ADMIN_ROLE;
 	}
 
 	/// @notice Can mint root level Meems
 	/// @return Hashed value that represents this role.
-	function MINTER_ROLE() public view returns (bytes32) {
+	function MINTER_ROLE() external view returns (bytes32) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.MINTER_ROLE;
 	}
@@ -24,7 +24,7 @@ contract AccessControlFacet {
 	/// @notice Grant a role to a user. The granting user must have the ADMIN_ROLE
 	/// @param user The wallet address of the user to grant the role to
 	/// @param role The role to grant
-	function grantRole(address user, bytes32 role) public {
+	function grantRole(address user, bytes32 role) external {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibAccessControl._grantRole(role, user);
@@ -33,7 +33,7 @@ contract AccessControlFacet {
 	/// @notice Grant a role to a user. The granting user must have the ADMIN_ROLE
 	/// @param user The wallet address of the user to revoke the role from
 	/// @param role The role to revoke
-	function revokeRole(address user, bytes32 role) public {
+	function revokeRole(address user, bytes32 role) external {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibAccessControl._revokeRole(role, user);
@@ -42,7 +42,7 @@ contract AccessControlFacet {
 	/// @notice Grant a role to a user. The granting user must have the ADMIN_ROLE
 	/// @param user The wallet address of the user to revoke the role from
 	/// @param role The role to revoke
-	function hasRole(address user, bytes32 role) public view returns (bool) {
+	function hasRole(address user, bytes32 role) external view returns (bool) {
 		return LibAccessControl.hasRole(role, user);
 	}
 }

@@ -113,7 +113,7 @@ export async function deployDiamond(options: {
 
 	let proxyRegistryAddress = ''
 	let walletAddress = ''
-	const basisPoints = 500
+	const basisPoints = 100
 
 	switch (hardhatArguments?.network) {
 		case 'matic':

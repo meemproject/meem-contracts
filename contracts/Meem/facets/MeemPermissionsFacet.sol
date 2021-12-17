@@ -12,24 +12,24 @@ import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemPermissionsFacet is IMeemPermissionsStandard {
 	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
-		public
+		external
 		override
 	{
 		LibMeem.setTotalChildren(tokenId, newTotalChildren);
 	}
 
-	function lockTotalChildren(uint256 tokenId) public override {
+	function lockTotalChildren(uint256 tokenId) external override {
 		LibMeem.lockTotalChildren(tokenId);
 	}
 
 	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
-		public
+		external
 		override
 	{
 		LibMeem.setChildrenPerWallet(tokenId, newTotalChildren);
 	}
 
-	function lockChildrenPerWallet(uint256 tokenId) public override {
+	function lockChildrenPerWallet(uint256 tokenId) external override {
 		LibMeem.lockChildrenPerWallet(tokenId);
 	}
 
@@ -38,7 +38,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		MeemPermission memory permission
-	) public override {
+	) external override {
 		LibMeem.addPermission(
 			tokenId,
 			propertyType,
@@ -52,7 +52,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		PermissionType permissionType,
 		uint256 idx
-	) public override {
+	) external override {
 		LibMeem.removePermissionAt(tokenId, propertyType, permissionType, idx);
 	}
 
@@ -62,7 +62,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PermissionType permissionType,
 		uint256 idx,
 		MeemPermission memory permission
-	) public override {
+	) external override {
 		LibMeem.updatePermissionAt(
 			tokenId,
 			propertyType,

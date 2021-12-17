@@ -51,61 +51,72 @@ library LibMeem {
 	}
 
 	function mint(
-		address to,
-		string memory mTokenURI,
-		Chain parentChain,
-		address parent,
-		uint256 parentTokenId,
-		Chain rootChain,
-		address root,
-		uint256 rootTokenId,
+		MeemMintParameters memory params,
 		MeemProperties memory mProperties,
-		MeemProperties memory mChildProperties,
-		PermissionType permissionType
+		MeemProperties memory mChildProperties
 	) internal returns (uint256 tokenId_) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.MINTER_ROLE);
-		LibMeem.requireValidMeem(parentChain, parent, parentTokenId);
+		LibMeem.requireValidMeem(
+			params.parentChain,
+			params.parent,
+			params.parentTokenId
+		);
 		uint256 tokenId = s.tokenCounter;
-		LibERC721._safeMint(to, tokenId);
-		s.tokenURIs[tokenId] = mTokenURI;
+		LibERC721._safeMint(params.to, tokenId);
+		s.tokenURIs[tokenId] = params.mTokenURI;
 
-		if (root == address(this) && parent != address(this)) {
+		if (params.root == address(this) && params.parent != address(this)) {
 			revert InvalidParent();
 		}
 
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
-		s.meems[tokenId].parentChain = parentChain;
-		s.meems[tokenId].rootChain = rootChain;
-		s.meems[tokenId].parent = parent;
-		s.meems[tokenId].parentTokenId = parentTokenId;
-		s.meems[tokenId].root = root;
-		s.meems[tokenId].rootTokenId = rootTokenId;
-		s.meems[tokenId].owner = to;
+		s.meems[tokenId].parentChain = params.parentChain;
+		s.meems[tokenId].rootChain = params.rootChain;
+		s.meems[tokenId].parent = params.parent;
+		s.meems[tokenId].parentTokenId = params.parentTokenId;
+		s.meems[tokenId].root = params.root;
+		s.meems[tokenId].rootTokenId = params.rootTokenId;
+		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
+		s.meems[tokenId].data = params.data;
 
 		// Set generation of Meem
-		if (parent == address(this)) {
-			s.meems[tokenId].generation = s.meems[parentTokenId].generation + 1;
+		if (params.parent == address(this)) {
+			// Verify token exists
+			if (s.meems[params.parentTokenId].owner == address(0)) {
+				revert TokenNotFound(params.parentTokenId);
+			}
+			// Verify we can mint based on permissions
+			requireCanMintChildOf(
+				msg.sender,
+				params.permissionType,
+				params.parentTokenId
+			);
+
+			s.meems[tokenId].generation =
+				s.meems[params.parentTokenId].generation +
+				1;
 
 			// Merge parent childProperties into this child
 			LibMeem.setProperties(
 				tokenId,
 				PropertyType.Meem,
 				mProperties,
-				parentTokenId,
+				params.parentTokenId,
 				true
 			);
 			LibMeem.setProperties(
 				tokenId,
 				PropertyType.Child,
 				mChildProperties,
-				parentTokenId,
+				params.parentTokenId,
 				true
 			);
 		} else {
+			// Gen 0 Meems require minter role
+			LibAccessControl.requireRole(s.MINTER_ROLE);
 			s.meems[tokenId].generation = 0;
 			LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
 			LibMeem.setProperties(
@@ -120,30 +131,35 @@ library LibMeem {
 		}
 
 		// Keep track of children Meems
-		if (parent == address(this)) {
-			// Verify token exists
-			if (s.meems[parentTokenId].owner == address(0)) {
-				revert TokenNotFound(parentTokenId);
-			}
-			// Verify we can mint based on permissions
-			requireCanMintChildOf(to, permissionType, parentTokenId);
-			s.children[parentTokenId].push(tokenId);
-			s.childrenOwnerTokens[parentTokenId][to].push(tokenId);
-		} else if (parent != address(0)) {
+		if (params.parent == address(this)) {
+			s.children[params.parentTokenId].push(tokenId);
+			s.childrenOwnerTokens[params.parentTokenId][params.to].push(
+				tokenId
+			);
+		} else if (params.parent != address(0)) {
 			// Keep track of wrapped NFTs
-			s.chainWrappedNFTs[parentChain][parent][parentTokenId] = tokenId;
-		} else if (parent == address(0)) {
+			s.chainWrappedNFTs[params.parentChain][params.parent][
+				params.parentTokenId
+			] = tokenId;
+		} else if (params.parent == address(0)) {
 			s.originalMeemTokensIndex[tokenId] = s.originalMeemTokens.length;
 			s.originalMeemTokens.push(tokenId);
 		}
 
-		if (root == address(this)) {
-			s.decendants[rootTokenId].push(tokenId);
+		if (params.root == address(this)) {
+			s.decendants[params.rootTokenId].push(tokenId);
 		}
 
 		s.tokenCounter += 1;
 
-		if (!LibERC721._checkOnERC721Received(address(0), to, tokenId, '')) {
+		if (
+			!LibERC721._checkOnERC721Received(
+				address(0),
+				params.to,
+				tokenId,
+				''
+			)
+		) {
 			revert ERC721ReceiverNotImplemented();
 		}
 
@@ -303,7 +319,8 @@ library LibMeem {
 			s.meems[tokenId].generation,
 			s.meemProperties[tokenId],
 			s.meemChildProperties[tokenId],
-			s.meems[tokenId].mintedAt
+			s.meems[tokenId].mintedAt,
+			s.meems[tokenId].data
 		);
 
 		return meem;
@@ -712,6 +729,13 @@ library LibMeem {
 		PermissionType permissionType,
 		uint256 tokenId
 	) internal view {
+		if (
+			permissionType != PermissionType.Copy &&
+			permissionType != PermissionType.Remix
+		) {
+			revert NoPermission();
+		}
+
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemBase storage parent = s.meems[tokenId];
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
@@ -736,40 +760,43 @@ library LibMeem {
 			revert ChildrenPerWalletExceeded();
 		}
 
-		// Check permissions
-		MeemPermission[] storage perms = getPermissions(
-			parentProperties,
-			permissionType
-		);
+		// If user doesn't have the minter role, check permissions
+		if (!LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)) {
+			// Check permissions
+			MeemPermission[] storage perms = getPermissions(
+				parentProperties,
+				permissionType
+			);
 
-		bool hasPermission = false;
-		for (uint256 i = 0; i < perms.length; i++) {
-			MeemPermission storage perm = perms[i];
-			if (
-				// Allowed if permission is anyone
-				perm.permission == Permission.Anyone ||
-				// Allowed if permission is owner and this is the owner
-				(perm.permission == Permission.Owner && parent.owner == to)
-			) {
-				hasPermission = true;
-				break;
-			} else if (perm.permission == Permission.Addresses) {
-				// Allowed if to is in the list of approved addresses
-				for (uint256 j = 0; j < perm.addresses.length; j++) {
-					if (perm.addresses[j] == to) {
-						hasPermission = true;
+			bool hasPermission = false;
+			for (uint256 i = 0; i < perms.length; i++) {
+				MeemPermission storage perm = perms[i];
+				if (
+					// Allowed if permission is anyone
+					perm.permission == Permission.Anyone ||
+					// Allowed if permission is owner and this is the owner
+					(perm.permission == Permission.Owner && parent.owner == to)
+				) {
+					hasPermission = true;
+					break;
+				} else if (perm.permission == Permission.Addresses) {
+					// Allowed if to is in the list of approved addresses
+					for (uint256 j = 0; j < perm.addresses.length; j++) {
+						if (perm.addresses[j] == to) {
+							hasPermission = true;
+							break;
+						}
+					}
+
+					if (hasPermission) {
 						break;
 					}
 				}
-
-				if (hasPermission) {
-					break;
-				}
 			}
-		}
 
-		if (!hasPermission) {
-			revert NoPermission();
+			if (!hasPermission) {
+				revert NoPermission();
+			}
 		}
 	}
 }

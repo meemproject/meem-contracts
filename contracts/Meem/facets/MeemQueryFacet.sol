@@ -12,7 +12,7 @@ import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemQueryFacet is IMeemQueryStandard {
 	function childrenOf(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (uint256[] memory)
@@ -22,7 +22,7 @@ contract MeemQueryFacet is IMeemQueryStandard {
 	}
 
 	function ownedChildrenOf(uint256 tokenId, address owner)
-		public
+		external
 		view
 		override
 		returns (uint256[] memory)
@@ -32,7 +32,7 @@ contract MeemQueryFacet is IMeemQueryStandard {
 	}
 
 	function numChildrenOf(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (uint256)
@@ -42,7 +42,7 @@ contract MeemQueryFacet is IMeemQueryStandard {
 	}
 
 	function getMeem(uint256 tokenId)
-		public
+		external
 		view
 		override
 		returns (Meem memory)
@@ -50,13 +50,13 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		return LibMeem.getMeem(tokenId);
 	}
 
-	function childDepth() public view override returns (uint256) {
+	function childDepth() external view override returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.childDepth;
 	}
 
 	function tokenIdsOfOwner(address _owner)
-		public
+		external
 		view
 		override
 		returns (uint256[] memory tokenIds_)
@@ -66,7 +66,7 @@ contract MeemQueryFacet is IMeemQueryStandard {
 	}
 
 	function tokenIdOfOwnerIndex(address _owner, uint256 tokenId)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -78,12 +78,12 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		Chain chain,
 		address contractAddress,
 		uint256 tokenId
-	) public view override returns (bool) {
+	) external view override returns (bool) {
 		return LibMeem.isNFTWrapped(chain, contractAddress, tokenId);
 	}
 
 	function wrappedTokens(WrappedItem[] memory items)
-		public
+		external
 		view
 		override
 		returns (uint256[] memory)

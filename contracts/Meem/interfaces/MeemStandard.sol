@@ -64,6 +64,7 @@ struct MeemBase {
 	uint256 rootTokenId;
 	uint256 generation;
 	uint256 mintedAt;
+	string data;
 }
 
 struct Meem {
@@ -78,12 +79,26 @@ struct Meem {
 	MeemProperties properties;
 	MeemProperties childProperties;
 	uint256 mintedAt;
+	string data;
 }
 
 struct WrappedItem {
 	Chain chain;
 	address contractAddress;
 	uint256 tokenId;
+}
+
+struct MeemMintParameters {
+	address to;
+	string mTokenURI;
+	Chain parentChain;
+	address parent;
+	uint256 parentTokenId;
+	Chain rootChain;
+	address root;
+	uint256 rootTokenId;
+	PermissionType permissionType;
+	string data;
 }
 
 interface IMeemBaseStandard {
@@ -94,17 +109,9 @@ interface IMeemBaseStandard {
 	);
 
 	function mint(
-		address to,
-		string memory mTokenURI,
-		Chain parentChain,
-		address parent,
-		uint256 parentTokenId,
-		Chain rootChain,
-		address root,
-		uint256 rootTokenId,
+		MeemMintParameters memory params,
 		MeemProperties memory properties,
-		MeemProperties memory childProperties,
-		PermissionType permissionType
+		MeemProperties memory childProperties
 	) external;
 
 	// TODO: Implement child minting
