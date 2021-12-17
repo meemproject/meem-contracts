@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/meemproject/meem-contracts/compare/v1.6.3...v1.6.4) (2021-12-06)
+
+
+### Bug Fixes
+
+* owner token index issue; add query method for token indexes; add getMeem() to interface ([81f3552](https://github.com/meemproject/meem-contracts/commit/81f3552))
+
 ## [1.6.3](https://github.com/meemproject/meem-contracts/compare/v1.6.2...v1.6.3) (2021-12-02)
 
 ## [1.6.2](https://github.com/meemproject/meem-contracts/compare/v1.6.1...v1.6.2) (2021-11-30)
