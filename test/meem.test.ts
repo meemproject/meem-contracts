@@ -47,7 +47,7 @@ describe('General MeemFacet Tests', function Test() {
 		assert.equal(json.seller_fee_basis_points, 100)
 		assert.equal(
 			json.fee_recipient,
-			'0x40c6BeE45d94063c5B05144489cd8A9879899592'
+			'0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
 		)
 	})
 })

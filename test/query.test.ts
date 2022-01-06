@@ -42,21 +42,23 @@ describe('Query Meems', function Test() {
 
 	it('Can query wrapped', async () => {
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[4].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[4].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
 					parent,
-					50,
-					Chain.Polygon,
-					parent,
-					50,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+					parentTokenId: 50,
+					rootChain: Chain.Polygon,
+					root: parent,
+					rootTokenId: 50,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 

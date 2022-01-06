@@ -49,41 +49,45 @@ describe('Minting', function Test() {
 
 	it('Can not mint as non-minter role', async () => {
 		await assert.isRejected(
-			meemFacet
-				.connect(signers[1])
-				.mint(
-					owner,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Ethereum,
-					zeroAddress,
-					0,
-					Chain.Ethereum,
-					zeroAddress,
-					0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			meemFacet.connect(signers[1]).mint(
+				{
+					to: owner,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Ethereum,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Ethereum,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		)
 	})
 
 	it('Can mint as minter role', async () => {
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[4].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
-					zeroAddress,
-					0,
-					Chain.Polygon,
-					zeroAddress,
-					0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[4].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
@@ -109,21 +113,23 @@ describe('Minting', function Test() {
 
 	it('Can not transfer wMeem as non-admin', async () => {
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[2].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Ethereum,
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[2].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Ethereum,
 					parent,
-					0,
-					Chain.Ethereum,
-					parent,
-					0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+					parentTokenId: 0,
+					rootChain: Chain.Ethereum,
+					root: parent,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
@@ -167,21 +173,23 @@ describe('Minting', function Test() {
 		const m = await queryFacet.getMeem(token0)
 		console.log(m)
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[2].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[2].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token0,
+					rootChain: Chain.Polygon,
+					root: contractAddress,
+					rootTokenId: token0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
@@ -214,21 +222,23 @@ describe('Minting', function Test() {
 
 	it('Can transfer original meem', async () => {
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[0].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Ethereum,
-					zeroAddress,
-					0,
-					Chain.Ethereum,
-					zeroAddress,
-					0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[0].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Ethereum,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Ethereum,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
@@ -247,41 +257,45 @@ describe('Minting', function Test() {
 		const otherAddress = '0xb822D949E8bE99bb137e04e548CF2fDc88513543'
 		// First one can mint
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[0].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Ethereum,
-					otherAddress,
-					1,
-					Chain.Ethereum,
-					otherAddress,
-					1,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[0].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Ethereum,
+					parent: otherAddress,
+					parentTokenId: 1,
+					rootChain: Chain.Ethereum,
+					root: otherAddress,
+					rootTokenId: 1,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
 		// Second one fails
 		await assert.isRejected(
-			meemFacet
-				.connect(signers[0])
-				.mint(
-					owner,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Ethereum,
-					otherAddress,
-					1,
-					Chain.Ethereum,
-					otherAddress,
-					1,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			meemFacet.connect(signers[0]).mint(
+				{
+					to: owner,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Ethereum,
+					parent: otherAddress,
+					parentTokenId: 1,
+					rootChain: Chain.Ethereum,
+					root: otherAddress,
+					rootTokenId: 1,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		)
 	})
 
@@ -307,40 +321,44 @@ describe('Minting', function Test() {
 
 	it('Can mint multiple children', async () => {
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[5].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[5].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token0,
+					rootChain: Chain.Polygon,
+					root: contractAddress,
+					rootTokenId: token0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 
 		await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[5].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					Chain.Polygon,
-					contractAddress,
-					token0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[5].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token0,
+					rootChain: Chain.Polygon,
+					root: contractAddress,
+					rootTokenId: token0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 	})
 

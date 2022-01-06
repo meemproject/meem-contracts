@@ -45,21 +45,23 @@ describe('Token Owner Permissions', function Test() {
 		)) as MeemQueryFacet
 
 		const { status } = await (
-			await meemFacet
-				.connect(signers[0])
-				.mint(
-					signers[1].address,
-					'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					Chain.Polygon,
-					zeroAddress,
-					0,
-					Chain.Polygon,
-					zeroAddress,
-					0,
-					meemMintData,
-					meemMintData,
-					PermissionType.Copy
-				)
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				meemMintData,
+				meemMintData
+			)
 		).wait()
 		assert.equal(status, 1)
 	})

@@ -90,7 +90,7 @@ library LibMeem {
 			}
 			// Verify we can mint based on permissions
 			requireCanMintChildOf(
-				msg.sender,
+				params.to,
 				params.permissionType,
 				params.parentTokenId
 			);
@@ -174,6 +174,8 @@ library LibMeem {
 	) internal {
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
+		permissionNotLocked(props, permissionType);
+
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		perms.push(permission);
 
@@ -761,42 +763,42 @@ library LibMeem {
 		}
 
 		// If user doesn't have the minter role, check permissions
-		if (!LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)) {
-			// Check permissions
-			MeemPermission[] storage perms = getPermissions(
-				parentProperties,
-				permissionType
-			);
+		// if (!LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)) {
+		// Check permissions
+		MeemPermission[] storage perms = getPermissions(
+			parentProperties,
+			permissionType
+		);
 
-			bool hasPermission = false;
-			for (uint256 i = 0; i < perms.length; i++) {
-				MeemPermission storage perm = perms[i];
-				if (
-					// Allowed if permission is anyone
-					perm.permission == Permission.Anyone ||
-					// Allowed if permission is owner and this is the owner
-					(perm.permission == Permission.Owner && parent.owner == to)
-				) {
-					hasPermission = true;
-					break;
-				} else if (perm.permission == Permission.Addresses) {
-					// Allowed if to is in the list of approved addresses
-					for (uint256 j = 0; j < perm.addresses.length; j++) {
-						if (perm.addresses[j] == to) {
-							hasPermission = true;
-							break;
-						}
-					}
-
-					if (hasPermission) {
+		bool hasPermission = false;
+		for (uint256 i = 0; i < perms.length; i++) {
+			MeemPermission storage perm = perms[i];
+			if (
+				// Allowed if permission is anyone
+				perm.permission == Permission.Anyone ||
+				// Allowed if permission is owner and this is the owner
+				(perm.permission == Permission.Owner && parent.owner == to)
+			) {
+				hasPermission = true;
+				break;
+			} else if (perm.permission == Permission.Addresses) {
+				// Allowed if to is in the list of approved addresses
+				for (uint256 j = 0; j < perm.addresses.length; j++) {
+					if (perm.addresses[j] == to) {
+						hasPermission = true;
 						break;
 					}
 				}
-			}
 
-			if (!hasPermission) {
-				revert NoPermission();
+				if (hasPermission) {
+					break;
+				}
 			}
 		}
+
+		if (!hasPermission) {
+			revert NoPermission();
+		}
+		// }
 	}
 }

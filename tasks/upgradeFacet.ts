@@ -21,7 +21,7 @@ interface ICut {
 task('upgradeFacet', 'Upgrade MeemFacet')
 	.addParam('proxy', 'The proxy address', undefined, types.string, false)
 	.addParam('facet', 'The facet name', undefined, types.string, false)
-	.addParam('gwei', 'The gwei price', undefined, types.int, false)
+	.addParam('gwei', 'The gwei price', 31, types.int, true)
 	.setAction(async (args, { ethers }) => {
 		const facetName = args.facet
 		const proxyAddress = args.proxy
