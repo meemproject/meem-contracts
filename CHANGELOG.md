@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/meemproject/meem-contracts/compare/v1.7.0...v1.8.0) (2022-01-07)
+
+
+### Features
+
+* set all permissions at once ([e635190](https://github.com/meemproject/meem-contracts/commit/e635190))
+
 # [1.7.0](https://github.com/meemproject/meem-contracts/compare/v1.6.4...v1.7.0) (2021-12-17)
 
 
