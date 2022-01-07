@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/meemproject/meem-contracts/compare/v1.6.4...v1.7.0) (2021-12-17)
+
+
+### Features
+
+* minting of child Meems; optimize some functions ([4954b58](https://github.com/meemproject/meem-contracts/commit/4954b58))
+
 ## [1.6.4](https://github.com/meemproject/meem-contracts/compare/v1.6.3...v1.6.4) (2021-12-06)
 
 
