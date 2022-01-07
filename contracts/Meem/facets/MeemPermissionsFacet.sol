@@ -33,6 +33,20 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		LibMeem.lockChildrenPerWallet(tokenId);
 	}
 
+	function setPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission[] memory permissions
+	) external override {
+		LibMeem.setPermissions(
+			tokenId,
+			propertyType,
+			permissionType,
+			permissions
+		);
+	}
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,

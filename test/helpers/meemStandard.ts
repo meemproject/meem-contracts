@@ -18,6 +18,6 @@ export enum Permission {
 }
 
 export enum PropertyType {
-	Meem = 1,
-	Child = 2
+	Meem = 0,
+	Child = 1
 }

@@ -3,9 +3,19 @@ import chai, { assert } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { MeemAdminFacet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
+import {
+	MeemAdminFacet,
+	MeemBaseFacet,
+	MeemPermissionsFacet,
+	MeemQueryFacet
+} from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, Permission, PermissionType } from './helpers/meemStandard'
+import {
+	Chain,
+	Permission,
+	PermissionType,
+	PropertyType
+} from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -13,6 +23,7 @@ chai.use(chaiAsPromised)
 describe('Minting Permissions', function Test() {
 	let meemFacet: MeemBaseFacet
 	let meemAdminFacet: MeemAdminFacet
+	let meemPermissionsFacet: MeemPermissionsFacet
 	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
@@ -40,6 +51,12 @@ describe('Minting Permissions', function Test() {
 			'MeemAdminFacet',
 			contractAddress
 		)) as MeemAdminFacet
+
+		meemPermissionsFacet = (await ethers.getContractAt(
+			'MeemPermissionsFacet',
+			contractAddress
+		)) as MeemPermissionsFacet
+
 		queryFacet = (await ethers.getContractAt(
 			'MeemQueryFacet',
 			contractAddress
@@ -603,6 +620,291 @@ describe('Minting Permissions', function Test() {
 				meemMintData,
 				meemMintData
 			)
+		)
+	})
+
+	it('Can set all permissions', async () => {
+		await (
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				{
+					...meemMintData,
+					copyPermissions: [
+						{
+							permission: Permission.Addresses,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: [signers[1].address]
+						},
+						{
+							permission: Permission.Owner,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: []
+						}
+					]
+				},
+				meemMintData
+			)
+		).wait()
+
+		await (
+			await meemPermissionsFacet
+				.connect(signers[1])
+				.setPermissions(token0, PropertyType.Meem, PermissionType.Copy, [
+					{
+						permission: Permission.Anyone,
+						numTokens: 0,
+						lockedBy: zeroAddress,
+						addresses: []
+					}
+				])
+		).wait()
+
+		const meem = await queryFacet.getMeem(token0)
+		assert.equal(meem.properties.copyPermissions.length, 1)
+		assert.equal(
+			meem.properties.copyPermissions[0].permission,
+			Permission.Anyone
+		)
+	})
+
+	it('Can not set permissions if locked', async () => {
+		await (
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				{
+					...meemMintData,
+					copyPermissions: [
+						{
+							permission: Permission.Addresses,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: [signers[1].address]
+						},
+						{
+							permission: Permission.Owner,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: []
+						}
+					],
+					copyPermissionsLockedBy: owner
+				},
+				meemMintData
+			)
+		).wait()
+
+		await assert.isRejected(
+			meemPermissionsFacet
+				.connect(signers[2])
+				.setPermissions(token0, PropertyType.Meem, PermissionType.Copy, [
+					{
+						permission: Permission.Anyone,
+						numTokens: 0,
+						lockedBy: zeroAddress,
+						addresses: []
+					}
+				])
+		)
+	})
+
+	it('Can not overwrite locked permission', async () => {
+		await (
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				{
+					...meemMintData,
+					copyPermissions: [
+						{
+							permission: Permission.Addresses,
+							numTokens: 0,
+							lockedBy: owner,
+							addresses: [signers[1].address]
+						},
+						{
+							permission: Permission.Owner,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: []
+						}
+					]
+				},
+				meemMintData
+			)
+		).wait()
+
+		await assert.isRejected(
+			meemPermissionsFacet
+				.connect(signers[2])
+				.setPermissions(token0, PropertyType.Meem, PermissionType.Copy, [
+					{
+						permission: Permission.Anyone,
+						numTokens: 0,
+						lockedBy: zeroAddress,
+						addresses: []
+					}
+				])
+		)
+	})
+
+	it('Can add to permissions w/ locked permission', async () => {
+		await (
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				{
+					...meemMintData,
+					copyPermissions: [
+						{
+							permission: Permission.Addresses,
+							numTokens: 0,
+							lockedBy: owner,
+							addresses: [signers[1].address]
+						},
+						{
+							permission: Permission.Owner,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: []
+						}
+					]
+				},
+				meemMintData
+			)
+		).wait()
+
+		await (
+			await meemPermissionsFacet
+				.connect(signers[1])
+				.setPermissions(token0, PropertyType.Meem, PermissionType.Copy, [
+					{
+						permission: Permission.Anyone,
+						numTokens: 0,
+						lockedBy: zeroAddress,
+						addresses: []
+					},
+					{
+						permission: Permission.Addresses,
+						numTokens: 0,
+						lockedBy: owner,
+						addresses: [signers[1].address]
+					}
+				])
+		).wait()
+
+		const meem = await queryFacet.getMeem(token0)
+		assert.equal(meem.properties.copyPermissions.length, 2)
+		assert.equal(
+			meem.properties.copyPermissions[0].permission,
+			Permission.Anyone
+		)
+		assert.equal(
+			meem.properties.copyPermissions[1].permission,
+			Permission.Addresses
+		)
+		assert.equal(meem.properties.copyPermissions[1].addresses.length, 1)
+		assert.equal(
+			meem.properties.copyPermissions[1].addresses[0],
+			signers[1].address
+		)
+	})
+
+	it('Can not set permissions as non-owner', async () => {
+		await (
+			await meemFacet.connect(signers[0]).mint(
+				{
+					to: signers[1].address,
+					mTokenURI:
+						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					rootChain: Chain.Polygon,
+					root: zeroAddress,
+					rootTokenId: 0,
+					permissionType: PermissionType.Copy,
+					data: ''
+				},
+				{
+					...meemMintData,
+					copyPermissions: [
+						{
+							permission: Permission.Addresses,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: [signers[1].address]
+						},
+						{
+							permission: Permission.Owner,
+							numTokens: 0,
+							lockedBy: zeroAddress,
+							addresses: []
+						}
+					]
+				},
+				meemMintData
+			)
+		).wait()
+
+		await assert.isRejected(
+			meemPermissionsFacet
+				.connect(signers[2])
+				.setPermissions(token0, PropertyType.Meem, PermissionType.Copy, [
+					{
+						permission: Permission.Anyone,
+						numTokens: 0,
+						lockedBy: zeroAddress,
+						addresses: []
+					}
+				])
 		)
 	})
 })

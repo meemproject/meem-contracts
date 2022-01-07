@@ -166,6 +166,36 @@ library LibMeem {
 		return tokenId;
 	}
 
+	function setPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission[] memory permissions
+	) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+		permissionNotLocked(props, permissionType);
+
+		MeemPermission[] storage perms = getPermissions(props, permissionType);
+
+		// Check if there are any existing locked permissions and if so, verify they're the same as the new permissions
+		validatePermissions(permissions, perms);
+
+		if (permissionType == PermissionType.Copy) {
+			delete props.copyPermissions;
+		} else if (permissionType == PermissionType.Remix) {
+			delete props.remixPermissions;
+		} else if (permissionType == PermissionType.Read) {
+			delete props.readPermissions;
+		} else {
+			revert InvalidPermissionType();
+		}
+
+		for (uint256 i = 0; i < permissions.length; i++) {
+			perms.push(permissions[i]);
+		}
+	}
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,

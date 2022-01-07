@@ -37,6 +37,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "MissingRequiredPermissions",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -316,6 +321,56 @@
       }
     ],
     "name": "setChildrenPerWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum Permission",
+            "name": "permission",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address[]",
+            "name": "addresses",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numTokens",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "lockedBy",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct MeemPermission[]",
+        "name": "permissions",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "setPermissions",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

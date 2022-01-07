@@ -208,6 +208,13 @@ interface IMeemPermissionsStandard {
 		MeemPermission[] permission
 	);
 
+	function setPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType,
+		MeemPermission[] memory permissions
+	) external;
+
 	function addPermission(
 		uint256 tokenId,
 		PropertyType propertyType,
