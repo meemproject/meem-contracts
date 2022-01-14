@@ -11,26 +11,42 @@ import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemPermissionsFacet is IMeemPermissionsStandard {
-	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
+	function setTotalChildren(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	) external override {
+		LibMeem.setTotalChildren(tokenId, propertyType, newTotalChildren);
+	}
+
+	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.setTotalChildren(tokenId, newTotalChildren);
+		LibMeem.lockTotalChildren(tokenId, propertyType);
 	}
 
-	function lockTotalChildren(uint256 tokenId) external override {
-		LibMeem.lockTotalChildren(tokenId);
+	function setChildrenPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	) external override {
+		LibMeem.setChildrenPerWallet(tokenId, propertyType, newTotalChildren);
 	}
 
-	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
+	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.setChildrenPerWallet(tokenId, newTotalChildren);
+		LibMeem.lockChildrenPerWallet(tokenId, propertyType);
 	}
 
-	function lockChildrenPerWallet(uint256 tokenId) external override {
-		LibMeem.lockChildrenPerWallet(tokenId);
+	function lockPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType
+	) external override {
+		LibMeem.lockPermissions(tokenId, propertyType, permissionType);
 	}
 
 	function setPermissions(

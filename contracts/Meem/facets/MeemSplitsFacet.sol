@@ -31,6 +31,21 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		return s.nonOwnerSplitAllocationAmount;
 	}
 
+	function lockSplits(uint256 tokenId, PropertyType propertyType)
+		external
+		override
+	{
+		LibMeem.lockSplits(tokenId, propertyType);
+	}
+
+	function setSplits(
+		uint256 tokenId,
+		PropertyType propertyType,
+		Split[] memory splits
+	) external override {
+		LibMeem.setSplits(tokenId, propertyType, splits);
+	}
+
 	function addSplit(
 		uint256 tokenId,
 		PropertyType propertyType,

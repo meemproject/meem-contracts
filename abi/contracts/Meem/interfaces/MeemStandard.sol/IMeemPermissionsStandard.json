@@ -10,6 +10,12 @@
       },
       {
         "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "lockedBy",
         "type": "address"
@@ -26,6 +32,12 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       },
       {
         "indexed": false,
@@ -101,6 +113,12 @@
       },
       {
         "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "lockedBy",
         "type": "address"
@@ -117,6 +135,12 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       },
       {
         "indexed": false,
@@ -184,6 +208,11 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       }
     ],
     "name": "lockChildrenPerWallet",
@@ -197,6 +226,34 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "enum PermissionType",
+        "name": "permissionType",
+        "type": "uint8"
+      }
+    ],
+    "name": "lockPermissions",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       }
     ],
     "name": "lockTotalChildren",
@@ -238,6 +295,11 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       },
       {
         "internalType": "int256",
@@ -306,6 +368,11 @@
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
       },
       {
         "internalType": "int256",

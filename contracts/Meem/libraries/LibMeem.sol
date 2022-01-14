@@ -26,10 +26,26 @@ library LibMeem {
 		PropertyType propertyType,
 		MeemProperties props
 	);
-	event TotalChildrenSet(uint256 tokenId, int256 newTotalChildren);
-	event TotalChildrenLocked(uint256 tokenId, address lockedBy);
-	event ChildrenPerWalletSet(uint256 tokenId, int256 newTotalChildren);
-	event ChildrenPerWalletLocked(uint256 tokenId, address lockedBy);
+	event TotalChildrenSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	);
+	event TotalChildrenLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event ChildrenPerWalletSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	);
+	event ChildrenPerWalletLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
 
 	function getRaribleV2Royalties(uint256 tokenId)
 		internal
@@ -166,6 +182,26 @@ library LibMeem {
 		return tokenId;
 	}
 
+	function lockPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType
+	) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+		permissionNotLocked(props, permissionType);
+
+		if (permissionType == PermissionType.Copy) {
+			props.copyPermissionsLockedBy = msg.sender;
+		} else if (permissionType == PermissionType.Remix) {
+			props.remixPermissionsLockedBy = msg.sender;
+		} else if (permissionType == PermissionType.Read) {
+			props.readPermissionsLockedBy = msg.sender;
+		} else {
+			revert InvalidPermissionType();
+		}
+	}
+
 	function setPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -194,6 +230,8 @@ library LibMeem {
 		for (uint256 i = 0; i < permissions.length; i++) {
 			perms.push(permissions[i]);
 		}
+
+		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
 	}
 
 	function addPermission(
@@ -259,6 +297,48 @@ library LibMeem {
 
 		perms[idx] = permission;
 		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+	}
+
+	function lockSplits(uint256 tokenId, PropertyType propertyType) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.splitsLockedBy != address(0)) {
+			revert PropertyLocked(props.splitsLockedBy);
+		}
+
+		props.splitsLockedBy = msg.sender;
+	}
+
+	function setSplits(
+		uint256 tokenId,
+		PropertyType propertyType,
+		Split[] memory splits
+	) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.splitsLockedBy != address(0)) {
+			revert PropertyLocked(props.splitsLockedBy);
+		}
+
+		validateOverrideSplits(splits, props.splits);
+
+		delete props.splits;
+
+		for (uint256 i = 0; i < splits.length; i++) {
+			props.splits.push(splits[i]);
+		}
+
+		validateSplits(
+			props,
+			LibERC721.ownerOf(tokenId),
+			s.nonOwnerSplitAllocationAmount
+		);
+
+		emit SplitsSet(tokenId, props.splits);
+		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function addSplit(
@@ -644,70 +724,74 @@ library LibMeem {
 		revert InvalidPermissionType();
 	}
 
-	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
-		internal
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+	function setTotalChildren(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	) internal {
 		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		MeemProperties storage props = getProperties(tokenId, propertyType);
 
 		if (newTotalChildren > -1) {
-			if (uint256(newTotalChildren) < s.children[tokenId].length) {
+			if (
+				propertyType == PropertyType.Meem &&
+				uint256(newTotalChildren) < s.children[tokenId].length
+			) {
 				revert InvalidTotalChildren(s.children[tokenId].length);
 			}
 		}
 
-		if (s.meemProperties[tokenId].totalChildrenLockedBy != address(0)) {
-			revert PropertyLocked(
-				s.meemProperties[tokenId].totalChildrenLockedBy
-			);
+		if (props.totalChildrenLockedBy != address(0)) {
+			revert PropertyLocked(props.totalChildrenLockedBy);
 		}
 
-		s.meemProperties[tokenId].totalChildren = newTotalChildren;
-		emit TotalChildrenSet(tokenId, newTotalChildren);
+		props.totalChildren = newTotalChildren;
+		emit TotalChildrenSet(tokenId, propertyType, newTotalChildren);
 	}
 
-	function lockTotalChildren(uint256 tokenId) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
-
-		if (s.meemProperties[tokenId].totalChildrenLockedBy != address(0)) {
-			revert PropertyLocked(
-				s.meemProperties[tokenId].totalChildrenLockedBy
-			);
-		}
-
-		s.meemProperties[tokenId].totalChildrenLockedBy = msg.sender;
-		emit TotalChildrenLocked(tokenId, msg.sender);
-	}
-
-	function setChildrenPerWallet(uint256 tokenId, int256 newTotalChildren)
+	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
 		internal
 	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (s.meemProperties[tokenId].childrenPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(
-				s.meemProperties[tokenId].childrenPerWalletLockedBy
-			);
+		if (props.totalChildrenLockedBy != address(0)) {
+			revert PropertyLocked(props.totalChildrenLockedBy);
 		}
 
-		s.meemProperties[tokenId].childrenPerWallet = newTotalChildren;
-		emit ChildrenPerWalletSet(tokenId, newTotalChildren);
+		props.totalChildrenLockedBy = msg.sender;
+		emit TotalChildrenLocked(tokenId, propertyType, msg.sender);
 	}
 
-	function lockChildrenPerWallet(uint256 tokenId) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+	function setChildrenPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	) internal {
 		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (s.meemProperties[tokenId].childrenPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(
-				s.meemProperties[tokenId].childrenPerWalletLockedBy
-			);
+		if (props.childrenPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.childrenPerWalletLockedBy);
 		}
 
-		s.meemProperties[tokenId].childrenPerWalletLockedBy = msg.sender;
-		emit ChildrenPerWalletLocked(tokenId, msg.sender);
+		props.childrenPerWallet = newTotalChildren;
+		emit ChildrenPerWalletSet(tokenId, propertyType, newTotalChildren);
+	}
+
+	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
+		internal
+	{
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.childrenPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.childrenPerWalletLockedBy);
+		}
+
+		props.childrenPerWalletLockedBy = msg.sender;
+		emit ChildrenPerWalletLocked(tokenId, propertyType, msg.sender);
 	}
 
 	function requireValidMeem(

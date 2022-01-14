@@ -175,6 +175,14 @@ interface IMeemSplitsStandard {
 
 	function nonOwnerSplitAllocationAmount() external view returns (uint256);
 
+	function lockSplits(uint256 tokenId, PropertyType propertyType) external;
+
+	function setSplits(
+		uint256 tokenId,
+		PropertyType propertyType,
+		Split[] memory splits
+	) external;
+
 	function addSplit(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -196,10 +204,26 @@ interface IMeemSplitsStandard {
 }
 
 interface IMeemPermissionsStandard {
-	event TotalChildrenSet(uint256 tokenId, int256 newTotalChildren);
-	event TotalChildrenLocked(uint256 tokenId, address lockedBy);
-	event ChildrenPerWalletSet(uint256 tokenId, int256 newTotalChildren);
-	event ChildrenPerWalletLocked(uint256 tokenId, address lockedBy);
+	event TotalChildrenSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	);
+	event TotalChildrenLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event ChildrenPerWalletSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	);
+	event ChildrenPerWalletLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
 
 	event PermissionsSet(
 		uint256 tokenId,
@@ -207,6 +231,12 @@ interface IMeemPermissionsStandard {
 		PermissionType permissionType,
 		MeemPermission[] permission
 	);
+
+	function lockPermissions(
+		uint256 tokenId,
+		PropertyType propertyType,
+		PermissionType permissionType
+	) external;
 
 	function setPermissions(
 		uint256 tokenId,
@@ -237,13 +267,21 @@ interface IMeemPermissionsStandard {
 		MeemPermission memory permission
 	) external;
 
-	function setTotalChildren(uint256 tokenId, int256 newTotalChildren)
+	function setTotalChildren(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalChildren
+	) external;
+
+	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
 		external;
 
-	function lockTotalChildren(uint256 tokenId) external;
+	function setChildrenPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newChildrenPerWallet
+	) external;
 
-	function setChildrenPerWallet(uint256 tokenId, int256 newChildrenPerWallet)
+	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
 		external;
-
-	function lockChildrenPerWallet(uint256 tokenId) external;
 }
