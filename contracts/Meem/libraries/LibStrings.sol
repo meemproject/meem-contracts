@@ -38,4 +38,25 @@ library LibStrings {
 		}
 		return string(abi.encodePacked(_str, buffer));
 	}
+
+	function getSlice(
+		uint256 begin,
+		uint256 end,
+		string memory text
+	) internal pure returns (string memory) {
+		bytes memory a = new bytes(end - begin + 1);
+		for (uint256 i = 0; i <= end - begin; i++) {
+			a[i] = bytes(text)[i + begin - 1];
+		}
+		return string(a);
+	}
+
+	function compareStrings(string memory a, string memory b)
+		internal
+		pure
+		returns (bool)
+	{
+		return (keccak256(abi.encodePacked((a))) ==
+			keccak256(abi.encodePacked((b))));
+	}
 }

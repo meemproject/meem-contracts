@@ -7,7 +7,8 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits} from '../libraries/Errors.sol';
+import {LibStrings} from '../libraries/LibStrings.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoCopyOfCopy, InvalidURI} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -77,28 +78,45 @@ library LibMeem {
 			params.parent,
 			params.parentTokenId
 		);
+
+		// Require IPFS uri
+		if (
+			params.permissionType != PermissionType.Copy &&
+			!LibStrings.compareStrings(
+				'ipfs://',
+				LibStrings.getSlice(0, 6, params.mTokenURI)
+			)
+		) {
+			revert InvalidURI();
+		}
+
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(params.to, tokenId);
-		s.tokenURIs[tokenId] = params.mTokenURI;
-
-		if (params.root == address(this) && params.parent != address(this)) {
-			revert InvalidParent();
-		}
 
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
+		if (params.isVerified) {
+			LibAccessControl.requireRole(s.MINTER_ROLE);
+			s.meems[tokenId].verifiedBy = msg.sender;
+		}
+
+		if (params.parent != address(0) && params.parent != address(this)) {
+			// Only trusted minter can mint a wNFT
+			LibAccessControl.requireRole(s.MINTER_ROLE);
+		}
+
 		s.meems[tokenId].parentChain = params.parentChain;
-		s.meems[tokenId].rootChain = params.rootChain;
+		// s.meems[tokenId].rootChain = params.rootChain;
 		s.meems[tokenId].parent = params.parent;
 		s.meems[tokenId].parentTokenId = params.parentTokenId;
-		s.meems[tokenId].root = params.root;
-		s.meems[tokenId].rootTokenId = params.rootTokenId;
+		// s.meems[tokenId].root = params.root;
+		// s.meems[tokenId].rootTokenId = params.rootTokenId;
 		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
 
-		// Set generation of Meem
+		// Handle creating child meem
 		if (params.parent == address(this)) {
 			// Verify token exists
 			if (s.meems[params.parentTokenId].owner == address(0)) {
@@ -110,6 +128,27 @@ library LibMeem {
 				params.permissionType,
 				params.parentTokenId
 			);
+
+			// If parent is verified, this child is also verified
+			if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
+				s.meems[tokenId].verifiedBy = address(this);
+			}
+
+			if (params.permissionType == PermissionType.Copy) {
+				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
+				s.meems[tokenId].meemType = MeemType.Copy;
+			} else {
+				s.tokenURIs[tokenId] = params.mTokenURI;
+				s.meems[tokenId].meemType = MeemType.Remix;
+			}
+
+			s.meems[tokenId].root = s.meems[params.parentTokenId].root;
+			s.meems[tokenId].rootTokenId = s
+				.meems[params.parentTokenId]
+				.rootTokenId;
+			s.meems[tokenId].rootChain = s
+				.meems[params.parentTokenId]
+				.rootChain;
 
 			s.meems[tokenId].generation =
 				s.meems[params.parentTokenId].generation +
@@ -131,9 +170,16 @@ library LibMeem {
 				true
 			);
 		} else {
-			// Gen 0 Meems require minter role
-			LibAccessControl.requireRole(s.MINTER_ROLE);
 			s.meems[tokenId].generation = 0;
+			s.meems[tokenId].root = params.parent;
+			s.meems[tokenId].rootTokenId = params.parentTokenId;
+			s.meems[tokenId].rootChain = params.parentChain;
+			s.tokenURIs[tokenId] = params.mTokenURI;
+			if (params.parent == address(0)) {
+				s.meems[tokenId].meemType = MeemType.Original;
+			} else {
+				s.meems[tokenId].meemType = MeemType.Copy;
+			}
 			LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
 			LibMeem.setProperties(
 				tokenId,
@@ -162,8 +208,8 @@ library LibMeem {
 			s.originalMeemTokens.push(tokenId);
 		}
 
-		if (params.root == address(this)) {
-			s.decendants[params.rootTokenId].push(tokenId);
+		if (s.meems[tokenId].root == address(this)) {
+			s.decendants[s.meems[tokenId].rootTokenId].push(tokenId);
 		}
 
 		s.tokenCounter += 1;
@@ -432,7 +478,8 @@ library LibMeem {
 			s.meemProperties[tokenId],
 			s.meemChildProperties[tokenId],
 			s.meems[tokenId].mintedAt,
-			s.meems[tokenId].data
+			s.meems[tokenId].data,
+			s.meems[tokenId].verifiedBy
 		);
 
 		return meem;
@@ -854,6 +901,12 @@ library LibMeem {
 
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemBase storage parent = s.meems[tokenId];
+
+		// Only allow copies if the parent is an original or remix (i.e. no copies of a copy)
+		if (parent.meemType == MeemType.Copy) {
+			revert NoCopyOfCopy();
+		}
+
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
 		uint256 currentChildren = s.children[tokenId].length;
 
@@ -876,8 +929,6 @@ library LibMeem {
 			revert ChildrenPerWalletExceeded();
 		}
 
-		// If user doesn't have the minter role, check permissions
-		// if (!LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)) {
 		// Check permissions
 		MeemPermission[] storage perms = getPermissions(
 			parentProperties,
@@ -913,6 +964,19 @@ library LibMeem {
 		if (!hasPermission) {
 			revert NoPermission();
 		}
-		// }
+	}
+
+	function permissionTypeToMeemType(PermissionType perm)
+		internal
+		pure
+		returns (MeemType)
+	{
+		if (perm == PermissionType.Copy) {
+			return MeemType.Copy;
+		} else if (perm == PermissionType.Remix) {
+			return MeemType.Remix;
+		}
+
+		revert NoPermission();
 	}
 }

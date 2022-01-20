@@ -392,6 +392,11 @@
             "internalType": "string",
             "name": "data",
             "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "verifiedBy",
+            "type": "address"
           }
         ],
         "internalType": "struct Meem",

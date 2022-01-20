@@ -199,21 +199,6 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum Chain",
-            "name": "rootChain",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "root",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rootTokenId",
-            "type": "uint256"
-          },
-          {
             "internalType": "enum PermissionType",
             "name": "permissionType",
             "type": "uint8"
@@ -222,6 +207,11 @@
             "internalType": "string",
             "name": "data",
             "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "isVerified",
+            "type": "bool"
           }
         ],
         "internalType": "struct MeemMintParameters",

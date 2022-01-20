@@ -15,7 +15,7 @@ describe('Child Meem Minting', function Test() {
 	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
-	const parent = '0xc4A383d1Fd38EDe98F032759CE7Ed8f3F10c82B0'
+	const parent = zeroAddress
 	const token0 = 100000
 	const token1 = 100001
 
@@ -45,12 +45,10 @@ describe('Child Meem Minting', function Test() {
 						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
 					parentChain: Chain.Polygon,
 					parent,
-					parentTokenId: 1000,
-					rootChain: Chain.Polygon,
-					root: parent,
-					rootTokenId: 1000,
+					parentTokenId: 0,
 					permissionType: PermissionType.Copy,
-					data: ''
+					data: '',
+					isVerified: false
 				},
 				{
 					...meemMintData,
@@ -102,11 +100,9 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					rootChain: Chain.Polygon,
-					root: zeroAddress,
-					rootTokenId: 0,
 					permissionType: PermissionType.Copy,
-					data: ''
+					data: '',
+					isVerified: false
 				},
 				meemMintData,
 				meemMintData
@@ -140,11 +136,9 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					rootChain: Chain.Polygon,
-					root: zeroAddress,
-					rootTokenId: 0,
 					permissionType: PermissionType.Copy,
-					data: ''
+					data: '',
+					isVerified: false
 				},
 				mintData,
 				mintData
@@ -183,11 +177,9 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					rootChain: Chain.Polygon,
-					root: zeroAddress,
-					rootTokenId: 0,
 					permissionType: PermissionType.Copy,
-					data: ''
+					data: '',
+					isVerified: false
 				},
 				mintData,
 				mintData
@@ -221,11 +213,9 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					rootChain: Chain.Polygon,
-					root: zeroAddress,
-					rootTokenId: 0,
 					permissionType: PermissionType.Copy,
-					data: ''
+					data: '',
+					isVerified: false
 				},
 				mintData,
 				mintData

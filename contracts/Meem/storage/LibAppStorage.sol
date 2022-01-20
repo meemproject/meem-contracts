@@ -72,6 +72,8 @@ library LibAppStorage {
 		uint256[] originalMeemTokens;
 		// Index of tokenId => allTokens index
 		mapping(uint256 => uint256) originalMeemTokensIndex;
+		// MeemID contract address
+		address meemID;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

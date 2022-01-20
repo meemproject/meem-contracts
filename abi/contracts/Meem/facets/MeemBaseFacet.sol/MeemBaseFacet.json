@@ -32,17 +32,17 @@
   },
   {
     "inputs": [],
-    "name": "InvalidParent",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "InvalidPermissionType",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "InvalidPropertyType",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidURI",
     "type": "error"
   },
   {
@@ -80,6 +80,11 @@
       }
     ],
     "name": "NFTAlreadyWrapped",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoCopyOfCopy",
     "type": "error"
   },
   {
@@ -341,21 +346,6 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum Chain",
-            "name": "rootChain",
-            "type": "uint8"
-          },
-          {
-            "internalType": "address",
-            "name": "root",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rootTokenId",
-            "type": "uint256"
-          },
-          {
             "internalType": "enum PermissionType",
             "name": "permissionType",
             "type": "uint8"
@@ -364,6 +354,11 @@
             "internalType": "string",
             "name": "data",
             "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "isVerified",
+            "type": "bool"
           }
         ],
         "internalType": "struct MeemMintParameters",

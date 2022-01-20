@@ -28,6 +28,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "meemID",
+        "type": "address"
+      }
+    ],
+    "name": "setMeemIDAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"

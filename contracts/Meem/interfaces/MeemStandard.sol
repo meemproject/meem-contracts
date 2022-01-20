@@ -27,6 +27,12 @@ enum PropertyType {
 	Child
 }
 
+enum MeemType {
+	Original,
+	Copy,
+	Remix
+}
+
 struct Split {
 	address toAddress;
 	uint256 amount;
@@ -65,6 +71,8 @@ struct MeemBase {
 	uint256 generation;
 	uint256 mintedAt;
 	string data;
+	address verifiedBy;
+	MeemType meemType;
 }
 
 struct Meem {
@@ -80,6 +88,7 @@ struct Meem {
 	MeemProperties childProperties;
 	uint256 mintedAt;
 	string data;
+	address verifiedBy;
 }
 
 struct WrappedItem {
@@ -94,11 +103,9 @@ struct MeemMintParameters {
 	Chain parentChain;
 	address parent;
 	uint256 parentTokenId;
-	Chain rootChain;
-	address root;
-	uint256 rootTokenId;
 	PermissionType permissionType;
 	string data;
+	bool isVerified;
 }
 
 interface IMeemBaseStandard {
@@ -168,6 +175,8 @@ interface IMeemAdminStandard {
 	function setTokenCounter(uint256 tokenCounter) external;
 
 	function setContractURI(string memory newContractURI) external;
+
+	function setMeemIDAddress(address meemID) external;
 }
 
 interface IMeemSplitsStandard {

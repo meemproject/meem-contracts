@@ -6,7 +6,7 @@ import {LibArray} from '../libraries/LibArray.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem} from '../interfaces/MeemStandard.sol';
-import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT} from '../libraries/Errors.sol';
+import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT, MeemNotVerified} from '../libraries/Errors.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
 library LibERC721 {
@@ -432,6 +432,10 @@ library LibERC721 {
 
 		if (to == address(0)) {
 			revert ToAddressInvalid(address(0));
+		}
+
+		if (s.meems[tokenId].verifiedBy == address(0)) {
+			revert MeemNotVerified();
 		}
 
 		if (!canFacilitateClaim) {

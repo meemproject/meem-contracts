@@ -55,3 +55,9 @@ error ChildDepthExceeded();
 error MissingRequiredPermissions();
 
 error MissingRequiredSplits();
+
+error NoCopyOfCopy();
+
+error MeemNotVerified();
+
+error InvalidURI();
