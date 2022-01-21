@@ -15,6 +15,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "InvalidMeemType",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -90,6 +95,11 @@
   {
     "inputs": [],
     "name": "NoPermission",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoRemixUnverified",
     "type": "error"
   },
   {
@@ -346,8 +356,8 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum PermissionType",
-            "name": "permissionType",
+            "internalType": "enum MeemType",
+            "name": "meemType",
             "type": "uint8"
           },
           {

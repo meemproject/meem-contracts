@@ -1,23 +1,30 @@
 export enum Chain {
-	Ethereum = 0,
-	Polygon = 1,
-	Cardano = 2
+	Ethereum,
+	Polygon,
+	Cardano
 }
 
 export enum PermissionType {
-	Copy = 0,
-	Remix = 1,
-	Read = 2
+	Copy,
+	Remix,
+	Read
 }
 
 export enum Permission {
-	Owner = 0,
-	Anyone = 1,
-	Addresses = 2,
-	Holders = 3
+	Owner,
+	Anyone,
+	Addresses,
+	Holders
 }
 
 export enum PropertyType {
-	Meem = 0,
-	Child = 1
+	Meem,
+	Child
+}
+
+export enum MeemType {
+	Original,
+	Copy,
+	Remix,
+	Wrapped
 }

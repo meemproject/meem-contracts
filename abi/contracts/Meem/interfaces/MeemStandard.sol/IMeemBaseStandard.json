@@ -199,8 +199,8 @@
             "type": "uint256"
           },
           {
-            "internalType": "enum PermissionType",
-            "name": "permissionType",
+            "internalType": "enum MeemType",
+            "name": "meemType",
             "type": "uint8"
           },
           {

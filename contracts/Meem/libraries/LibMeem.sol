@@ -8,7 +8,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoCopyOfCopy, InvalidURI} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoCopyOfCopy, InvalidURI, InvalidMeemType, NoRemixUnverified} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -81,10 +81,10 @@ library LibMeem {
 
 		// Require IPFS uri
 		if (
-			params.permissionType != PermissionType.Copy &&
+			params.meemType != MeemType.Copy &&
 			!LibStrings.compareStrings(
 				'ipfs://',
-				LibStrings.getSlice(0, 6, params.mTokenURI)
+				LibStrings.substring(params.mTokenURI, 0, 7)
 			)
 		) {
 			revert InvalidURI();
@@ -99,11 +99,6 @@ library LibMeem {
 		if (params.isVerified) {
 			LibAccessControl.requireRole(s.MINTER_ROLE);
 			s.meems[tokenId].verifiedBy = msg.sender;
-		}
-
-		if (params.parent != address(0) && params.parent != address(this)) {
-			// Only trusted minter can mint a wNFT
-			LibAccessControl.requireRole(s.MINTER_ROLE);
 		}
 
 		s.meems[tokenId].parentChain = params.parentChain;
@@ -125,7 +120,7 @@ library LibMeem {
 			// Verify we can mint based on permissions
 			requireCanMintChildOf(
 				params.to,
-				params.permissionType,
+				params.meemType,
 				params.parentTokenId
 			);
 
@@ -134,10 +129,13 @@ library LibMeem {
 				s.meems[tokenId].verifiedBy = address(this);
 			}
 
-			if (params.permissionType == PermissionType.Copy) {
+			if (params.meemType == MeemType.Copy) {
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
 			} else {
+				if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
+					revert NoRemixUnverified();
+				}
 				s.tokenURIs[tokenId] = params.mTokenURI;
 				s.meems[tokenId].meemType = MeemType.Remix;
 			}
@@ -176,9 +174,17 @@ library LibMeem {
 			s.meems[tokenId].rootChain = params.parentChain;
 			s.tokenURIs[tokenId] = params.mTokenURI;
 			if (params.parent == address(0)) {
+				if (params.meemType != MeemType.Original) {
+					revert InvalidMeemType();
+				}
 				s.meems[tokenId].meemType = MeemType.Original;
 			} else {
-				s.meems[tokenId].meemType = MeemType.Copy;
+				// Only trusted minter can mint a wNFT
+				LibAccessControl.requireRole(s.MINTER_ROLE);
+				if (params.meemType != MeemType.Wrapped) {
+					revert InvalidMeemType();
+				}
+				s.meems[tokenId].meemType = MeemType.Wrapped;
 			}
 			LibMeem.setProperties(tokenId, PropertyType.Meem, mProperties);
 			LibMeem.setProperties(
@@ -889,13 +895,10 @@ library LibMeem {
 	// Checks if "to" can mint a child of tokenId
 	function requireCanMintChildOf(
 		address to,
-		PermissionType permissionType,
+		MeemType meemType,
 		uint256 tokenId
 	) internal view {
-		if (
-			permissionType != PermissionType.Copy &&
-			permissionType != PermissionType.Remix
-		) {
+		if (meemType != MeemType.Copy && meemType != MeemType.Remix) {
 			revert NoPermission();
 		}
 
@@ -932,7 +935,7 @@ library LibMeem {
 		// Check permissions
 		MeemPermission[] storage perms = getPermissions(
 			parentProperties,
-			permissionType
+			meemTypeToPermissionType(meemType)
 		);
 
 		bool hasPermission = false;
@@ -975,6 +978,20 @@ library LibMeem {
 			return MeemType.Copy;
 		} else if (perm == PermissionType.Remix) {
 			return MeemType.Remix;
+		}
+
+		revert NoPermission();
+	}
+
+	function meemTypeToPermissionType(MeemType meemType)
+		internal
+		pure
+		returns (PermissionType)
+	{
+		if (meemType == MeemType.Copy) {
+			return PermissionType.Copy;
+		} else if (meemType == MeemType.Remix) {
+			return PermissionType.Remix;
 		}
 
 		revert NoPermission();

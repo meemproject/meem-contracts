@@ -58,6 +58,10 @@ error MissingRequiredSplits();
 
 error NoCopyOfCopy();
 
+error NoRemixUnverified();
+
 error MeemNotVerified();
 
 error InvalidURI();
+
+error InvalidMeemType();

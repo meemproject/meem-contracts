@@ -39,16 +39,17 @@ library LibStrings {
 		return string(abi.encodePacked(_str, buffer));
 	}
 
-	function getSlice(
-		uint256 begin,
-		uint256 end,
-		string memory text
+	function substring(
+		string memory str,
+		uint256 startIndex,
+		uint256 numChars
 	) internal pure returns (string memory) {
-		bytes memory a = new bytes(end - begin + 1);
-		for (uint256 i = 0; i <= end - begin; i++) {
-			a[i] = bytes(text)[i + begin - 1];
+		bytes memory strBytes = bytes(str);
+		bytes memory result = new bytes(numChars - startIndex);
+		for (uint256 i = startIndex; i < numChars; i++) {
+			result[i - startIndex] = strBytes[i];
 		}
-		return string(a);
+		return string(result);
 	}
 
 	function compareStrings(string memory a, string memory b)

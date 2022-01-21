@@ -30,7 +30,8 @@ enum PropertyType {
 enum MeemType {
 	Original,
 	Copy,
-	Remix
+	Remix,
+	Wrapped
 }
 
 struct Split {
@@ -103,7 +104,7 @@ struct MeemMintParameters {
 	Chain parentChain;
 	address parent;
 	uint256 parentTokenId;
-	PermissionType permissionType;
+	MeemType meemType;
 	string data;
 	bool isVerified;
 }

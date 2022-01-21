@@ -5,8 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, Permission, PermissionType } from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
+import { Chain, MeemType } from './helpers/meemStandard'
 
 chai.use(chaiAsPromised)
 
@@ -15,7 +14,8 @@ describe('Child Meem Minting', function Test() {
 	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
-	const parent = zeroAddress
+	const parent = '0xc4A383d1Fd38EDe98F032759CE7Ed8f3F10c82B0'
+	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 	const token0 = 100000
 	const token1 = 100001
 
@@ -41,33 +41,32 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[0].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent,
 					parentTokenId: 0,
-					permissionType: PermissionType.Copy,
+					meemType: MeemType.Wrapped,
 					data: '',
 					isVerified: false
 				},
 				{
-					...meemMintData,
-					copyPermissions: [
-						{
-							permission: Permission.Addresses,
-							addresses: [signers[1].address],
-							numTokens: 0,
-							lockedBy: zeroAddress
-						}
-					],
-					remixPermissions: [
-						{
-							permission: Permission.Addresses,
-							addresses: [signers[1].address],
-							numTokens: 0,
-							lockedBy: zeroAddress
-						}
-					]
+					...meemMintData
+					// copyPermissions: [
+					// 	{
+					// 		permission: Permission.Addresses,
+					// 		addresses: [signers[1].address],
+					// 		numTokens: 0,
+					// 		lockedBy: zeroAddress
+					// 	}
+					// ],
+					// remixPermissions: [
+					// 	{
+					// 		permission: Permission.Addresses,
+					// 		addresses: [signers[1].address],
+					// 		numTokens: 0,
+					// 		lockedBy: zeroAddress
+					// 	}
+					// ]
 				},
 				{
 					...meemMintData,
@@ -95,12 +94,11 @@ describe('Child Meem Minting', function Test() {
 			meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					permissionType: PermissionType.Copy,
+					meemType: MeemType.Copy,
 					data: '',
 					isVerified: false
 				},
@@ -131,12 +129,11 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					permissionType: PermissionType.Copy,
+					meemType: MeemType.Copy,
 					data: '',
 					isVerified: false
 				},
@@ -150,7 +147,7 @@ describe('Child Meem Minting', function Test() {
 		console.log({ meem })
 	})
 
-	it('Can not mint child as non-approved wallet', async () => {
+	it('Can mint child as non-minter role', async () => {
 		const mintData = {
 			...meemMintData,
 			splits: [
@@ -168,22 +165,19 @@ describe('Child Meem Minting', function Test() {
 			]
 		}
 
-		await assert.isRejected(
-			meemFacet.connect(signers[2]).mint(
-				{
-					to: signers[4].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
-					parentChain: Chain.Polygon,
-					parent: contractAddress,
-					parentTokenId: token0,
-					permissionType: PermissionType.Copy,
-					data: '',
-					isVerified: false
-				},
-				mintData,
-				mintData
-			)
+		await meemFacet.connect(signers[2]).mint(
+			{
+				to: signers[4].address,
+				mTokenURI: ipfsURL,
+				parentChain: Chain.Polygon,
+				parent: contractAddress,
+				parentTokenId: token0,
+				meemType: MeemType.Copy,
+				data: '',
+				isVerified: false
+			},
+			mintData,
+			mintData
 		)
 	})
 
@@ -208,12 +202,11 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					permissionType: PermissionType.Copy,
+					meemType: MeemType.Copy,
 					data: '',
 					isVerified: false
 				},
@@ -225,5 +218,40 @@ describe('Child Meem Minting', function Test() {
 
 		const meem = await queryFacet.getMeem(token1)
 		console.log({ meem })
+	})
+
+	it('Can not mint copy of copy', async () => {
+		const mintData = {
+			...meemMintData,
+			splits: [
+				...meemMintData.splits,
+				{
+					toAddress: signers[1].address,
+					amount: 100,
+					lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+				},
+				{
+					toAddress: signers[2].address,
+					amount: 100,
+					lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+				}
+			]
+		}
+		await assert.isRejected(
+			meemFacet.connect(signers[1]).mint(
+				{
+					to: signers[4].address,
+					mTokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token1,
+					meemType: MeemType.Copy,
+					data: '',
+					isVerified: false
+				},
+				mintData,
+				mintData
+			)
+		)
 	})
 })

@@ -1,7 +1,9 @@
+import { Permission } from './meemStandard'
+
 export const meemMintData = {
 	copyPermissions: [
 		{
-			permission: 1,
+			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
 			lockedBy: '0x0000000000000000000000000000000000000000'
@@ -9,7 +11,7 @@ export const meemMintData = {
 	],
 	remixPermissions: [
 		{
-			permission: 1,
+			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
 			lockedBy: '0x0000000000000000000000000000000000000000'
@@ -17,7 +19,7 @@ export const meemMintData = {
 	],
 	readPermissions: [
 		{
-			permission: 1,
+			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
 			lockedBy: '0x0000000000000000000000000000000000000000'
