@@ -60,7 +60,8 @@ describe('Token Owner Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData

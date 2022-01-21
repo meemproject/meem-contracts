@@ -47,7 +47,8 @@ describe('Child Meem Minting', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData
@@ -100,7 +101,8 @@ describe('Child Meem Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -135,7 +137,8 @@ describe('Child Meem Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				mintData,
 				mintData
@@ -174,7 +177,8 @@ describe('Child Meem Minting', function Test() {
 				parentTokenId: token0,
 				meemType: MeemType.Copy,
 				data: '',
-				isVerified: false
+				isVerified: false,
+				mintedBy: signers[0].address
 			},
 			mintData,
 			mintData
@@ -208,7 +212,8 @@ describe('Child Meem Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				mintData,
 				mintData
@@ -247,7 +252,8 @@ describe('Child Meem Minting', function Test() {
 					parentTokenId: token1,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				mintData,
 				mintData

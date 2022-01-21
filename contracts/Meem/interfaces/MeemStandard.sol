@@ -74,6 +74,7 @@ struct MeemBase {
 	string data;
 	address verifiedBy;
 	MeemType meemType;
+	address mintedBy;
 }
 
 struct Meem {
@@ -107,6 +108,7 @@ struct MeemMintParameters {
 	MeemType meemType;
 	string data;
 	bool isVerified;
+	address mintedBy;
 }
 
 interface IMeemBaseStandard {

@@ -59,7 +59,8 @@ describe('Minting', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -78,7 +79,8 @@ describe('Minting', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -117,7 +119,8 @@ describe('Minting', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -174,7 +177,8 @@ describe('Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -220,7 +224,8 @@ describe('Minting', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -252,7 +257,8 @@ describe('Minting', function Test() {
 					parentTokenId: 1,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -271,7 +277,8 @@ describe('Minting', function Test() {
 					parentTokenId: 1,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -310,7 +317,8 @@ describe('Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -328,7 +336,8 @@ describe('Minting', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData

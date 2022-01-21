@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType, PermissionType } from './helpers/meemStandard'
+import { Chain, MeemType } from './helpers/meemStandard'
 
 chai.use(chaiAsPromised)
 
@@ -52,7 +52,8 @@ describe('Query Meems', function Test() {
 					parentTokenId: 50,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData

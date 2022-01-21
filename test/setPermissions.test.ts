@@ -76,7 +76,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true
+					isVerified: true,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -98,7 +99,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -119,7 +121,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token1,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -142,7 +145,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -160,7 +164,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token1,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -180,7 +185,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token2,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -199,7 +205,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{ ...meemMintData, totalChildren: 1 },
 				meemMintData
@@ -217,7 +224,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{ ...meemMintData, totalChildren: 1 },
 				meemMintData
@@ -235,7 +243,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{ ...meemMintData, totalChildren: 1 },
 				meemMintData
@@ -254,7 +263,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{ ...meemMintData, childrenPerWallet: 1 },
 				meemMintData
@@ -272,7 +282,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -290,7 +301,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -308,7 +320,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -327,7 +340,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -355,7 +369,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -373,7 +388,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -392,7 +408,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -420,7 +437,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -438,7 +456,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -456,7 +475,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -475,7 +495,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -509,7 +530,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -527,7 +549,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -545,7 +568,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				meemMintData,
 				meemMintData
@@ -564,7 +588,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -619,7 +644,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -668,7 +694,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -716,7 +743,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,
@@ -786,7 +814,8 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false
+					isVerified: false,
+					mintedBy: signers[0].address
 				},
 				{
 					...meemMintData,

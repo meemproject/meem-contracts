@@ -111,6 +111,15 @@ library LibMeem {
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
 
+		if (
+			params.mintedBy != address(0) &&
+			LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)
+		) {
+			s.meems[tokenId].mintedBy = params.mintedBy;
+		} else {
+			s.meems[tokenId].mintedBy = msg.sender;
+		}
+
 		// Handle creating child meem
 		if (params.parent == address(this)) {
 			// Verify token exists

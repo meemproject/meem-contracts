@@ -212,6 +212,11 @@
             "internalType": "bool",
             "name": "isVerified",
             "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "mintedBy",
+            "type": "address"
           }
         ],
         "internalType": "struct MeemMintParameters",
