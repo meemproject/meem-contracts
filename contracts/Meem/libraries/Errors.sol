@@ -56,7 +56,7 @@ error MissingRequiredPermissions();
 
 error MissingRequiredSplits();
 
-error NoCopyOfCopy();
+error NoChildOfCopy();
 
 error NoRemixUnverified();
 

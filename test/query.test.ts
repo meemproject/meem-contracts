@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, PermissionType } from './helpers/meemStandard'
+import { Chain, MeemType, PermissionType } from './helpers/meemStandard'
 
 chai.use(chaiAsPromised)
 
@@ -15,6 +15,7 @@ describe('Query Meems', function Test() {
 	let signers: SignerWithAddress[]
 	let contractAddress: string
 	// const owner = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
+	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 	const parent = '0xc4A383d1Fd38EDe98F032759CE7Ed8f3F10c82B0'
 	const token0 = 100000
 	// const token1 = 100001
@@ -45,16 +46,13 @@ describe('Query Meems', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent,
 					parentTokenId: 50,
-					rootChain: Chain.Polygon,
-					root: parent,
-					rootTokenId: 50,
-					permissionType: PermissionType.Copy,
-					data: ''
+					meemType: MeemType.Wrapped,
+					data: '',
+					isVerified: true
 				},
 				meemMintData,
 				meemMintData

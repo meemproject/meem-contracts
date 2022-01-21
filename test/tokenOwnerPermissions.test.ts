@@ -9,7 +9,12 @@ import {
 	MeemQueryFacet
 } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, PermissionType } from './helpers/meemStandard'
+import {
+	Chain,
+	MeemType,
+	PermissionType,
+	PropertyType
+} from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -20,6 +25,7 @@ describe('Token Owner Permissions', function Test() {
 	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 
+	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 	const token0 = 100000
 
 	before(async () => {
@@ -48,16 +54,13 @@ describe('Token Owner Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI:
-						'https://raw.githubusercontent.com/meemproject/metadata/master/meem/1.json',
+					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
-					rootChain: Chain.Polygon,
-					root: zeroAddress,
-					rootTokenId: 0,
-					permissionType: PermissionType.Copy,
-					data: ''
+					meemType: MeemType.Original,
+					data: '',
+					isVerified: true
 				},
 				meemMintData,
 				meemMintData
@@ -70,7 +73,7 @@ describe('Token Owner Permissions', function Test() {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.setTotalChildren(token0, 5000)
+				.setTotalChildren(token0, PropertyType.Meem, 5000)
 		).wait()
 		assert.equal(status, 1)
 
@@ -81,18 +84,24 @@ describe('Token Owner Permissions', function Test() {
 
 	it('Can not set total children as non-owner', async () => {
 		await assert.isRejected(
-			meemPermissionsFacet.connect(signers[2]).setTotalChildren(token0, 5000)
+			meemPermissionsFacet
+				.connect(signers[2])
+				.setTotalChildren(token0, PropertyType.Meem, 5000)
 		)
 	})
 
 	it('Can lock total children as owner', async () => {
 		const { status } = await (
-			await meemPermissionsFacet.connect(signers[1]).lockTotalChildren(token0)
+			await meemPermissionsFacet
+				.connect(signers[1])
+				.lockTotalChildren(token0, PropertyType.Meem)
 		).wait()
 		assert.equal(status, 1)
 
 		await assert.isRejected(
-			meemPermissionsFacet.connect(signers[1]).setTotalChildren(token0, 5000)
+			meemPermissionsFacet
+				.connect(signers[1])
+				.setTotalChildren(token0, PropertyType.Meem, 5000)
 		)
 	})
 
@@ -100,7 +109,7 @@ describe('Token Owner Permissions', function Test() {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.setChildrenPerWallet(token0, 1)
+				.setChildrenPerWallet(token0, PropertyType.Meem, 1)
 		).wait()
 		assert.equal(status, 1)
 
@@ -113,7 +122,7 @@ describe('Token Owner Permissions', function Test() {
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[2])
-				.setChildrenPerWallet(token0, 5000)
+				.setChildrenPerWallet(token0, PropertyType.Meem, 5000)
 		)
 	})
 
@@ -121,14 +130,14 @@ describe('Token Owner Permissions', function Test() {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.lockChildrenPerWallet(token0)
+				.lockChildrenPerWallet(token0, PropertyType.Meem)
 		).wait()
 		assert.equal(status, 1)
 
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[1])
-				.setChildrenPerWallet(token0, 5000)
+				.setChildrenPerWallet(token0, PropertyType.Meem, 5000)
 		)
 	})
 })

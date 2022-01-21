@@ -8,7 +8,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoCopyOfCopy, InvalidURI, InvalidMeemType, NoRemixUnverified} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoRemixUnverified} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -907,7 +907,7 @@ library LibMeem {
 
 		// Only allow copies if the parent is an original or remix (i.e. no copies of a copy)
 		if (parent.meemType == MeemType.Copy) {
-			revert NoCopyOfCopy();
+			revert NoChildOfCopy();
 		}
 
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
