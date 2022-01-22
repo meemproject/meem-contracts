@@ -55,12 +55,22 @@ library LibMeem {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		uint256 numSplits = s.meemProperties[tokenId].splits.length;
+		uint256 tokenIdToUse = s.meems[tokenId].meemType == MeemType.Copy
+			? s.meems[tokenId].parentTokenId
+			: tokenId;
+
+		uint256 numSplits = s.meemProperties[tokenIdToUse].splits.length;
 		LibPart.Part[] memory parts = new LibPart.Part[](numSplits);
-		for (uint256 i = 0; i < s.meemProperties[tokenId].splits.length; i++) {
+		for (
+			uint256 i = 0;
+			i < s.meemProperties[tokenIdToUse].splits.length;
+			i++
+		) {
 			parts[i] = LibPart.Part({
-				account: payable(s.meemProperties[tokenId].splits[i].toAddress),
-				value: uint96(s.meemProperties[tokenId].splits[i].amount)
+				account: payable(
+					s.meemProperties[tokenIdToUse].splits[i].toAddress
+				),
+				value: uint96(s.meemProperties[tokenIdToUse].splits[i].amount)
 			});
 		}
 
@@ -102,11 +112,8 @@ library LibMeem {
 		}
 
 		s.meems[tokenId].parentChain = params.parentChain;
-		// s.meems[tokenId].rootChain = params.rootChain;
 		s.meems[tokenId].parent = params.parent;
 		s.meems[tokenId].parentTokenId = params.parentTokenId;
-		// s.meems[tokenId].root = params.root;
-		// s.meems[tokenId].rootTokenId = params.rootTokenId;
 		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
@@ -481,6 +488,8 @@ library LibMeem {
 
 	function getMeem(uint256 tokenId) internal view returns (Meem memory) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		bool isCopy = s.meems[tokenId].meemType == MeemType.Copy;
+
 		Meem memory meem = Meem(
 			s.meems[tokenId].owner,
 			s.meems[tokenId].parentChain,
@@ -490,11 +499,19 @@ library LibMeem {
 			s.meems[tokenId].root,
 			s.meems[tokenId].rootTokenId,
 			s.meems[tokenId].generation,
-			s.meemProperties[tokenId],
-			s.meemChildProperties[tokenId],
+			isCopy
+				? s.meemProperties[s.meems[tokenId].parentTokenId]
+				: s.meemProperties[tokenId],
+			isCopy
+				? s.meemChildProperties[s.meems[tokenId].parentTokenId]
+				: s.meemChildProperties[tokenId],
 			s.meems[tokenId].mintedAt,
-			s.meems[tokenId].data,
-			s.meems[tokenId].verifiedBy
+			isCopy
+				? s.meems[s.meems[tokenId].parentTokenId].data
+				: s.meems[tokenId].data,
+			s.meems[tokenId].verifiedBy,
+			s.meems[tokenId].meemType,
+			s.meems[tokenId].mintedBy
 		);
 
 		return meem;

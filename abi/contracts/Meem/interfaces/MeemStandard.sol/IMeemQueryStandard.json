@@ -397,6 +397,16 @@
             "internalType": "address",
             "name": "verifiedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum MeemType",
+            "name": "meemType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "mintedBy",
+            "type": "address"
           }
         ],
         "internalType": "struct Meem",

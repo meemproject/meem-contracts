@@ -91,6 +91,8 @@ struct Meem {
 	uint256 mintedAt;
 	string data;
 	address verifiedBy;
+	MeemType meemType;
+	address mintedBy;
 }
 
 struct WrappedItem {
@@ -122,6 +124,13 @@ interface IMeemBaseStandard {
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
+	) external;
+
+	function mintAndCopy(
+		MeemMintParameters memory params,
+		MeemProperties memory properties,
+		MeemProperties memory childProperties,
+		address toCopyAddress
 	) external;
 
 	// TODO: Implement child minting
@@ -180,6 +189,8 @@ interface IMeemAdminStandard {
 	function setContractURI(string memory newContractURI) external;
 
 	function setMeemIDAddress(address meemID) external;
+
+	function verifyToken(uint256 tokenId) external;
 }
 
 interface IMeemSplitsStandard {
