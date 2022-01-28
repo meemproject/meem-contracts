@@ -118,12 +118,12 @@ describe('Minting Curation', function Test() {
 				meemMintData,
 				meemMintData,
 				{
-					to: signers[1],
+					to: signers[1].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
-					meemType: MeemType.Original,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: true,
 					mintedBy: copyAddress
@@ -140,7 +140,7 @@ describe('Minting Curation', function Test() {
 		assert.equal(original.owner, owner)
 		assert.equal(copy.owner, copyAddress)
 		assert.equal(original.meemType, MeemType.Original)
-		assert.equal(copy.meemType, MeemType.Copy)
+		assert.equal(copy.meemType, MeemType.Remix)
 		assert.equal(original.mintedBy, copyAddress)
 	})
 })
