@@ -99,7 +99,7 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -135,7 +135,7 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -175,7 +175,7 @@ describe('Child Meem Minting', function Test() {
 				parentChain: Chain.Polygon,
 				parent: contractAddress,
 				parentTokenId: token0,
-				meemType: MeemType.Copy,
+				meemType: MeemType.Remix,
 				data: '',
 				isVerified: false,
 				mintedBy: signers[0].address
@@ -210,7 +210,7 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -250,7 +250,7 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token1,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address

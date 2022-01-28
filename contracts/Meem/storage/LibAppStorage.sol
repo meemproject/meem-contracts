@@ -58,21 +58,21 @@ library LibAppStorage {
 		mapping(uint256 => address) tokenApprovals;
 		/** Mapping from owner to operator approvals */
 		mapping(address => mapping(address => bool)) operatorApprovals;
-		// All tokenIds that have been minted and the corresponding index in allTokens
+		/** All tokenIds that have been minted and the corresponding index in allTokens */
 		uint256[] allTokens;
-		// Index of tokenId => allTokens index
+		/** Index of tokenId => allTokens index */
 		mapping(uint256 => uint256) allTokensIndex;
-		// Keep track of whether a tokenId has been minted
+		/** Keep track of whether a tokenId has been minted */
 		mapping(uint256 => bool) mintedTokens;
-		// Keep track of tokens that have already been wrapped
+		/** Keep track of tokens that have already been wrapped */
 		mapping(Chain => mapping(address => mapping(uint256 => uint256))) chainWrappedNFTs;
-		// Mapping of (parent) tokenId to owners and the child tokenIds they own
+		/** Mapping of (parent) tokenId to owners and the child tokenIds they own */
 		mapping(uint256 => mapping(address => uint256[])) childrenOwnerTokens;
-		// Keep track of original Meems
+		/** Keep track of original Meems */
 		uint256[] originalMeemTokens;
-		// Index of tokenId => allTokens index
+		/** Index of tokenId => allTokens index */
 		mapping(uint256 => uint256) originalMeemTokensIndex;
-		// MeemID contract address
+		/** MeemID contract address */
 		address meemID;
 	}
 

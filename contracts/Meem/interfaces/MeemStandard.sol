@@ -133,6 +133,15 @@ interface IMeemBaseStandard {
 		address toCopyAddress
 	) external;
 
+	function mintAndRemix(
+		MeemMintParameters memory params,
+		MeemProperties memory properties,
+		MeemProperties memory childProperties,
+		MeemMintParameters memory remixParams,
+		MeemProperties memory remixProperties,
+		MeemProperties memory remixChildProperties
+	) external;
+
 	// TODO: Implement child minting
 	// function mintChild(
 	// 	address to,

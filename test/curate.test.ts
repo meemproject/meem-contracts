@@ -99,4 +99,48 @@ describe('Minting Curation', function Test() {
 		assert.equal(copy.meemType, MeemType.Copy)
 		assert.equal(original.mintedBy, copyAddress)
 	})
+
+	it('Can mint and remix', async () => {
+		const copyAddress = signers[1].address
+		const { status } = await (
+			await meemFacet.connect(signers[0]).mintAndRemix(
+				{
+					to: owner,
+					mTokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					meemType: MeemType.Original,
+					data: '',
+					isVerified: true,
+					mintedBy: copyAddress
+				},
+				meemMintData,
+				meemMintData,
+				{
+					to: signers[1],
+					mTokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					meemType: MeemType.Original,
+					data: '',
+					isVerified: true,
+					mintedBy: copyAddress
+				},
+				meemMintData,
+				meemMintData
+			)
+		).wait()
+		assert.equal(status, 1)
+
+		const original = await queryFacet.getMeem(token0)
+		const copy = await queryFacet.getMeem(token1)
+
+		assert.equal(original.owner, owner)
+		assert.equal(copy.owner, copyAddress)
+		assert.equal(original.meemType, MeemType.Original)
+		assert.equal(copy.meemType, MeemType.Copy)
+		assert.equal(original.mintedBy, copyAddress)
+	})
 })

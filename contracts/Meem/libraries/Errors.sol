@@ -58,7 +58,7 @@ error MissingRequiredSplits();
 
 error NoChildOfCopy();
 
-error NoRemixUnverified();
+error NoCopyUnverified();
 
 error MeemNotVerified();
 

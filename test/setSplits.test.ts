@@ -15,7 +15,7 @@ import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
-describe('Minting Permissions', function Test() {
+describe('Set Splits', function Test() {
 	let meemFacet: MeemBaseFacet
 	let meemAdminFacet: MeemAdminFacet
 	let meemSplitsFacet: MeemSplitsFacet

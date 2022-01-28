@@ -8,7 +8,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoRemixUnverified} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -146,12 +146,12 @@ library LibMeem {
 			}
 
 			if (params.meemType == MeemType.Copy) {
+				if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
+					revert NoCopyUnverified();
+				}
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
 			} else {
-				if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
-					revert NoRemixUnverified();
-				}
 				s.tokenURIs[tokenId] = params.mTokenURI;
 				s.meems[tokenId].meemType = MeemType.Remix;
 			}

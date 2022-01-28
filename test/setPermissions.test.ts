@@ -21,7 +21,7 @@ import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
-describe('Minting Permissions', function Test() {
+describe('Set Permissions', function Test() {
 	let meemFacet: MeemBaseFacet
 	let meemAdminFacet: MeemAdminFacet
 	let meemPermissionsFacet: MeemPermissionsFacet
@@ -97,7 +97,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -119,7 +119,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token1,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -222,7 +222,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -241,7 +241,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -280,7 +280,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -299,7 +299,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -318,7 +318,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -345,7 +345,7 @@ describe('Minting Permissions', function Test() {
 				},
 				{
 					...meemMintData,
-					copyPermissions: [
+					remixPermissions: [
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
@@ -367,7 +367,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -379,14 +379,14 @@ describe('Minting Permissions', function Test() {
 
 		// Fails as non-owner
 		await assert.isRejected(
-			meemFacet.connect(signers[0]).mint(
+			meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[1].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -413,7 +413,7 @@ describe('Minting Permissions', function Test() {
 				},
 				{
 					...meemMintData,
-					copyPermissions: [
+					remixPermissions: [
 						{
 							permission: Permission.Addresses,
 							numTokens: 0,
@@ -435,7 +435,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -454,7 +454,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -466,14 +466,14 @@ describe('Minting Permissions', function Test() {
 
 		// Fails as other address
 		await assert.isRejected(
-			meemFacet.connect(signers[0]).mint(
+			meemFacet.connect(signers[3]).mint(
 				{
 					to: signers[3].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -500,7 +500,7 @@ describe('Minting Permissions', function Test() {
 				},
 				{
 					...meemMintData,
-					copyPermissions: [
+					remixPermissions: [
 						{
 							permission: Permission.Addresses,
 							numTokens: 0,
@@ -528,7 +528,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -547,7 +547,7 @@ describe('Minting Permissions', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
@@ -559,14 +559,14 @@ describe('Minting Permissions', function Test() {
 
 		// Fails as other address
 		await assert.isRejected(
-			meemFacet.connect(signers[0]).mint(
+			meemFacet.connect(signers[3]).mint(
 				{
 					to: signers[3].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
-					meemType: MeemType.Copy,
+					meemType: MeemType.Remix,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address
