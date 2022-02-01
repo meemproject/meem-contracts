@@ -11,6 +11,7 @@ import {IERC721} from '../interfaces/IERC721.sol';
 import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
+import {InvalidToken} from '../libraries/Errors.sol';
 
 contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	function contractURI() external view returns (string memory) {
@@ -141,7 +142,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		address to,
 		uint256 tokenId
 	) external payable override {
-		return LibERC721.transferFrom(from, to, tokenId);
+		return LibERC721.transfer(from, to, tokenId);
 	}
 
 	/**
@@ -152,7 +153,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		address to,
 		uint256 tokenId
 	) external payable override {
-		return LibERC721.safeTransferFrom(from, to, tokenId);
+		return LibERC721.safeTransfer(from, to, tokenId);
 	}
 
 	/**
@@ -164,7 +165,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		uint256 tokenId,
 		bytes memory data
 	) external payable override {
-		return LibERC721._safeTransfer(from, to, tokenId, data);
+		return LibERC721.safeTransfer(from, to, tokenId, data);
 	}
 
 	/**
@@ -201,30 +202,45 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		return s.ownerTokenIds[owner];
 	}
 
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal virtual {}
-
-	function _transfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal {
-		LibERC721._transfer(from, to, tokenId);
+	function onERC721Received(
+		address,
+		address,
+		uint256,
+		bytes calldata
+	) external view returns (bytes4) {
+		if (msg.sender != address(this)) {
+			revert InvalidToken();
+		}
+		return
+			bytes4(
+				keccak256('onERC721Received(address,address,uint256,bytes)')
+			);
 	}
 
-	function _exists(uint256 tokenId) internal view virtual returns (bool) {
-		return LibERC721._exists(tokenId);
-	}
+	// function _beforeTokenTransfer(
+	// 	address from,
+	// 	address to,
+	// 	uint256 tokenId
+	// ) internal virtual {}
 
-	function _isApprovedOrOwner(address spender, uint256 tokenId)
-		internal
-		view
-		virtual
-		returns (bool)
-	{
-		return LibERC721._isApprovedOrOwner(spender, tokenId);
-	}
+	// function _transfer(
+	// 	address from,
+	// 	address to,
+	// 	uint256 tokenId
+	// ) internal {
+	// 	LibERC721._transfer(from, to, tokenId);
+	// }
+
+	// function _exists(uint256 tokenId) internal view virtual returns (bool) {
+	// 	return LibERC721._exists(tokenId);
+	// }
+
+	// function _isApprovedOrOwner(address spender, uint256 tokenId)
+	// 	internal
+	// 	view
+	// 	virtual
+	// 	returns (bool)
+	// {
+	// 	return LibERC721._isApprovedOrOwner(spender, tokenId);
+	// }
 }

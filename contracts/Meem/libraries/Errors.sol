@@ -5,6 +5,8 @@ error MissingRequiredRole(bytes32 requiredRole);
 
 error NotTokenOwner(uint256 tokenId);
 
+error NotTokenAdmin(uint256 tokenId);
+
 error InvalidNonOwnerSplitAllocationAmount(
 	uint256 minAmount,
 	uint256 maxAmount
@@ -65,3 +67,5 @@ error MeemNotVerified();
 error InvalidURI();
 
 error InvalidMeemType();
+
+error InvalidToken();

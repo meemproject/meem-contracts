@@ -106,22 +106,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "parentAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "parentTokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "NoTransferWrappedNFT",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "to",
         "type": "address"
       }

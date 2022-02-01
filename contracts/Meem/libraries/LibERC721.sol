@@ -5,8 +5,8 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Meem} from '../interfaces/MeemStandard.sol';
-import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT, MeemNotVerified} from '../libraries/Errors.sol';
+import {Meem, MeemType} from '../interfaces/MeemStandard.sol';
+import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT, MeemNotVerified, NotTokenAdmin} from '../libraries/Errors.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
 library LibERC721 {
@@ -50,8 +50,6 @@ library LibERC721 {
 
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = ownerOf(tokenId);
-
-		_beforeTokenTransfer(owner, address(0), tokenId);
 
 		// Clear approvals
 		_approve(address(0), tokenId);
@@ -233,50 +231,50 @@ library LibERC721 {
 		return s.operatorApprovals[owner][operator];
 	}
 
-	/**
-	 * @dev See {IERC721-transferFrom}.
-	 */
-	function transferFrom(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal {
-		if (
-			!_isApprovedOrOwner(_msgSender(), tokenId) &&
-			!_canFacilitateClaim(_msgSender(), tokenId)
-		) {
-			revert NotApproved();
-		}
+	// /**
+	//  * @dev See {IERC721-transferFrom}.
+	//  */
+	// function transferFrom(
+	// 	address from,
+	// 	address to,
+	// 	uint256 tokenId
+	// ) internal {
+	// 	if (
+	// 		// !_isApprovedOrOwner(_msgSender(), tokenId) &&
+	// 		!_canFacilitateClaim(_msgSender(), tokenId)
+	// 	) {
+	// 		revert NotApproved();
+	// 	}
 
-		_transfer(from, to, tokenId);
-	}
+	// 	_transfer(from, to, tokenId);
+	// }
 
-	/**
-	 * @dev See {IERC721-safeTransferFrom}.
-	 */
-	function safeTransferFrom(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal {
-		safeTransferFrom(from, to, tokenId, '');
-	}
+	// /**
+	//  * @dev See {IERC721-safeTransferFrom}.
+	//  */
+	// function safeTransferFrom(
+	// 	address from,
+	// 	address to,
+	// 	uint256 tokenId
+	// ) internal {
+	// 	safeTransferFrom(from, to, tokenId, '');
+	// }
 
-	/**
-	 * @dev See {IERC721-safeTransferFrom}.
-	 */
-	function safeTransferFrom(
-		address from,
-		address to,
-		uint256 tokenId,
-		bytes memory _data
-	) internal {
-		if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
-			revert NotApproved();
-		}
+	// /**
+	//  * @dev See {IERC721-safeTransferFrom}.
+	//  */
+	// function safeTransferFrom(
+	// 	address from,
+	// 	address to,
+	// 	uint256 tokenId,
+	// 	bytes memory _data
+	// ) internal {
+	// 	if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
+	// 		revert NotApproved();
+	// 	}
 
-		_safeTransfer(from, to, tokenId, _data);
-	}
+	// 	_safeTransfer(from, to, tokenId, _data);
+	// }
 
 	/**
 	 * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
@@ -296,13 +294,21 @@ library LibERC721 {
 	 *
 	 * Emits a {Transfer} event.
 	 */
-	function _safeTransfer(
+	function safeTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal {
+		safeTransfer(from, to, tokenId, '');
+	}
+
+	function safeTransfer(
 		address from,
 		address to,
 		uint256 tokenId,
 		bytes memory _data
 	) internal {
-		_transfer(from, to, tokenId);
+		transfer(from, to, tokenId);
 
 		if (!_checkOnERC721Received(from, to, tokenId, _data)) {
 			revert ERC721ReceiverNotImplemented();
@@ -396,8 +402,6 @@ library LibERC721 {
 			revert TokenAlreadyExists(tokenId);
 		}
 
-		_beforeTokenTransfer(address(0), to, tokenId);
-
 		s.allTokens.push(tokenId);
 		s.allTokensIndex[tokenId] = s.allTokens.length;
 		s.ownerTokenIds[to].push(tokenId);
@@ -418,7 +422,7 @@ library LibERC721 {
 	 *
 	 * Emits a {Transfer} event.
 	 */
-	function _transfer(
+	function transfer(
 		address from,
 		address to,
 		uint256 tokenId
@@ -426,7 +430,19 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		bool canFacilitateClaim = _canFacilitateClaim(_msgSender(), tokenId);
 
-		if (ownerOf(tokenId) != from && !canFacilitateClaim) {
+		// Meems can be transferred if:
+		// 1. They are wrapped and the sender can facilitate claim
+		// 2. They are owned by this contract and the sender can facilitate claim
+		// 3. They are the owner
+		if (
+			s.meems[tokenId].meemType == MeemType.Wrapped && !canFacilitateClaim
+		) {
+			revert NotTokenAdmin(tokenId);
+		} else if (
+			s.meems[tokenId].owner == address(this) && !canFacilitateClaim
+		) {
+			revert NotTokenAdmin(tokenId);
+		} else if (ownerOf(tokenId) != from) {
 			revert NotTokenOwner(tokenId);
 		}
 
@@ -436,10 +452,6 @@ library LibERC721 {
 
 		if (s.meems[tokenId].verifiedBy == address(0)) {
 			revert MeemNotVerified();
-		}
-
-		if (!canFacilitateClaim) {
-			_beforeTokenTransfer(from, to, tokenId);
 		}
 
 		// Clear approvals from the previous owner
@@ -530,42 +542,6 @@ library LibERC721 {
 		}
 	}
 
-	/**
-	 * @dev Hook that is called before any token transfer. This includes minting
-	 * and burning.
-	 *
-	 * Calling conditions:
-	 *
-	 * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
-	 * transferred to `to`.
-	 * - When `from` is zero, `tokenId` will be minted for `to`.
-	 * - When `to` is zero, ``from``'s `tokenId` will be burned.
-	 * - `from` and `to` are never both zero.
-	 *
-	 * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-	 */
-	function _beforeTokenTransfer(
-		address from,
-		address to,
-		uint256 tokenId
-	) internal view {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-
-		if (
-			s.meems[tokenId].parent != address(this) &&
-			s.meems[tokenId].parent != address(0)
-		) {
-			revert NoTransferWrappedNFT(
-				s.meems[tokenId].parent,
-				s.meems[tokenId].parentTokenId
-			);
-		}
-
-		if (from == to) {
-			revert ToAddressInvalid(to);
-		}
-	}
-
 	function _msgSender() internal view returns (address) {
 		return msg.sender;
 	}
@@ -610,8 +586,8 @@ library LibERC721 {
 		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, user);
 		if (
 			!isAdmin ||
-			meem.parent == address(0) ||
-			meem.parent == address(this)
+			(meem.parent == address(0) && meem.owner != address(this)) ||
+			(meem.parent == address(this) && meem.owner != address(this))
 		) {
 			// Meem is an original or a child of another meem and can only be transferred by the owner
 			return false;
