@@ -37,6 +37,7 @@ interface MeemInterface extends ethers.utils.Interface {
     "isApprovedForAll(address,address)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "ownerTokens(address)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -47,25 +48,37 @@ interface MeemInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
     "setChildDepth(uint256)": FunctionFragment;
     "setContractURI(string)": FunctionFragment;
+    "setMeemIDAddress(address)": FunctionFragment;
     "setNonOwnerSplitAllocationAmount(uint256)": FunctionFragment;
     "setTokenCounter(uint256)": FunctionFragment;
+    "verifyToken(uint256)": FunctionFragment;
+    "mint(tuple,tuple,tuple)": FunctionFragment;
+    "mintAndCopy(tuple,tuple,tuple,address)": FunctionFragment;
+    "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)": FunctionFragment;
+    "addPermission(uint256,uint8,uint8,tuple)": FunctionFragment;
+    "lockChildrenPerWallet(uint256,uint8)": FunctionFragment;
+    "lockPermissions(uint256,uint8,uint8)": FunctionFragment;
+    "lockTotalChildren(uint256,uint8)": FunctionFragment;
+    "removePermissionAt(uint256,uint8,uint8,uint256)": FunctionFragment;
+    "setChildrenPerWallet(uint256,uint8,int256)": FunctionFragment;
+    "setPermissions(uint256,uint8,uint8,tuple[])": FunctionFragment;
+    "setTotalChildren(uint256,uint8,int256)": FunctionFragment;
+    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)": FunctionFragment;
     "childDepth()": FunctionFragment;
     "childrenOf(uint256)": FunctionFragment;
     "getMeem(uint256)": FunctionFragment;
-    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)": FunctionFragment;
+    "isNFTWrapped(uint8,address,uint256)": FunctionFragment;
     "numChildrenOf(uint256)": FunctionFragment;
     "ownedChildrenOf(uint256,address)": FunctionFragment;
-    "addPermission(uint256,uint8,uint8,tuple)": FunctionFragment;
-    "lockChildrenPerWallet(uint256)": FunctionFragment;
-    "lockTotalChildren(uint256)": FunctionFragment;
-    "removePermissionAt(uint256,uint8,uint8,uint256)": FunctionFragment;
-    "setChildrenPerWallet(uint256,int256)": FunctionFragment;
-    "setTotalChildren(uint256,int256)": FunctionFragment;
-    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)": FunctionFragment;
+    "tokenIdOfOwnerIndex(address,uint256)": FunctionFragment;
+    "tokenIdsOfOwner(address)": FunctionFragment;
+    "wrappedTokens(tuple[])": FunctionFragment;
     "addSplit(uint256,uint8,tuple)": FunctionFragment;
     "getRaribleV2Royalties(uint256)": FunctionFragment;
+    "lockSplits(uint256,uint8)": FunctionFragment;
     "nonOwnerSplitAllocationAmount()": FunctionFragment;
     "removeSplitAt(uint256,uint8,uint256)": FunctionFragment;
+    "setSplits(uint256,uint8,tuple[])": FunctionFragment;
     "updateSplitAt(uint256,uint8,uint256,tuple)": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
     "diamondCut(tuple[],address,bytes)": FunctionFragment;
@@ -132,6 +145,7 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "ownerTokens", values: [string]): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
@@ -170,6 +184,10 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMeemIDAddress",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setNonOwnerSplitAllocationAmount",
     values: [BigNumberish]
   ): string;
@@ -178,56 +196,22 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "childDepth",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "childrenOf",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMeem",
+    functionFragment: "verifyToken",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
     values: [
-      string,
-      string,
-      BigNumberish,
-      string,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish,
       {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
       },
       {
         totalChildren: BigNumberish;
@@ -258,16 +242,254 @@ interface MeemInterface extends ethers.utils.Interface {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      BigNumberish
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      }
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "numChildrenOf",
-    values: [BigNumberish]
+    functionFragment: "mintAndCopy",
+    values: [
+      {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      string
+    ]
   ): string;
   encodeFunctionData(
-    functionFragment: "ownedChildrenOf",
-    values: [BigNumberish, string]
+    functionFragment: "mintAndRemix",
+    values: [
+      {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "addPermission",
@@ -285,11 +507,15 @@ interface MeemInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lockChildrenPerWallet",
-    values: [BigNumberish]
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lockPermissions",
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "lockTotalChildren",
-    values: [BigNumberish]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "removePermissionAt",
@@ -297,11 +523,25 @@ interface MeemInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setChildrenPerWallet",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPermissions",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "setTotalChildren",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updatePermissionAt",
@@ -319,6 +559,44 @@ interface MeemInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "childDepth",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "childrenOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMeem",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isNFTWrapped",
+    values: [BigNumberish, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numChildrenOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ownedChildrenOf",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenIdOfOwnerIndex",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenIdsOfOwner",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "wrappedTokens",
+    values: [
+      { chain: BigNumberish; contractAddress: string; tokenId: BigNumberish }[]
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "addSplit",
     values: [
       BigNumberish,
@@ -331,12 +609,24 @@ interface MeemInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "lockSplits",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "nonOwnerSplitAllocationAmount",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "removeSplitAt",
     values: [BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSplits",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      { toAddress: string; amount: BigNumberish; lockedBy: string }[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "updateSplitAt",
@@ -428,6 +718,10 @@ interface MeemInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "ownerTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
@@ -462,6 +756,10 @@ interface MeemInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setMeemIDAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setNonOwnerSplitAllocationAmount",
     data: BytesLike
   ): Result;
@@ -469,16 +767,17 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "setTokenCounter",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "childDepth", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "childrenOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getMeem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "verifyToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "numChildrenOf",
+    functionFragment: "mintAndCopy",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "ownedChildrenOf",
+    functionFragment: "mintAndRemix",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -487,6 +786,10 @@ interface MeemInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "lockChildrenPerWallet",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lockPermissions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -502,6 +805,10 @@ interface MeemInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setPermissions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setTotalChildren",
     data: BytesLike
   ): Result;
@@ -509,11 +816,39 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "updatePermissionAt",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "childDepth", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "childrenOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getMeem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isNFTWrapped",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "numChildrenOf",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ownedChildrenOf",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenIdOfOwnerIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenIdsOfOwner",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "wrappedTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "addSplit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRaribleV2Royalties",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "lockSplits", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "nonOwnerSplitAllocationAmount",
     data: BytesLike
@@ -522,6 +857,7 @@ interface MeemInterface extends ethers.utils.Interface {
     functionFragment: "removeSplitAt",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setSplits", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "updateSplitAt",
     data: BytesLike
@@ -571,11 +907,11 @@ interface MeemInterface extends ethers.utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "PropertiesSet(uint256,uint8,tuple)": EventFragment;
-    "ChildrenPerWalletLocked(uint256,address)": EventFragment;
-    "ChildrenPerWalletSet(uint256,int256)": EventFragment;
+    "ChildrenPerWalletLocked(uint256,uint8,address)": EventFragment;
+    "ChildrenPerWalletSet(uint256,uint8,int256)": EventFragment;
     "PermissionsSet(uint256,uint8,uint8,tuple[])": EventFragment;
-    "TotalChildrenLocked(uint256,address)": EventFragment;
-    "TotalChildrenSet(uint256,int256)": EventFragment;
+    "TotalChildrenLocked(uint256,uint8,address)": EventFragment;
+    "TotalChildrenSet(uint256,uint8,int256)": EventFragment;
     "RoyaltiesSet(uint256,tuple[])": EventFragment;
     "SplitsSet(uint256,tuple[])": EventFragment;
     "DiamondCut(tuple[],address,bytes)": EventFragment;
@@ -765,6 +1101,16 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    ownerTokens(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
+    "ownerTokens(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
+
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
@@ -870,6 +1216,16 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setMeemIDAddress(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setMeemIDAddress(address)"(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setNonOwnerSplitAllocationAmount(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -887,6 +1243,756 @@ export class Meem extends Contract {
 
     "setTokenCounter(uint256)"(
       tokenCounter: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    verifyToken(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "verifyToken(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mint(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "mint(tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mintAndCopy(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "mintAndCopy(tuple,tuple,tuple,address)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mintAndRemix(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    addPermission(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "addPermission(uint256,uint8,uint8,tuple)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    lockChildrenPerWallet(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "lockChildrenPerWallet(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    lockPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "lockPermissions(uint256,uint8,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    lockTotalChildren(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "lockTotalChildren(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    removePermissionAt(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "removePermissionAt(uint256,uint8,uint8,uint256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setChildrenPerWallet(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setChildrenPerWallet(uint256,uint8,int256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setPermissions(uint256,uint8,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setTotalChildren(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setTotalChildren(uint256,uint8,int256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updatePermissionAt(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -1048,7 +2154,11 @@ export class Meem extends Contract {
             })[];
             splitsLockedBy: string;
           },
-          BigNumber
+          BigNumber,
+          string,
+          string,
+          number,
+          string
         ] & {
           owner: string;
           parentChain: number;
@@ -1189,6 +2299,10 @@ export class Meem extends Contract {
             splitsLockedBy: string;
           };
           mintedAt: BigNumber;
+          data: string;
+          verifiedBy: string;
+          meemType: number;
+          mintedBy: string;
         }
       ]
     >;
@@ -1337,7 +2451,11 @@ export class Meem extends Contract {
             })[];
             splitsLockedBy: string;
           },
-          BigNumber
+          BigNumber,
+          string,
+          string,
+          number,
+          string
         ] & {
           owner: string;
           parentChain: number;
@@ -1478,151 +2596,27 @@ export class Meem extends Contract {
             splitsLockedBy: string;
           };
           mintedAt: BigNumber;
+          data: string;
+          verifiedBy: string;
+          meemType: number;
+          mintedBy: string;
         }
       ]
     >;
 
-    mint(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      mChildProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      permissionType: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    isNFTWrapped(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      mChildProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      permissionType: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     numChildrenOf(
       tokenId: BigNumberish,
@@ -1646,119 +2640,45 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
-    addPermission(
+    tokenIdOfOwnerIndex(
+      _owner: string,
       tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-    "addPermission(uint256,uint8,uint8,tuple)"(
+    "tokenIdOfOwnerIndex(address,uint256)"(
+      _owner: string,
       tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-    lockChildrenPerWallet(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    tokenIdsOfOwner(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { tokenIds_: BigNumber[] }>;
 
-    "lockChildrenPerWallet(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "tokenIdsOfOwner(address)"(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { tokenIds_: BigNumber[] }>;
 
-    lockTotalChildren(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    wrappedTokens(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
 
-    "lockTotalChildren(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    removePermissionAt(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "removePermissionAt(uint256,uint8,uint8,uint256)"(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setChildrenPerWallet(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setChildrenPerWallet(uint256,int256)"(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setTotalChildren(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setTotalChildren(uint256,int256)"(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    updatePermissionAt(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "wrappedTokens(tuple[])"(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
 
     addSplit(
       tokenId: BigNumberish,
@@ -1788,6 +2708,18 @@ export class Meem extends Contract {
       [([string, BigNumber] & { account: string; value: BigNumber })[]]
     >;
 
+    lockSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "lockSplits(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     nonOwnerSplitAllocationAmount(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -1807,6 +2739,20 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setSplits(uint256,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -2067,6 +3013,13 @@ export class Meem extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  ownerTokens(owner: string, overrides?: CallOverrides): Promise<BigNumber[]>;
+
+  "ownerTokens(address)"(
+    owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
   "safeTransferFrom(address,address,uint256)"(
     from: string,
     to: string,
@@ -2165,6 +3118,16 @@ export class Meem extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setMeemIDAddress(
+    meemID: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setMeemIDAddress(address)"(
+    meemID: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setNonOwnerSplitAllocationAmount(
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -2182,6 +3145,756 @@ export class Meem extends Contract {
 
   "setTokenCounter(uint256)"(
     tokenCounter: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  verifyToken(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "verifyToken(uint256)"(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mint(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "mint(tuple,tuple,tuple)"(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mintAndCopy(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    toCopyAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "mintAndCopy(tuple,tuple,tuple,address)"(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    toCopyAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mintAndRemix(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    remixParams: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    remixProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    remixChildProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)"(
+    params: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    properties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    childProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    remixParams: {
+      to: string;
+      mTokenURI: string;
+      parentChain: BigNumberish;
+      parent: string;
+      parentTokenId: BigNumberish;
+      meemType: BigNumberish;
+      data: string;
+      isVerified: boolean;
+      mintedBy: string;
+    },
+    remixProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    remixChildProperties: {
+      totalChildren: BigNumberish;
+      totalChildrenLockedBy: string;
+      childrenPerWallet: BigNumberish;
+      childrenPerWalletLockedBy: string;
+      copyPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      remixPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      readPermissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[];
+      copyPermissionsLockedBy: string;
+      remixPermissionsLockedBy: string;
+      readPermissionsLockedBy: string;
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+      splitsLockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  addPermission(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    permission: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "addPermission(uint256,uint8,uint8,tuple)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    permission: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  lockChildrenPerWallet(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "lockChildrenPerWallet(uint256,uint8)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  lockPermissions(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "lockPermissions(uint256,uint8,uint8)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  lockTotalChildren(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "lockTotalChildren(uint256,uint8)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  removePermissionAt(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    idx: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "removePermissionAt(uint256,uint8,uint8,uint256)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    idx: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setChildrenPerWallet(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    newTotalChildren: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setChildrenPerWallet(uint256,uint8,int256)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    newTotalChildren: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setPermissions(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    permissions: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setPermissions(uint256,uint8,uint8,tuple[])"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    permissions: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setTotalChildren(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    newTotalChildren: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setTotalChildren(uint256,uint8,int256)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    newTotalChildren: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updatePermissionAt(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    idx: BigNumberish,
+    permission: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    },
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    permissionType: BigNumberish,
+    idx: BigNumberish,
+    permission: {
+      permission: BigNumberish;
+      addresses: string[];
+      numTokens: BigNumberish;
+      lockedBy: string;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -2342,7 +4055,11 @@ export class Meem extends Contract {
         })[];
         splitsLockedBy: string;
       },
-      BigNumber
+      BigNumber,
+      string,
+      string,
+      number,
+      string
     ] & {
       owner: string;
       parentChain: number;
@@ -2483,6 +4200,10 @@ export class Meem extends Contract {
         splitsLockedBy: string;
       };
       mintedAt: BigNumber;
+      data: string;
+      verifiedBy: string;
+      meemType: number;
+      mintedBy: string;
     }
   >;
 
@@ -2629,7 +4350,11 @@ export class Meem extends Contract {
         })[];
         splitsLockedBy: string;
       },
-      BigNumber
+      BigNumber,
+      string,
+      string,
+      number,
+      string
     ] & {
       owner: string;
       parentChain: number;
@@ -2770,150 +4495,26 @@ export class Meem extends Contract {
         splitsLockedBy: string;
       };
       mintedAt: BigNumber;
+      data: string;
+      verifiedBy: string;
+      meemType: number;
+      mintedBy: string;
     }
   >;
 
-  mint(
-    to: string,
-    mTokenURI: string,
-    parentChain: BigNumberish,
-    parent: string,
-    parentTokenId: BigNumberish,
-    rootChain: BigNumberish,
-    root: string,
-    rootTokenId: BigNumberish,
-    mProperties: {
-      totalChildren: BigNumberish;
-      totalChildrenLockedBy: string;
-      childrenPerWallet: BigNumberish;
-      childrenPerWalletLockedBy: string;
-      copyPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      remixPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      readPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      copyPermissionsLockedBy: string;
-      remixPermissionsLockedBy: string;
-      readPermissionsLockedBy: string;
-      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-      splitsLockedBy: string;
-    },
-    mChildProperties: {
-      totalChildren: BigNumberish;
-      totalChildrenLockedBy: string;
-      childrenPerWallet: BigNumberish;
-      childrenPerWalletLockedBy: string;
-      copyPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      remixPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      readPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      copyPermissionsLockedBy: string;
-      remixPermissionsLockedBy: string;
-      readPermissionsLockedBy: string;
-      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-      splitsLockedBy: string;
-    },
-    permissionType: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  isNFTWrapped(
+    chain: BigNumberish,
+    contractAddress: string,
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
-    to: string,
-    mTokenURI: string,
-    parentChain: BigNumberish,
-    parent: string,
-    parentTokenId: BigNumberish,
-    rootChain: BigNumberish,
-    root: string,
-    rootTokenId: BigNumberish,
-    mProperties: {
-      totalChildren: BigNumberish;
-      totalChildrenLockedBy: string;
-      childrenPerWallet: BigNumberish;
-      childrenPerWalletLockedBy: string;
-      copyPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      remixPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      readPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      copyPermissionsLockedBy: string;
-      remixPermissionsLockedBy: string;
-      readPermissionsLockedBy: string;
-      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-      splitsLockedBy: string;
-    },
-    mChildProperties: {
-      totalChildren: BigNumberish;
-      totalChildrenLockedBy: string;
-      childrenPerWallet: BigNumberish;
-      childrenPerWalletLockedBy: string;
-      copyPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      remixPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      readPermissions: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      }[];
-      copyPermissionsLockedBy: string;
-      remixPermissionsLockedBy: string;
-      readPermissionsLockedBy: string;
-      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-      splitsLockedBy: string;
-    },
-    permissionType: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "isNFTWrapped(uint8,address,uint256)"(
+    chain: BigNumberish,
+    contractAddress: string,
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   numChildrenOf(
     tokenId: BigNumberish,
@@ -2937,119 +4538,45 @@ export class Meem extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
-  addPermission(
+  tokenIdOfOwnerIndex(
+    _owner: string,
     tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    permission: {
-      permission: BigNumberish;
-      addresses: string[];
-      numTokens: BigNumberish;
-      lockedBy: string;
-    },
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-  "addPermission(uint256,uint8,uint8,tuple)"(
+  "tokenIdOfOwnerIndex(address,uint256)"(
+    _owner: string,
     tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    permission: {
-      permission: BigNumberish;
-      addresses: string[];
-      numTokens: BigNumberish;
-      lockedBy: string;
-    },
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-  lockChildrenPerWallet(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  tokenIdsOfOwner(
+    _owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
-  "lockChildrenPerWallet(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "tokenIdsOfOwner(address)"(
+    _owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
-  lockTotalChildren(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  wrappedTokens(
+    items: {
+      chain: BigNumberish;
+      contractAddress: string;
+      tokenId: BigNumberish;
+    }[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
-  "lockTotalChildren(uint256)"(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  removePermissionAt(
-    tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    idx: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "removePermissionAt(uint256,uint8,uint8,uint256)"(
-    tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    idx: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setChildrenPerWallet(
-    tokenId: BigNumberish,
-    newTotalChildren: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setChildrenPerWallet(uint256,int256)"(
-    tokenId: BigNumberish,
-    newTotalChildren: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setTotalChildren(
-    tokenId: BigNumberish,
-    newTotalChildren: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setTotalChildren(uint256,int256)"(
-    tokenId: BigNumberish,
-    newTotalChildren: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  updatePermissionAt(
-    tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    idx: BigNumberish,
-    permission: {
-      permission: BigNumberish;
-      addresses: string[];
-      numTokens: BigNumberish;
-      lockedBy: string;
-    },
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
-    tokenId: BigNumberish,
-    propertyType: BigNumberish,
-    permissionType: BigNumberish,
-    idx: BigNumberish,
-    permission: {
-      permission: BigNumberish;
-      addresses: string[];
-      numTokens: BigNumberish;
-      lockedBy: string;
-    },
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "wrappedTokens(tuple[])"(
+    items: {
+      chain: BigNumberish;
+      contractAddress: string;
+      tokenId: BigNumberish;
+    }[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
   addSplit(
     tokenId: BigNumberish,
@@ -3075,6 +4602,18 @@ export class Meem extends Contract {
     overrides?: CallOverrides
   ): Promise<([string, BigNumber] & { account: string; value: BigNumber })[]>;
 
+  lockSplits(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "lockSplits(uint256,uint8)"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   nonOwnerSplitAllocationAmount(overrides?: CallOverrides): Promise<BigNumber>;
 
   "nonOwnerSplitAllocationAmount()"(
@@ -3092,6 +4631,20 @@ export class Meem extends Contract {
     tokenId: BigNumberish,
     propertyType: BigNumberish,
     idx: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setSplits(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setSplits(uint256,uint8,tuple[])"(
+    tokenId: BigNumberish,
+    propertyType: BigNumberish,
+    splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -3328,6 +4881,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    ownerTokens(owner: string, overrides?: CallOverrides): Promise<BigNumber[]>;
+
+    "ownerTokens(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
@@ -3426,6 +4986,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setMeemIDAddress(meemID: string, overrides?: CallOverrides): Promise<void>;
+
+    "setMeemIDAddress(address)"(
+      meemID: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setNonOwnerSplitAllocationAmount(
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -3443,6 +5010,756 @@ export class Meem extends Contract {
 
     "setTokenCounter(uint256)"(
       tokenCounter: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    verifyToken(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "verifyToken(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mint(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "mint(tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintAndCopy(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "mintAndCopy(tuple,tuple,tuple,address)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintAndRemix(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    addPermission(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "addPermission(uint256,uint8,uint8,tuple)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    lockChildrenPerWallet(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "lockChildrenPerWallet(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    lockPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "lockPermissions(uint256,uint8,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    lockTotalChildren(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "lockTotalChildren(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    removePermissionAt(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "removePermissionAt(uint256,uint8,uint8,uint256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setChildrenPerWallet(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setChildrenPerWallet(uint256,uint8,int256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setPermissions(uint256,uint8,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setTotalChildren(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setTotalChildren(uint256,uint8,int256)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      newTotalChildren: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updatePermissionAt(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      idx: BigNumberish,
+      permission: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -3603,7 +5920,11 @@ export class Meem extends Contract {
           })[];
           splitsLockedBy: string;
         },
-        BigNumber
+        BigNumber,
+        string,
+        string,
+        number,
+        string
       ] & {
         owner: string;
         parentChain: number;
@@ -3744,6 +6065,10 @@ export class Meem extends Contract {
           splitsLockedBy: string;
         };
         mintedAt: BigNumber;
+        data: string;
+        verifiedBy: string;
+        meemType: number;
+        mintedBy: string;
       }
     >;
 
@@ -3890,7 +6215,11 @@ export class Meem extends Contract {
           })[];
           splitsLockedBy: string;
         },
-        BigNumber
+        BigNumber,
+        string,
+        string,
+        number,
+        string
       ] & {
         owner: string;
         parentChain: number;
@@ -4031,150 +6360,26 @@ export class Meem extends Contract {
           splitsLockedBy: string;
         };
         mintedAt: BigNumber;
+        data: string;
+        verifiedBy: string;
+        meemType: number;
+        mintedBy: string;
       }
     >;
 
-    mint(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      mChildProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      permissionType: BigNumberish,
+    isNFTWrapped(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<boolean>;
 
-    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      mChildProperties: {
-        totalChildren: BigNumberish;
-        totalChildrenLockedBy: string;
-        childrenPerWallet: BigNumberish;
-        childrenPerWalletLockedBy: string;
-        copyPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        remixPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        readPermissions: {
-          permission: BigNumberish;
-          addresses: string[];
-          numTokens: BigNumberish;
-          lockedBy: string;
-        }[];
-        copyPermissionsLockedBy: string;
-        remixPermissionsLockedBy: string;
-        readPermissionsLockedBy: string;
-        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
-        splitsLockedBy: string;
-      },
-      permissionType: BigNumberish,
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<boolean>;
 
     numChildrenOf(
       tokenId: BigNumberish,
@@ -4198,119 +6403,45 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
 
-    addPermission(
+    tokenIdOfOwnerIndex(
+      _owner: string,
       tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
-    "addPermission(uint256,uint8,uint8,tuple)"(
+    "tokenIdOfOwnerIndex(address,uint256)"(
+      _owner: string,
       tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber>;
 
-    lockChildrenPerWallet(
-      tokenId: BigNumberish,
+    tokenIdsOfOwner(
+      _owner: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
-    "lockChildrenPerWallet(uint256)"(
-      tokenId: BigNumberish,
+    "tokenIdsOfOwner(address)"(
+      _owner: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
-    lockTotalChildren(
-      tokenId: BigNumberish,
+    wrappedTokens(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
-    "lockTotalChildren(uint256)"(
-      tokenId: BigNumberish,
+    "wrappedTokens(tuple[])"(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
       overrides?: CallOverrides
-    ): Promise<void>;
-
-    removePermissionAt(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "removePermissionAt(uint256,uint8,uint8,uint256)"(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setChildrenPerWallet(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setChildrenPerWallet(uint256,int256)"(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setTotalChildren(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setTotalChildren(uint256,int256)"(
-      tokenId: BigNumberish,
-      newTotalChildren: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    updatePermissionAt(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "updatePermissionAt(uint256,uint8,uint8,uint256,tuple)"(
-      tokenId: BigNumberish,
-      propertyType: BigNumberish,
-      permissionType: BigNumberish,
-      idx: BigNumberish,
-      permission: {
-        permission: BigNumberish;
-        addresses: string[];
-        numTokens: BigNumberish;
-        lockedBy: string;
-      },
-      overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<BigNumber[]>;
 
     addSplit(
       tokenId: BigNumberish,
@@ -4336,6 +6467,18 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<([string, BigNumber] & { account: string; value: BigNumber })[]>;
 
+    lockSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "lockSplits(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     nonOwnerSplitAllocationAmount(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -4355,6 +6498,20 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setSplits(uint256,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -4654,18 +6811,20 @@ export class Meem extends Contract {
 
     ChildrenPerWalletLocked(
       tokenId: null,
+      propertyType: null,
       lockedBy: null
     ): TypedEventFilter<
-      [BigNumber, string],
-      { tokenId: BigNumber; lockedBy: string }
+      [BigNumber, number, string],
+      { tokenId: BigNumber; propertyType: number; lockedBy: string }
     >;
 
     ChildrenPerWalletSet(
       tokenId: null,
+      propertyType: null,
       newTotalChildren: null
     ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { tokenId: BigNumber; newTotalChildren: BigNumber }
+      [BigNumber, number, BigNumber],
+      { tokenId: BigNumber; propertyType: number; newTotalChildren: BigNumber }
     >;
 
     PermissionsSet(
@@ -4700,18 +6859,20 @@ export class Meem extends Contract {
 
     TotalChildrenLocked(
       tokenId: null,
+      propertyType: null,
       lockedBy: null
     ): TypedEventFilter<
-      [BigNumber, string],
-      { tokenId: BigNumber; lockedBy: string }
+      [BigNumber, number, string],
+      { tokenId: BigNumber; propertyType: number; lockedBy: string }
     >;
 
     TotalChildrenSet(
       tokenId: null,
+      propertyType: null,
       newTotalChildren: null
     ): TypedEventFilter<
-      [BigNumber, BigNumber],
-      { tokenId: BigNumber; newTotalChildren: BigNumber }
+      [BigNumber, number, BigNumber],
+      { tokenId: BigNumber; propertyType: number; newTotalChildren: BigNumber }
     >;
 
     RoyaltiesSet(
@@ -4909,6 +7070,13 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    ownerTokens(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "ownerTokens(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
@@ -5010,6 +7178,16 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setMeemIDAddress(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setMeemIDAddress(address)"(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setNonOwnerSplitAllocationAmount(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -5030,40 +7208,29 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    childDepth(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "childDepth()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    childrenOf(
+    verifyToken(
       tokenId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "childrenOf(uint256)"(
+    "verifyToken(uint256)"(
       tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getMeem(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "getMeem(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     mint(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5092,7 +7259,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      mChildProperties: {
+      childProperties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5121,20 +7288,22 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
+    "mint(tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5163,7 +7332,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      mChildProperties: {
+      childProperties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5192,30 +7361,439 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    numChildrenOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    mintAndCopy(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "numChildrenOf(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    "mintAndCopy(tuple,tuple,tuple,address)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    ownedChildrenOf(
-      tokenId: BigNumberish,
-      owner: string,
-      overrides?: CallOverrides
+    mintAndRemix(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "ownedChildrenOf(uint256,address)"(
-      tokenId: BigNumberish,
-      owner: string,
-      overrides?: CallOverrides
+    "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     addPermission(
@@ -5246,21 +7824,39 @@ export class Meem extends Contract {
 
     lockChildrenPerWallet(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "lockChildrenPerWallet(uint256)"(
+    "lockChildrenPerWallet(uint256,uint8)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    lockPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "lockPermissions(uint256,uint8,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     lockTotalChildren(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "lockTotalChildren(uint256)"(
+    "lockTotalChildren(uint256,uint8)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -5282,24 +7878,54 @@ export class Meem extends Contract {
 
     setChildrenPerWallet(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setChildrenPerWallet(uint256,int256)"(
+    "setChildrenPerWallet(uint256,uint8,int256)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setPermissions(uint256,uint8,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setTotalChildren(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setTotalChildren(uint256,int256)"(
+    "setTotalChildren(uint256,uint8,int256)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -5332,6 +7958,106 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    childDepth(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "childDepth()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    childrenOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "childrenOf(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getMeem(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getMeem(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isNFTWrapped(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    numChildrenOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "numChildrenOf(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenIdOfOwnerIndex(
+      _owner: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "tokenIdOfOwnerIndex(address,uint256)"(
+      _owner: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenIdsOfOwner(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "tokenIdsOfOwner(address)"(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    wrappedTokens(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "wrappedTokens(tuple[])"(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     addSplit(
       tokenId: BigNumberish,
       propertyType: BigNumberish,
@@ -5356,6 +8082,18 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    lockSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "lockSplits(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     nonOwnerSplitAllocationAmount(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -5375,6 +8113,20 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setSplits(uint256,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -5622,6 +8374,16 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    ownerTokens(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "ownerTokens(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
@@ -5723,6 +8485,16 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    setMeemIDAddress(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setMeemIDAddress(address)"(
+      meemID: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     setNonOwnerSplitAllocationAmount(
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -5743,40 +8515,29 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    childDepth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "childDepth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    childrenOf(
+    verifyToken(
       tokenId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "childrenOf(uint256)"(
+    "verifyToken(uint256)"(
       tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getMeem(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getMeem(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     mint(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5805,7 +8566,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      mChildProperties: {
+      childProperties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5834,20 +8595,22 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "mint(address,string,uint8,address,uint256,uint8,address,uint256,tuple,tuple,uint8)"(
-      to: string,
-      mTokenURI: string,
-      parentChain: BigNumberish,
-      parent: string,
-      parentTokenId: BigNumberish,
-      rootChain: BigNumberish,
-      root: string,
-      rootTokenId: BigNumberish,
-      mProperties: {
+    "mint(tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5876,7 +8639,7 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      mChildProperties: {
+      childProperties: {
         totalChildren: BigNumberish;
         totalChildrenLockedBy: string;
         childrenPerWallet: BigNumberish;
@@ -5905,30 +8668,439 @@ export class Meem extends Contract {
         splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
         splitsLockedBy: string;
       },
-      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    numChildrenOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    mintAndCopy(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "numChildrenOf(uint256)"(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    "mintAndCopy(tuple,tuple,tuple,address)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      toCopyAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    ownedChildrenOf(
-      tokenId: BigNumberish,
-      owner: string,
-      overrides?: CallOverrides
+    mintAndRemix(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "ownedChildrenOf(uint256,address)"(
-      tokenId: BigNumberish,
-      owner: string,
-      overrides?: CallOverrides
+    "mintAndRemix(tuple,tuple,tuple,tuple,tuple,tuple)"(
+      params: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      properties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      childProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixParams: {
+        to: string;
+        mTokenURI: string;
+        parentChain: BigNumberish;
+        parent: string;
+        parentTokenId: BigNumberish;
+        meemType: BigNumberish;
+        data: string;
+        isVerified: boolean;
+        mintedBy: string;
+      },
+      remixProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      remixChildProperties: {
+        totalChildren: BigNumberish;
+        totalChildrenLockedBy: string;
+        childrenPerWallet: BigNumberish;
+        childrenPerWalletLockedBy: string;
+        copyPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        remixPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        readPermissions: {
+          permission: BigNumberish;
+          addresses: string[];
+          numTokens: BigNumberish;
+          lockedBy: string;
+        }[];
+        copyPermissionsLockedBy: string;
+        remixPermissionsLockedBy: string;
+        readPermissionsLockedBy: string;
+        splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[];
+        splitsLockedBy: string;
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     addPermission(
@@ -5959,21 +9131,39 @@ export class Meem extends Contract {
 
     lockChildrenPerWallet(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "lockChildrenPerWallet(uint256)"(
+    "lockChildrenPerWallet(uint256,uint8)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    lockPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "lockPermissions(uint256,uint8,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     lockTotalChildren(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "lockTotalChildren(uint256)"(
+    "lockTotalChildren(uint256,uint8)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -5995,24 +9185,54 @@ export class Meem extends Contract {
 
     setChildrenPerWallet(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setChildrenPerWallet(uint256,int256)"(
+    "setChildrenPerWallet(uint256,uint8,int256)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPermissions(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setPermissions(uint256,uint8,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      permissionType: BigNumberish,
+      permissions: {
+        permission: BigNumberish;
+        addresses: string[];
+        numTokens: BigNumberish;
+        lockedBy: string;
+      }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setTotalChildren(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setTotalChildren(uint256,int256)"(
+    "setTotalChildren(uint256,uint8,int256)"(
       tokenId: BigNumberish,
+      propertyType: BigNumberish,
       newTotalChildren: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -6045,6 +9265,106 @@ export class Meem extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    childDepth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "childDepth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    childrenOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "childrenOf(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getMeem(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getMeem(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isNFTWrapped(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isNFTWrapped(uint8,address,uint256)"(
+      chain: BigNumberish,
+      contractAddress: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    numChildrenOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "numChildrenOf(uint256)"(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    ownedChildrenOf(
+      tokenId: BigNumberish,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "ownedChildrenOf(uint256,address)"(
+      tokenId: BigNumberish,
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenIdOfOwnerIndex(
+      _owner: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokenIdOfOwnerIndex(address,uint256)"(
+      _owner: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenIdsOfOwner(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "tokenIdsOfOwner(address)"(
+      _owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    wrappedTokens(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "wrappedTokens(tuple[])"(
+      items: {
+        chain: BigNumberish;
+        contractAddress: string;
+        tokenId: BigNumberish;
+      }[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     addSplit(
       tokenId: BigNumberish,
       propertyType: BigNumberish,
@@ -6069,6 +9389,18 @@ export class Meem extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    lockSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "lockSplits(uint256,uint8)"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     nonOwnerSplitAllocationAmount(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -6088,6 +9420,20 @@ export class Meem extends Contract {
       tokenId: BigNumberish,
       propertyType: BigNumberish,
       idx: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setSplits(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setSplits(uint256,uint8,tuple[])"(
+      tokenId: BigNumberish,
+      propertyType: BigNumberish,
+      splits: { toAddress: string; amount: BigNumberish; lockedBy: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

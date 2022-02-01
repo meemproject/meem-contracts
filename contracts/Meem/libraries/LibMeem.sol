@@ -970,8 +970,9 @@ library LibMeem {
 			if (
 				// Allowed if permission is anyone
 				perm.permission == Permission.Anyone ||
-				// Allowed if permission is owner and this is the owner
-				(perm.permission == Permission.Owner && parent.owner == to)
+				// Allowed if permission is owner and the minter is the owner
+				(perm.permission == Permission.Owner &&
+					parent.owner == msg.sender)
 			) {
 				hasPermission = true;
 				break;

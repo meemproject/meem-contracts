@@ -470,7 +470,7 @@ describe('Minting Permissions', function Test() {
 		await (
 			await meemFacet.connect(signers[0]).mint(
 				{
-					to: owner,
+					to: signers[2].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
@@ -503,7 +503,7 @@ describe('Minting Permissions', function Test() {
 
 		// Succeeds as approved address
 		await (
-			await meemFacet.connect(signers[0]).mint(
+			await meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[1].address,
 					mTokenURI: ipfsURL,
@@ -522,9 +522,9 @@ describe('Minting Permissions', function Test() {
 
 		// Succeeds as owner
 		await (
-			await meemFacet.connect(signers[0]).mint(
+			await meemFacet.connect(signers[2]).mint(
 				{
-					to: owner,
+					to: signers[2].address,
 					mTokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
