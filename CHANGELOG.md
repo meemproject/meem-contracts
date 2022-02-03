@@ -1,3 +1,13 @@
+# [1.9.0](https://github.com/meemproject/meem-contracts/compare/v1.8.1...v1.9.0) (2022-02-03)
+
+
+### Features
+
+* add "mintedBy" ([93f22af](https://github.com/meemproject/meem-contracts/commit/93f22af))
+* mint and copy ([fc3fe85](https://github.com/meemproject/meem-contracts/commit/fc3fe85))
+* mint and remix; change remix/copy verified permissions ([7272213](https://github.com/meemproject/meem-contracts/commit/7272213))
+* support for claim flows ([e0c2b82](https://github.com/meemproject/meem-contracts/commit/e0c2b82))
+
 ## [1.8.1](https://github.com/meemproject/meem-contracts/compare/v1.8.0...v1.8.1) (2022-01-14)
 
 # [1.8.0](https://github.com/meemproject/meem-contracts/compare/v1.7.0...v1.8.0) (2022-01-07)
