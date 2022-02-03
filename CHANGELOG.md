@@ -1,3 +1,5 @@
+## [1.9.2](https://github.com/meemproject/meem-contracts/compare/v1.9.1...v1.9.2) (2022-02-03)
+
 ## [1.9.1](https://github.com/meemproject/meem-contracts/compare/v1.9.0...v1.9.1) (2022-02-03)
 
 # [1.9.0](https://github.com/meemproject/meem-contracts/compare/v1.8.1...v1.9.0) (2022-02-03)
