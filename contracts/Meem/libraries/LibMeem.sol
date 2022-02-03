@@ -979,7 +979,7 @@ library LibMeem {
 			} else if (perm.permission == Permission.Addresses) {
 				// Allowed if to is in the list of approved addresses
 				for (uint256 j = 0; j < perm.addresses.length; j++) {
-					if (perm.addresses[j] == to) {
+					if (perm.addresses[j] == msg.sender) {
 						hasPermission = true;
 						break;
 					}
