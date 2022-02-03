@@ -1,7 +1,7 @@
 {
 	"name": "@meemproject/meem-contracts",
 	"private": true,
-	"version": "1.9.0",
+	"version": "1.9.1",
 	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
