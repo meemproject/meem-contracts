@@ -19,7 +19,7 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		s.contractURI = newContractURI;
 	}
 
-	function setChildDepth(uint256 newChildDepth) external override {
+	function setChildDepth(int256 newChildDepth) external override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		s.childDepth = newChildDepth;

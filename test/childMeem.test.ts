@@ -250,7 +250,7 @@ describe('Child Meem Minting', function Test() {
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token1,
-					meemType: MeemType.Remix,
+					meemType: MeemType.Copy,
 					data: '',
 					isVerified: false,
 					mintedBy: signers[0].address

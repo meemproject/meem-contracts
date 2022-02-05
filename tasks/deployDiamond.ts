@@ -2,7 +2,7 @@ import path from 'path'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
-import { task } from 'hardhat/config'
+import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import {
 	FacetCutAction,
@@ -19,10 +19,13 @@ export interface IDeployHistory {
 }
 
 export async function deployDiamond(options: {
+	args?: {
+		gwei: number
+	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
 }) {
-	const { ethers, hardhatArguments } = options
+	const { args, ethers, hardhatArguments } = options
 	const deployedContracts: Record<string, string> = {}
 	const network = await ethers.provider.getNetwork()
 	const { chainId } = network
@@ -39,6 +42,8 @@ export async function deployDiamond(options: {
 		console.log(e)
 	}
 
+	const wei = args?.gwei ? args.gwei * 1000000000 : undefined
+
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
 	console.log('Deploying contracts with the account:', contractOwner.address)
@@ -48,7 +53,9 @@ export async function deployDiamond(options: {
 	// deploy Diamond
 	const Diamond = await ethers.getContractFactory('MeemDiamond')
 
-	const diamond = await Diamond.deploy()
+	const diamond = await Diamond.deploy({
+		gasPrice: wei
+	})
 
 	await diamond.deployed()
 	deployedContracts.DiamondProxy = diamond.address
@@ -76,7 +83,9 @@ export async function deployDiamond(options: {
 		const Facet = await ethers.getContractFactory(facetName, {
 			...facets[facetName]
 		})
-		const facet = await Facet.deploy()
+		const facet = await Facet.deploy({
+			gasPrice: wei
+		})
 		await facet.deployed()
 		facets[facetName] = facet
 		console.log(`${facetName} deployed: ${facet.address}`)
@@ -146,15 +155,17 @@ export async function deployDiamond(options: {
 			{
 				name: 'Meem',
 				symbol: 'MEEM',
-				childDepth: 1,
-				nonOwnerSplitAllocationAmount: 100,
+				childDepth: -1,
+				nonOwnerSplitAllocationAmount: 0,
 				proxyRegistryAddress,
 				contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`
 			}
 		]
 	)
 
-	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall)
+	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall, {
+		gasPrice: wei
+	})
 	console.log('Diamond cut tx: ', tx.hash)
 	const receipt = await tx.wait()
 	if (!receipt.status) {
@@ -173,9 +184,9 @@ export async function deployDiamond(options: {
 	return deployedContracts
 }
 
-task('deployDiamond', 'Deploys Meem').setAction(
-	async (args, { ethers, hardhatArguments }) => {
-		const result = await deployDiamond({ ethers, hardhatArguments })
+task('deployDiamond', 'Deploys Meem')
+	.addParam('gwei', 'The gwei price', 31, types.int, true)
+	.setAction(async (args, { ethers, hardhatArguments }) => {
+		const result = await deployDiamond({ args, ethers, hardhatArguments })
 		return result
-	}
-)
+	})

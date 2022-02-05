@@ -70,75 +70,75 @@ describe('Token Owner Permissions', function Test() {
 		assert.equal(status, 1)
 	})
 
-	it('Can set total children as owner', async () => {
+	it('Can set total copies as owner', async () => {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.setTotalChildren(token0, PropertyType.Meem, 5000)
+				.setTotalCopies(token0, PropertyType.Meem, 5000)
 		).wait()
 		assert.equal(status, 1)
 
 		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
 		console.log({ meem })
-		assert.equal(meem.properties.totalChildren.toNumber(), 5000)
+		assert.equal(meem.properties.totalCopies.toNumber(), 5000)
 	})
 
-	it('Can not set total children as non-owner', async () => {
+	it('Can not set total copies as non-owner', async () => {
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[2])
-				.setTotalChildren(token0, PropertyType.Meem, 5000)
+				.setTotalCopies(token0, PropertyType.Meem, 5000)
 		)
 	})
 
-	it('Can lock total children as owner', async () => {
+	it('Can lock total copies as owner', async () => {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.lockTotalChildren(token0, PropertyType.Meem)
+				.lockTotalCopies(token0, PropertyType.Meem)
 		).wait()
 		assert.equal(status, 1)
 
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[1])
-				.setTotalChildren(token0, PropertyType.Meem, 5000)
+				.setTotalCopies(token0, PropertyType.Meem, 5000)
 		)
 	})
 
-	it('Can set total children per wallet as owner', async () => {
+	it('Can set total copies per wallet as owner', async () => {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.setChildrenPerWallet(token0, PropertyType.Meem, 1)
+				.setCopiesPerWallet(token0, PropertyType.Meem, 1)
 		).wait()
 		assert.equal(status, 1)
 
 		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
 		console.log({ meem })
-		assert.equal(meem.properties.totalChildren.toNumber(), 5000)
+		assert.equal(meem.properties.totalCopies.toNumber(), 5000)
 	})
 
-	it('Can not set total children per wallet as non-owner', async () => {
+	it('Can not set total copies per wallet as non-owner', async () => {
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[2])
-				.setChildrenPerWallet(token0, PropertyType.Meem, 5000)
+				.setCopiesPerWallet(token0, PropertyType.Meem, 5000)
 		)
 	})
 
-	it('Can lock total children per wallet as owner', async () => {
+	it('Can lock total copies per wallet as owner', async () => {
 		const { status } = await (
 			await meemPermissionsFacet
 				.connect(signers[1])
-				.lockChildrenPerWallet(token0, PropertyType.Meem)
+				.lockCopiesPerWallet(token0, PropertyType.Meem)
 		).wait()
 		assert.equal(status, 1)
 
 		await assert.isRejected(
 			meemPermissionsFacet
 				.connect(signers[1])
-				.setChildrenPerWallet(token0, PropertyType.Meem, 5000)
+				.setCopiesPerWallet(token0, PropertyType.Meem, 5000)
 		)
 	})
 })

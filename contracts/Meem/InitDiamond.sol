@@ -20,7 +20,7 @@ contract InitDiamond {
 	struct Args {
 		string name;
 		string symbol;
-		uint256 childDepth;
+		int256 childDepth;
 		uint256 nonOwnerSplitAllocationAmount;
 		address proxyRegistryAddress;
 		string contractURI;

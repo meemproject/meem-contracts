@@ -21,7 +21,7 @@
         "type": "address"
       }
     ],
-    "name": "ChildrenPerWalletLocked",
+    "name": "CopiesPerWalletLocked",
     "type": "event"
   },
   {
@@ -42,11 +42,11 @@
       {
         "indexed": false,
         "internalType": "int256",
-        "name": "newTotalChildren",
+        "name": "newTotalCopies",
         "type": "int256"
       }
     ],
-    "name": "ChildrenPerWalletSet",
+    "name": "CopiesPerWalletSet",
     "type": "event"
   },
   {
@@ -124,7 +124,7 @@
         "type": "address"
       }
     ],
-    "name": "TotalChildrenLocked",
+    "name": "TotalCopiesLocked",
     "type": "event"
   },
   {
@@ -145,11 +145,11 @@
       {
         "indexed": false,
         "internalType": "int256",
-        "name": "newTotalChildren",
+        "name": "newTotalCopies",
         "type": "int256"
       }
     ],
-    "name": "TotalChildrenSet",
+    "name": "TotalCopiesSet",
     "type": "event"
   },
   {
@@ -215,7 +215,7 @@
         "type": "uint8"
       }
     ],
-    "name": "lockChildrenPerWallet",
+    "name": "lockCopiesPerWallet",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -256,7 +256,43 @@
         "type": "uint8"
       }
     ],
-    "name": "lockTotalChildren",
+    "name": "lockRemixesPerWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      }
+    ],
+    "name": "lockTotalCopies",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      }
+    ],
+    "name": "lockTotalRemixes",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -307,7 +343,7 @@
         "type": "int256"
       }
     ],
-    "name": "setChildrenPerWallet",
+    "name": "setCopiesPerWallet",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -376,11 +412,57 @@
       },
       {
         "internalType": "int256",
-        "name": "newTotalChildren",
+        "name": "newChildrenPerWallet",
         "type": "int256"
       }
     ],
-    "name": "setTotalChildren",
+    "name": "setRemixesPerWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "int256",
+        "name": "newTotalCopies",
+        "type": "int256"
+      }
+    ],
+    "name": "setTotalCopies",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "int256",
+        "name": "newTotalRemixes",
+        "type": "int256"
+      }
+    ],
+    "name": "setTotalRemixes",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

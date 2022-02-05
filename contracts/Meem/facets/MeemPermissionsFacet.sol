@@ -11,34 +11,64 @@ import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemPermissionsFacet is IMeemPermissionsStandard {
-	function setTotalChildren(
+	function setTotalCopies(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	) external override {
-		LibMeem.setTotalChildren(tokenId, propertyType, newTotalChildren);
+		LibMeem.setTotalCopies(tokenId, propertyType, newTotalCopies);
 	}
 
-	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
+	function lockTotalCopies(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockTotalChildren(tokenId, propertyType);
+		LibMeem.lockTotalCopies(tokenId, propertyType);
 	}
 
-	function setChildrenPerWallet(
+	function setCopiesPerWallet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	) external override {
-		LibMeem.setChildrenPerWallet(tokenId, propertyType, newTotalChildren);
+		LibMeem.setCopiesPerWallet(tokenId, propertyType, newTotalCopies);
 	}
 
-	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
+	function lockCopiesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockChildrenPerWallet(tokenId, propertyType);
+		LibMeem.lockCopiesPerWallet(tokenId, propertyType);
+	}
+
+	function setTotalRemixes(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	) external override {
+		LibMeem.setTotalRemixes(tokenId, propertyType, newTotalRemixes);
+	}
+
+	function lockTotalRemixes(uint256 tokenId, PropertyType propertyType)
+		external
+		override
+	{
+		LibMeem.lockTotalRemixes(tokenId, propertyType);
+	}
+
+	function setRemixesPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	) external override {
+		LibMeem.setRemixesPerWallet(tokenId, propertyType, newTotalRemixes);
+	}
+
+	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
+		external
+		override
+	{
+		LibMeem.lockRemixesPerWallet(tokenId, propertyType);
 	}
 
 	function lockPermissions(

@@ -40,11 +40,17 @@ error InvalidPropertyType();
 
 error InvalidPermissionType();
 
-error InvalidTotalChildren(uint256 currentTotalChildren);
+error InvalidTotalCopies(uint256 currentTotalCopies);
 
-error TotalChildrenExceeded();
+error TotalCopiesExceeded();
 
-error ChildrenPerWalletExceeded();
+error InvalidTotalRemixes(uint256 currentTotalRemixes);
+
+error TotalRemixesExceeded();
+
+error CopiesPerWalletExceeded();
+
+error RemixesPerWalletExceeded();
 
 error NoPermission();
 
