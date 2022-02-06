@@ -1,6 +1,6 @@
 # Meem
 
-Join us in building the future of digital content where creators set the rules: [https://discord.gg/5NP8PYN8](https://discord.gg/5NP8PYN8)
+Join us in building the future of digital content where creators set the rules: [https://meem.wtf](https://meem.wtf)
 
 **Check out the [Developer Documentation](https://developer.meem.wtf/)** for the latest documentation on working with the Meem smart contracts.
 
@@ -8,42 +8,16 @@ Join us in building the future of digital content where creators set the rules: 
 
 ### Polygon (MATIC) Mainnet
 
-Meem Proxy: [](https://polygonscan.com/address/)
+Proxy contract: [0x82aC441F3276ede5db366704866d2E0fD9c2cFA8](https://polygonscan.com/address/0x82aC441F3276ede5db366704866d2E0fD9c2cFA8)
 
-Meem Implementation: [](https://polygonscan.com/address/)
-
-MeemPropsLibrary: [](https://polygonscan.com/address/)
-
-```
-{
-  deployedContracts: {
-    DiamondProxy: '0xbbc36838b7b9C5A052f51477FEA23F1Ec4aAcf0c',
-    AccessControlFacet: '0xE43B2C94170D019aa70D67d5D88E9D71AAc7eB41',
-    ERC721Facet: '0xab21bE5C64134D739b24B8509cb04C4747425360',
-    InitDiamond: '0x4C43e2554e71Fb1ff66e1Dd9F6886Eb01455B559',
-    MeemAdminFacet: '0x1B5062905613885e61D82b54A7EB316eeDCd6eC5',
-    MeemBaseFacet: '0x089F1f6EC208412DAf8c391De21FCaF126a6f8Ca',
-    MeemPermissionsFacet: '0x20e3132a5968C9265Fb7Af476dCC1a2B281e9D70',
-    MeemQueryFacet: '0xEC1763C310fBAbdA82898771038ce67BD0128E98',
-    MeemSplitsFacet: '0x9ff2359b0aDcf5Eba72b3907b2a33255605d6e92'
-  }
-}
-```
+Diamond inspector: [https://louper.dev/diamond/0x82aC441F3276ede5db366704866d2E0fD9c2cFA8?network=matic](https://louper.dev/diamond/0x82aC441F3276ede5db366704866d2E0fD9c2cFA8?network=matic)
 
 
 ### Rinkeby Testnet
 
-```
-{
-  deployedContracts: {
-    DiamondCutFacet: '0x5A6A75a1Ea30f1D564bb36DE45292a236d74A98E',
-    DiamondProxy: '0xEBf9B4f3AeEEb1aEFbAf535DC8E353809a7Df6D4',
-    DiamondImplementation: '0x197b0716c9e260f9c7bC48781A7e59d6Dc15E513',
-    DiamondLoupeFacet: '0x27CCb33F5b7eec52A85c5dfE6eec4388fCe349E9',
-    MeemFacet: '0x80897317b9C8D9273b451688121D471c46844d51'
-  }
-}
-```
+Proxy contract: [0x87e5882fa0ea7e391b7e31E8b23a8a38F35C84Ac](https://rinkeby.etherscan.io/address/0x87e5882fa0ea7e391b7e31E8b23a8a38F35C84Ac)
+
+Diamond inspector: [https://louper.dev/diamond/0x87e5882fa0ea7e391b7e31E8b23a8a38F35C84Ac?network=rinkeby](https://louper.dev/diamond/0x87e5882fa0ea7e391b7e31E8b23a8a38F35C84Ac?network=rinkeby)
 
 ## Development
 
@@ -75,11 +49,9 @@ This will start up a local node using hardhat
 
 ## Smart Contract Interaction
 
-> **Change the network**
->
-> For (deploy, upgrade, console, etc.) commands, you can change the network with `--network <network name>`
->
-> The local network is used by default.
+**Options for deploy/upgrade scripts:**
+- `--network <network name>` (optional, default is local)
+- `--gwei <amount>` (optional)
 
 ### Deploy contract
 
