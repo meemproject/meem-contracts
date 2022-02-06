@@ -11,34 +11,64 @@ import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 contract MeemQueryFacet is IMeemQueryStandard {
-	function childrenOf(uint256 tokenId)
+	function copiesOf(uint256 tokenId)
 		external
 		view
 		override
 		returns (uint256[] memory)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.children[tokenId];
+		return s.copies[tokenId];
 	}
 
-	function ownedChildrenOf(uint256 tokenId, address owner)
+	function ownedCopiesOf(uint256 tokenId, address owner)
 		external
 		view
 		override
 		returns (uint256[] memory)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.childrenOwnerTokens[tokenId][owner];
+		return s.copiesOwnerTokens[tokenId][owner];
 	}
 
-	function numChildrenOf(uint256 tokenId)
+	function numCopiesOf(uint256 tokenId)
 		external
 		view
 		override
 		returns (uint256)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.children[tokenId].length;
+		return s.copies[tokenId].length;
+	}
+
+	function remixesOf(uint256 tokenId)
+		external
+		view
+		override
+		returns (uint256[] memory)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.copies[tokenId];
+	}
+
+	function ownedRemixesOf(uint256 tokenId, address owner)
+		external
+		view
+		override
+		returns (uint256[] memory)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.remixesOwnerTokens[tokenId][owner];
+	}
+
+	function numRemixesOf(uint256 tokenId)
+		external
+		view
+		override
+		returns (uint256)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.remixes[tokenId].length;
 	}
 
 	function getMeem(uint256 tokenId)
@@ -50,7 +80,7 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		return LibMeem.getMeem(tokenId);
 	}
 
-	function childDepth() external view override returns (uint256) {
+	function childDepth() external view override returns (int256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.childDepth;
 	}

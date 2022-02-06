@@ -6,7 +6,7 @@
   },
   {
     "inputs": [],
-    "name": "ChildrenPerWalletExceeded",
+    "name": "CopiesPerWalletExceeded",
     "type": "error"
   },
   {
@@ -103,6 +103,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "RemixesPerWalletExceeded",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -137,7 +142,12 @@
   },
   {
     "inputs": [],
-    "name": "TotalChildrenExceeded",
+    "name": "TotalCopiesExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TotalRemixesExceeded",
     "type": "error"
   },
   {
@@ -159,22 +169,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -298,6 +308,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -368,22 +398,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -507,6 +537,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -518,22 +568,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -657,6 +707,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -728,22 +798,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -867,6 +937,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -878,22 +968,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -1017,6 +1107,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -1093,22 +1203,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -1232,6 +1342,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -1243,22 +1373,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -1382,6 +1512,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -1445,22 +1595,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -1584,6 +1734,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],
@@ -1595,22 +1765,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -1734,6 +1904,26 @@
           {
             "internalType": "address",
             "name": "splitsLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
             "type": "address"
           }
         ],

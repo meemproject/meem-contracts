@@ -21,7 +21,7 @@
         "type": "address"
       }
     ],
-    "name": "ChildrenPerWalletLocked",
+    "name": "CopiesPerWalletLocked",
     "type": "event"
   },
   {
@@ -42,11 +42,11 @@
       {
         "indexed": false,
         "internalType": "int256",
-        "name": "newTotalChildren",
+        "name": "newTotalRemixes",
         "type": "int256"
       }
     ],
-    "name": "ChildrenPerWalletSet",
+    "name": "CopiesPerWalletSet",
     "type": "event"
   },
   {
@@ -121,22 +121,22 @@
         "components": [
           {
             "internalType": "int256",
-            "name": "totalChildren",
+            "name": "totalRemixes",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "totalChildrenLockedBy",
+            "name": "totalRemixesLockedBy",
             "type": "address"
           },
           {
             "internalType": "int256",
-            "name": "childrenPerWallet",
+            "name": "remixesPerWallet",
             "type": "int256"
           },
           {
             "internalType": "address",
-            "name": "childrenPerWalletLockedBy",
+            "name": "remixesPerWalletLockedBy",
             "type": "address"
           },
           {
@@ -261,6 +261,26 @@
             "internalType": "address",
             "name": "splitsLockedBy",
             "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "totalCopies",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "totalCopiesLockedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "int256",
+            "name": "copiesPerWallet",
+            "type": "int256"
+          },
+          {
+            "internalType": "address",
+            "name": "copiesPerWalletLockedBy",
+            "type": "address"
           }
         ],
         "indexed": false,
@@ -270,6 +290,56 @@
       }
     ],
     "name": "PropertiesSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "lockedBy",
+        "type": "address"
+      }
+    ],
+    "name": "RemixesPerWalletLocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "newTotalRemixes",
+        "type": "int256"
+      }
+    ],
+    "name": "RemixesPerWalletSet",
     "type": "event"
   },
   {
@@ -361,7 +431,7 @@
         "type": "address"
       }
     ],
-    "name": "TotalChildrenLocked",
+    "name": "TotalCopiesLocked",
     "type": "event"
   },
   {
@@ -382,11 +452,61 @@
       {
         "indexed": false,
         "internalType": "int256",
-        "name": "newTotalChildren",
+        "name": "newTotalCopies",
         "type": "int256"
       }
     ],
-    "name": "TotalChildrenSet",
+    "name": "TotalCopiesSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "lockedBy",
+        "type": "address"
+      }
+    ],
+    "name": "TotalRemixesLocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "newTotalRemixes",
+        "type": "int256"
+      }
+    ],
+    "name": "TotalRemixesSet",
     "type": "event"
   }
 ]

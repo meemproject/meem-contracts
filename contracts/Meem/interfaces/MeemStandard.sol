@@ -47,10 +47,10 @@ struct MeemPermission {
 }
 
 struct MeemProperties {
-	int256 totalChildren;
-	address totalChildrenLockedBy;
-	int256 childrenPerWallet;
-	address childrenPerWalletLockedBy;
+	int256 totalRemixes;
+	address totalRemixesLockedBy;
+	int256 remixesPerWallet;
+	address remixesPerWalletLockedBy;
 	MeemPermission[] copyPermissions;
 	MeemPermission[] remixPermissions;
 	MeemPermission[] readPermissions;
@@ -59,6 +59,10 @@ struct MeemProperties {
 	address readPermissionsLockedBy;
 	Split[] splits;
 	address splitsLockedBy;
+	int256 totalCopies;
+	address totalCopiesLockedBy;
+	int256 copiesPerWallet;
+	address copiesPerWalletLockedBy;
 }
 
 struct MeemBase {
@@ -155,19 +159,28 @@ interface IMeemBaseStandard {
 
 interface IMeemQueryStandard {
 	// Get children meems
-	function childrenOf(uint256 tokenId)
+	function copiesOf(uint256 tokenId) external view returns (uint256[] memory);
+
+	function ownedCopiesOf(uint256 tokenId, address owner)
 		external
 		view
 		returns (uint256[] memory);
 
-	function ownedChildrenOf(uint256 tokenId, address owner)
+	function numCopiesOf(uint256 tokenId) external view returns (uint256);
+
+	function remixesOf(uint256 tokenId)
 		external
 		view
 		returns (uint256[] memory);
 
-	function numChildrenOf(uint256 tokenId) external view returns (uint256);
+	function ownedRemixesOf(uint256 tokenId, address owner)
+		external
+		view
+		returns (uint256[] memory);
 
-	function childDepth() external returns (uint256);
+	function numRemixesOf(uint256 tokenId) external view returns (uint256);
+
+	function childDepth() external returns (int256);
 
 	function tokenIdsOfOwner(address _owner)
 		external
@@ -191,7 +204,7 @@ interface IMeemQueryStandard {
 interface IMeemAdminStandard {
 	function setNonOwnerSplitAllocationAmount(uint256 amount) external;
 
-	function setChildDepth(uint256 newChildDepth) external;
+	function setChildDepth(int256 newChildDepth) external;
 
 	function setTokenCounter(uint256 tokenCounter) external;
 
@@ -236,22 +249,42 @@ interface IMeemSplitsStandard {
 }
 
 interface IMeemPermissionsStandard {
-	event TotalChildrenSet(
+	event TotalCopiesSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	);
-	event TotalChildrenLocked(
+	event TotalCopiesLocked(
 		uint256 tokenId,
 		PropertyType propertyType,
 		address lockedBy
 	);
-	event ChildrenPerWalletSet(
+	event CopiesPerWalletSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	);
-	event ChildrenPerWalletLocked(
+	event CopiesPerWalletLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event TotalRemixesSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event TotalRemixesLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event RemixesPerWalletSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event RemixesPerWalletLocked(
 		uint256 tokenId,
 		PropertyType propertyType,
 		address lockedBy
@@ -299,21 +332,39 @@ interface IMeemPermissionsStandard {
 		MeemPermission memory permission
 	) external;
 
-	function setTotalChildren(
+	function setTotalCopies(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	) external;
 
-	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
+	function lockTotalCopies(uint256 tokenId, PropertyType propertyType)
 		external;
 
-	function setChildrenPerWallet(
+	function setCopiesPerWallet(
 		uint256 tokenId,
 		PropertyType propertyType,
 		int256 newChildrenPerWallet
 	) external;
 
-	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
+	function lockCopiesPerWallet(uint256 tokenId, PropertyType propertyType)
+		external;
+
+	function setTotalRemixes(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	) external;
+
+	function lockTotalRemixes(uint256 tokenId, PropertyType propertyType)
+		external;
+
+	function setRemixesPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newChildrenPerWallet
+	) external;
+
+	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external;
 }

@@ -71,6 +71,8 @@ describe('Minting Permissions', function Test() {
 	it('Mints can not exceed childDepth', async () => {
 		await mintZeroMeem()
 
+		await (await meemAdminFacet.setChildDepth(1)).wait()
+
 		const { status } = await (
 			await meemFacet.connect(signers[0]).mint(
 				{
@@ -176,7 +178,7 @@ describe('Minting Permissions', function Test() {
 		)
 	})
 
-	it('Respects total children', async () => {
+	it('Respects total remixes', async () => {
 		await (
 			await meemFacet.connect(signers[0]).mint(
 				{
@@ -190,7 +192,7 @@ describe('Minting Permissions', function Test() {
 					isVerified: true,
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalChildren: 1 },
+				{ ...meemMintData, totalRemixes: 1 },
 				meemMintData
 			)
 		).wait()
@@ -209,7 +211,7 @@ describe('Minting Permissions', function Test() {
 					isVerified: false,
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalChildren: 1 },
+				{ ...meemMintData, totalRemixes: 1 },
 				meemMintData
 			)
 		).wait()
@@ -228,7 +230,7 @@ describe('Minting Permissions', function Test() {
 					isVerified: false,
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalChildren: 1 },
+				{ ...meemMintData, totalRemixes: 1 },
 				meemMintData
 			)
 		)
@@ -248,7 +250,7 @@ describe('Minting Permissions', function Test() {
 					isVerified: true,
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, childrenPerWallet: 1 },
+				{ ...meemMintData, remixesPerWallet: 1 },
 				meemMintData
 			)
 		).wait()

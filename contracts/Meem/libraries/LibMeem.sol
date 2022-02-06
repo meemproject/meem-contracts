@@ -8,7 +8,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalChildren, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalChildrenExceeded, ChildrenPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -27,22 +27,42 @@ library LibMeem {
 		PropertyType propertyType,
 		MeemProperties props
 	);
-	event TotalChildrenSet(
+	event TotalCopiesSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	);
-	event TotalChildrenLocked(
+	event TotalCopiesLocked(
 		uint256 tokenId,
 		PropertyType propertyType,
 		address lockedBy
 	);
-	event ChildrenPerWalletSet(
+	event CopiesPerWalletSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalRemixes
 	);
-	event ChildrenPerWalletLocked(
+	event TotalRemixesSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event TotalRemixesLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event RemixesPerWalletSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event CopiesPerWalletLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event RemixesPerWalletLocked(
 		uint256 tokenId,
 		PropertyType propertyType,
 		address lockedBy
@@ -210,16 +230,26 @@ library LibMeem {
 			);
 		}
 
-		if (s.meems[tokenId].generation > s.childDepth) {
+		if (
+			s.childDepth > -1 &&
+			s.meems[tokenId].generation > uint256(s.childDepth)
+		) {
 			revert ChildDepthExceeded();
 		}
 
 		// Keep track of children Meems
 		if (params.parent == address(this)) {
-			s.children[params.parentTokenId].push(tokenId);
-			s.childrenOwnerTokens[params.parentTokenId][params.to].push(
-				tokenId
-			);
+			if (s.meems[tokenId].meemType == MeemType.Copy) {
+				s.copies[params.parentTokenId].push(tokenId);
+				s.copiesOwnerTokens[params.parentTokenId][params.to].push(
+					tokenId
+				);
+			} else if (s.meems[tokenId].meemType == MeemType.Remix) {
+				s.remixes[params.parentTokenId].push(tokenId);
+				s.remixesOwnerTokens[params.parentTokenId][params.to].push(
+					tokenId
+				);
+			}
 		} else if (params.parent != address(0)) {
 			// Keep track of wrapped NFTs
 			s.chainWrappedNFTs[params.parentChain][params.parent][
@@ -540,16 +570,27 @@ library LibMeem {
 	) internal pure returns (MeemProperties memory) {
 		MeemProperties memory mergedProps = baseProperties;
 
-		if (overrideProps.totalChildrenLockedBy != address(0)) {
-			mergedProps.totalChildrenLockedBy = overrideProps
-				.totalChildrenLockedBy;
-			mergedProps.totalChildren = overrideProps.totalChildren;
+		if (overrideProps.totalCopiesLockedBy != address(0)) {
+			mergedProps.totalCopiesLockedBy = overrideProps.totalCopiesLockedBy;
+			mergedProps.totalCopies = overrideProps.totalCopies;
 		}
 
-		if (overrideProps.childrenPerWalletLockedBy != address(0)) {
-			mergedProps.childrenPerWalletLockedBy = overrideProps
-				.childrenPerWalletLockedBy;
-			mergedProps.childrenPerWallet = overrideProps.childrenPerWallet;
+		if (overrideProps.copiesPerWalletLockedBy != address(0)) {
+			mergedProps.copiesPerWalletLockedBy = overrideProps
+				.copiesPerWalletLockedBy;
+			mergedProps.copiesPerWallet = overrideProps.copiesPerWallet;
+		}
+
+		if (overrideProps.totalRemixesLockedBy != address(0)) {
+			mergedProps.totalRemixesLockedBy = overrideProps
+				.totalRemixesLockedBy;
+			mergedProps.totalRemixes = overrideProps.totalRemixes;
+		}
+
+		if (overrideProps.remixesPerWalletLockedBy != address(0)) {
+			mergedProps.remixesPerWalletLockedBy = overrideProps
+				.remixesPerWalletLockedBy;
+			mergedProps.remixesPerWallet = overrideProps.remixesPerWallet;
 		}
 
 		// Merge / validate properties
@@ -713,10 +754,14 @@ library LibMeem {
 			props.splits.push(newProps.splits[i]);
 		}
 
-		props.totalChildren = newProps.totalChildren;
-		props.totalChildrenLockedBy = newProps.totalChildrenLockedBy;
-		props.childrenPerWallet = newProps.childrenPerWallet;
-		props.childrenPerWalletLockedBy = newProps.childrenPerWalletLockedBy;
+		props.totalCopies = newProps.totalCopies;
+		props.totalCopiesLockedBy = newProps.totalCopiesLockedBy;
+		props.totalRemixes = newProps.totalRemixes;
+		props.totalRemixesLockedBy = newProps.totalRemixesLockedBy;
+		props.copiesPerWallet = newProps.copiesPerWallet;
+		props.copiesPerWalletLockedBy = newProps.copiesPerWalletLockedBy;
+		props.remixesPerWallet = newProps.remixesPerWallet;
+		props.remixesPerWalletLockedBy = newProps.remixesPerWalletLockedBy;
 		props.copyPermissionsLockedBy = newProps.copyPermissionsLockedBy;
 		props.remixPermissionsLockedBy = newProps.remixPermissionsLockedBy;
 		props.readPermissionsLockedBy = newProps.readPermissionsLockedBy;
@@ -803,74 +848,144 @@ library LibMeem {
 		revert InvalidPermissionType();
 	}
 
-	function setTotalChildren(
+	function setTotalCopies(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	) internal {
 		LibERC721.requireOwnsToken(tokenId);
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (newTotalChildren > -1) {
+		if (newTotalCopies > -1) {
 			if (
 				propertyType == PropertyType.Meem &&
-				uint256(newTotalChildren) < s.children[tokenId].length
+				uint256(newTotalCopies) < s.copies[tokenId].length
 			) {
-				revert InvalidTotalChildren(s.children[tokenId].length);
+				revert InvalidTotalCopies(s.copies[tokenId].length);
 			}
 		}
 
-		if (props.totalChildrenLockedBy != address(0)) {
-			revert PropertyLocked(props.totalChildrenLockedBy);
+		if (props.totalCopiesLockedBy != address(0)) {
+			revert PropertyLocked(props.totalCopiesLockedBy);
 		}
 
-		props.totalChildren = newTotalChildren;
-		emit TotalChildrenSet(tokenId, propertyType, newTotalChildren);
+		props.totalCopies = newTotalCopies;
+		emit TotalCopiesSet(tokenId, propertyType, newTotalCopies);
 	}
 
-	function lockTotalChildren(uint256 tokenId, PropertyType propertyType)
+	function lockTotalCopies(uint256 tokenId, PropertyType propertyType)
 		internal
 	{
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (props.totalChildrenLockedBy != address(0)) {
-			revert PropertyLocked(props.totalChildrenLockedBy);
+		if (props.totalCopiesLockedBy != address(0)) {
+			revert PropertyLocked(props.totalCopiesLockedBy);
 		}
 
-		props.totalChildrenLockedBy = msg.sender;
-		emit TotalChildrenLocked(tokenId, propertyType, msg.sender);
+		props.totalCopiesLockedBy = msg.sender;
+		emit TotalCopiesLocked(tokenId, propertyType, msg.sender);
 	}
 
-	function setChildrenPerWallet(
+	function setCopiesPerWallet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalChildren
+		int256 newTotalCopies
 	) internal {
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (props.childrenPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.childrenPerWalletLockedBy);
+		if (props.copiesPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.copiesPerWalletLockedBy);
 		}
 
-		props.childrenPerWallet = newTotalChildren;
-		emit ChildrenPerWalletSet(tokenId, propertyType, newTotalChildren);
+		props.copiesPerWallet = newTotalCopies;
+		emit CopiesPerWalletSet(tokenId, propertyType, newTotalCopies);
 	}
 
-	function lockChildrenPerWallet(uint256 tokenId, PropertyType propertyType)
+	function lockCopiesPerWallet(uint256 tokenId, PropertyType propertyType)
 		internal
 	{
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = getProperties(tokenId, propertyType);
 
-		if (props.childrenPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.childrenPerWalletLockedBy);
+		if (props.copiesPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.copiesPerWalletLockedBy);
 		}
 
-		props.childrenPerWalletLockedBy = msg.sender;
-		emit ChildrenPerWalletLocked(tokenId, propertyType, msg.sender);
+		props.copiesPerWalletLockedBy = msg.sender;
+		emit CopiesPerWalletLocked(tokenId, propertyType, msg.sender);
+	}
+
+	function setTotalRemixes(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (newTotalRemixes > -1) {
+			if (
+				propertyType == PropertyType.Meem &&
+				uint256(newTotalRemixes) < s.remixes[tokenId].length
+			) {
+				revert InvalidTotalRemixes(s.remixes[tokenId].length);
+			}
+		}
+
+		if (props.totalRemixesLockedBy != address(0)) {
+			revert PropertyLocked(props.totalRemixesLockedBy);
+		}
+
+		props.totalRemixes = newTotalRemixes;
+		emit TotalRemixesSet(tokenId, propertyType, newTotalRemixes);
+	}
+
+	function lockTotalRemixes(uint256 tokenId, PropertyType propertyType)
+		internal
+	{
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.totalRemixesLockedBy != address(0)) {
+			revert PropertyLocked(props.totalRemixesLockedBy);
+		}
+
+		props.totalRemixesLockedBy = msg.sender;
+		emit TotalRemixesLocked(tokenId, propertyType, msg.sender);
+	}
+
+	function setRemixesPerWallet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.remixesPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.remixesPerWalletLockedBy);
+		}
+
+		props.remixesPerWallet = newTotalRemixes;
+		emit RemixesPerWalletSet(tokenId, propertyType, newTotalRemixes);
+	}
+
+	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
+		internal
+	{
+		LibERC721.requireOwnsToken(tokenId);
+		MeemProperties storage props = getProperties(tokenId, propertyType);
+
+		if (props.remixesPerWalletLockedBy != address(0)) {
+			revert PropertyLocked(props.remixesPerWalletLockedBy);
+		}
+
+		props.remixesPerWalletLockedBy = msg.sender;
+		emit RemixesPerWalletLocked(tokenId, propertyType, msg.sender);
 	}
 
 	function requireValidMeem(
@@ -937,25 +1052,38 @@ library LibMeem {
 		}
 
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
-		uint256 currentChildren = s.children[tokenId].length;
+		// uint256 currentChildren = s.children[tokenId].length;
 
 		// Check total children
 		if (
-			parentProperties.totalChildren >= 0 &&
-			currentChildren + 1 > uint256(parentProperties.totalChildren)
+			meemType == MeemType.Copy &&
+			parentProperties.totalCopies >= 0 &&
+			s.copies[tokenId].length + 1 > uint256(parentProperties.totalCopies)
 		) {
-			revert TotalChildrenExceeded();
+			revert TotalCopiesExceeded();
+		} else if (
+			meemType == MeemType.Remix &&
+			parentProperties.totalRemixes >= 0 &&
+			s.remixes[tokenId].length + 1 >
+			uint256(parentProperties.totalRemixes)
+		) {
+			revert TotalRemixesExceeded();
 		}
 
-		// Check total children per wallet
-		uint256 numChildrenAlreadyHeld = s
-		.childrenOwnerTokens[tokenId][to].length;
 		if (
-			parentProperties.childrenPerWallet >= 0 &&
-			numChildrenAlreadyHeld + 1 >
-			uint256(parentProperties.childrenPerWallet)
+			meemType == MeemType.Copy &&
+			parentProperties.copiesPerWallet >= 0 &&
+			s.copiesOwnerTokens[tokenId][to].length + 1 >
+			uint256(parentProperties.copiesPerWallet)
 		) {
-			revert ChildrenPerWalletExceeded();
+			revert CopiesPerWalletExceeded();
+		} else if (
+			meemType == MeemType.Remix &&
+			parentProperties.remixesPerWallet >= 0 &&
+			s.remixesOwnerTokens[tokenId][to].length + 1 >
+			uint256(parentProperties.remixesPerWallet)
+		) {
+			revert RemixesPerWalletExceeded();
 		}
 
 		// Check permissions

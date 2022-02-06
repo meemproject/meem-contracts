@@ -83,7 +83,7 @@ describe('Minting Curation', function Test() {
 					isVerified: true,
 					mintedBy: copyAddress
 				},
-				meemMintData,
+				{ ...meemMintData, totalCopies: 1 },
 				meemMintData,
 				copyAddress
 			)

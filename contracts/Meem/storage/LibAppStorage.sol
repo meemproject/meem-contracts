@@ -45,11 +45,11 @@ library LibAppStorage {
 		/** The contract URI. Used to describe this NFT collection */
 		string contractURI;
 		/** The depth allowed for minting of children. If 0, no child copies are allowed. */
-		uint256 childDepth;
+		int256 childDepth;
 		/** Mapping of token => URIs for each token */
 		mapping(uint256 => string) tokenURIs;
 		/** Mapping of token to all children */
-		mapping(uint256 => uint256[]) children;
+		mapping(uint256 => uint256[]) remixes;
 		/** Mapping of token to all decendants */
 		mapping(uint256 => uint256[]) decendants;
 		/** Keeps track of assigned roles */
@@ -67,13 +67,15 @@ library LibAppStorage {
 		/** Keep track of tokens that have already been wrapped */
 		mapping(Chain => mapping(address => mapping(uint256 => uint256))) chainWrappedNFTs;
 		/** Mapping of (parent) tokenId to owners and the child tokenIds they own */
-		mapping(uint256 => mapping(address => uint256[])) childrenOwnerTokens;
+		mapping(uint256 => mapping(address => uint256[])) remixesOwnerTokens;
 		/** Keep track of original Meems */
 		uint256[] originalMeemTokens;
 		/** Index of tokenId => allTokens index */
 		mapping(uint256 => uint256) originalMeemTokensIndex;
 		/** MeemID contract address */
 		address meemID;
+		mapping(uint256 => uint256[]) copies;
+		mapping(uint256 => mapping(address => uint256[])) copiesOwnerTokens;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

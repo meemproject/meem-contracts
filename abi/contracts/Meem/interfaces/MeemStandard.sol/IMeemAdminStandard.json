@@ -2,9 +2,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "int256",
         "name": "newChildDepth",
-        "type": "uint256"
+        "type": "int256"
       }
     ],
     "name": "setChildDepth",

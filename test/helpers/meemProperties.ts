@@ -36,8 +36,12 @@ export const meemMintData = {
 		}
 	],
 	splitsLockedBy: '0x0000000000000000000000000000000000000000',
-	childrenPerWallet: -1,
-	childrenPerWalletLockedBy: '0x0000000000000000000000000000000000000000',
-	totalChildren: 99,
-	totalChildrenLockedBy: '0x0000000000000000000000000000000000000000'
+	copiesPerWallet: -1,
+	copiesPerWalletLockedBy: '0x0000000000000000000000000000000000000000',
+	totalCopies: 0,
+	totalCopiesLockedBy: '0x0000000000000000000000000000000000000000',
+	remixesPerWallet: -1,
+	remixesPerWalletLockedBy: '0x0000000000000000000000000000000000000000',
+	totalRemixes: -1,
+	totalRemixesLockedBy: '0x0000000000000000000000000000000000000000'
 }
