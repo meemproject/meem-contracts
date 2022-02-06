@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/meemproject/meem-contracts/compare/v1.9.2...v1.10.0) (2022-02-06)
+
+
+### Features
+
+* separate copies/remixes permissions instead of total children ([d4eef90](https://github.com/meemproject/meem-contracts/commit/d4eef90))
+
 ## [1.9.2](https://github.com/meemproject/meem-contracts/compare/v1.9.1...v1.9.2) (2022-02-03)
 
 ## [1.9.1](https://github.com/meemproject/meem-contracts/compare/v1.9.0...v1.9.1) (2022-02-03)
