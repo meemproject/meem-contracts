@@ -269,6 +269,26 @@ interface IMeemPermissionsStandard {
 		PropertyType propertyType,
 		address lockedBy
 	);
+	event TotalRemixesSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event TotalRemixesLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
+	event RemixesPerWalletSet(
+		uint256 tokenId,
+		PropertyType propertyType,
+		int256 newTotalRemixes
+	);
+	event RemixesPerWalletLocked(
+		uint256 tokenId,
+		PropertyType propertyType,
+		address lockedBy
+	);
 
 	event PermissionsSet(
 		uint256 tokenId,
