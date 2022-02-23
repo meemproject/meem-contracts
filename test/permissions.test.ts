@@ -381,7 +381,7 @@ describe('Minting Permissions', function Test() {
 		)
 	})
 
-	it('Respects address only minting', async () => {
+	it.only('Respects address only minting', async () => {
 		await (
 			await meemFacet.connect(signers[0]).mint(
 				{
@@ -421,7 +421,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isVerified: true,
 					mintedBy: signers[0].address
 				},
 				meemMintData,

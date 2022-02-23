@@ -216,7 +216,7 @@ interface IMeemAdminStandard {
 }
 
 interface IMeemSplitsStandard {
-	event SplitsSet(uint256 tokenId, Split[] splits);
+	event SplitsSet(uint256 tokenId, PropertyType propertyType, Split[] splits);
 
 	function nonOwnerSplitAllocationAmount() external view returns (uint256);
 

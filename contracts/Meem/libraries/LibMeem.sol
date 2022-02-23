@@ -21,7 +21,7 @@ library LibMeem {
 		PermissionType permissionType,
 		MeemPermission[] permission
 	);
-	event SplitsSet(uint256 tokenId, Split[] splits);
+	event SplitsSet(uint256 tokenId, PropertyType propertyType, Split[] splits);
 	event PropertiesSet(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -435,7 +435,7 @@ library LibMeem {
 			s.nonOwnerSplitAllocationAmount
 		);
 
-		emit SplitsSet(tokenId, props.splits);
+		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -457,7 +457,7 @@ library LibMeem {
 			LibERC721.ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
-		emit SplitsSet(tokenId, props.splits);
+		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -485,7 +485,7 @@ library LibMeem {
 		}
 
 		props.splits.pop();
-		emit SplitsSet(tokenId, props.splits);
+		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -512,7 +512,7 @@ library LibMeem {
 			LibERC721.ownerOf(tokenId),
 			s.nonOwnerSplitAllocationAmount
 		);
-		emit SplitsSet(tokenId, props.splits);
+		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
