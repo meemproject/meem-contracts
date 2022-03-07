@@ -213,6 +213,13 @@ interface IMeemAdminStandard {
 	function setMeemIDAddress(address meemID) external;
 
 	function verifyToken(uint256 tokenId) external;
+
+	function setTokenRoot(
+		uint256 tokenId,
+		Chain rootChain,
+		address root,
+		uint256 rootTokenId
+	) external;
 }
 
 interface IMeemSplitsStandard {
@@ -367,4 +374,27 @@ interface IMeemPermissionsStandard {
 
 	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external;
+}
+
+interface IClippingStandard {
+	event TokenClipped(uint256 tokenId, address addy);
+
+	function clip(uint256 tokenId) external;
+
+	function addressClippings(address addy)
+		external
+		view
+		returns (uint256[] memory);
+
+	function hasAddressClipped(uint256 tokenId, address addy)
+		external
+		view
+		returns (bool);
+
+	function clippings(uint256 tokenId)
+		external
+		view
+		returns (address[] memory);
+
+	function numClippings(uint256 tokenId) external view returns (uint256);
 }

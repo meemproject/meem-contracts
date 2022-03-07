@@ -6,19 +6,30 @@ import { deployDiamond } from '../tasks'
 import {
 	AccessControlFacet,
 	MeemAdminFacet,
+	MeemBaseFacet,
+	MeemQueryFacet,
 	MeemSplitsFacet,
 	Ownable
 } from '../typechain'
+import { meemMintData } from './helpers/meemProperties'
+import { Chain, MeemType } from './helpers/meemStandard'
+import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
+	let meemFacet: MeemBaseFacet
 	let adminFacet: MeemAdminFacet
 	let meemSplitsFacet: MeemSplitsFacet
 	let ownershipFacet: Ownable
 	let accessControlFacet: AccessControlFacet
+	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
 	const someUser = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
+	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
+	const owner = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
+	const parent = '0xc4A383d1Fd38EDe98F032759CE7Ed8f3F10c82B0'
+	const token0 = 100000
 
 	before(async () => {
 		signers = await ethers.getSigners()
@@ -26,6 +37,11 @@ describe('Contract Admin', function Test() {
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			ethers
 		})
+
+		meemFacet = (await ethers.getContractAt(
+			'MeemBaseFacet',
+			DiamondAddress
+		)) as MeemBaseFacet
 
 		meemSplitsFacet = (await ethers.getContractAt(
 			'MeemSplitsFacet',
@@ -46,6 +62,11 @@ describe('Contract Admin', function Test() {
 			'AccessControlFacet',
 			DiamondAddress
 		)) as AccessControlFacet
+
+		queryFacet = (await ethers.getContractAt(
+			'MeemQueryFacet',
+			DiamondAddress
+		)) as MeemQueryFacet
 	})
 
 	it('Assigns ownership to deployer', async () => {
@@ -120,5 +141,70 @@ describe('Contract Admin', function Test() {
 		await assert.isRejected(
 			accessControlFacet.connect(signers[1]).revokeRole(someUser, minterRole)
 		)
+	})
+
+	it('Can not set root as non-admin', async () => {
+		const { status } = await (
+			await meemFacet.connect(signers[1]).mint(
+				{
+					to: signers[4].address,
+					mTokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					meemType: MeemType.Original,
+					data: '',
+					isVerified: false,
+					mintedBy: signers[0].address
+				},
+				meemMintData,
+				meemMintData
+			)
+		).wait()
+		assert.equal(status, 1)
+
+		const token = await queryFacet.getMeem(token0)
+		assert.equal(token.root, zeroAddress)
+		assert.equal(token.rootTokenId.toNumber(), 0)
+
+		await assert.isRejected(
+			adminFacet
+				.connect(signers[1])
+				.setTokenRoot(token0, Chain.Ethereum, parent, 23)
+		)
+	})
+
+	it('Can set root as admin', async () => {
+		const { status } = await (
+			await meemFacet.connect(signers[1]).mint(
+				{
+					to: signers[4].address,
+					mTokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: 0,
+					meemType: MeemType.Original,
+					data: '',
+					isVerified: false,
+					mintedBy: signers[0].address
+				},
+				meemMintData,
+				meemMintData
+			)
+		).wait()
+		assert.equal(status, 1)
+
+		let token = await queryFacet.getMeem(token0)
+		assert.equal(token.root, zeroAddress)
+		assert.equal(token.rootTokenId.toNumber(), 0)
+
+		await adminFacet
+			.connect(signers[0])
+			.setTokenRoot(token0, Chain.Ethereum, parent, 23)
+
+		token = await queryFacet.getMeem(token0)
+		assert.equal(token.root, parent)
+		assert.equal(token.rootChain, Chain.Ethereum)
+		assert.equal(token.rootTokenId.toNumber(), 23)
 	})
 })

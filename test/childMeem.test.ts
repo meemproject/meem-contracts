@@ -18,6 +18,7 @@ describe('Child Meem Minting', function Test() {
 	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 	const token0 = 100000
 	const token1 = 100001
+	const token2 = 100002
 
 	before(async () => {
 		signers = await ethers.getSigners()
