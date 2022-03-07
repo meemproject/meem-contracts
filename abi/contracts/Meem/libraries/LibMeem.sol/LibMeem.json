@@ -383,6 +383,12 @@
         "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "enum PropertyType",
+        "name": "propertyType",
+        "type": "uint8"
+      },
+      {
         "components": [
           {
             "internalType": "address",
@@ -407,6 +413,25 @@
       }
     ],
     "name": "SplitsSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "addy",
+        "type": "address"
+      }
+    ],
+    "name": "TokenClipped",
     "type": "event"
   },
   {

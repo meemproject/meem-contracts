@@ -76,6 +76,13 @@ library LibAppStorage {
 		address meemID;
 		mapping(uint256 => uint256[]) copies;
 		mapping(uint256 => mapping(address => uint256[])) copiesOwnerTokens;
+		/** Keep track of "clipped" meems */
+		/** tokenId => array of addresses that have clipped */
+		mapping(uint256 => address[]) clippings;
+		/** address => tokenIds */
+		mapping(address => uint256[]) addressClippings;
+		/** address => tokenId with flag to check if it has already been clipped */
+		mapping(address => mapping(uint256 => bool)) addressHasClipped;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

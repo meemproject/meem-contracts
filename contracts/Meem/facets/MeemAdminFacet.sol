@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {IMeemAdminStandard} from '../interfaces/MeemStandard.sol';
+import {IMeemAdminStandard, Chain} from '../interfaces/MeemStandard.sol';
 import {InvalidNonOwnerSplitAllocationAmount} from '../libraries/Errors.sol';
 
 contract MeemAdminFacet is IMeemAdminStandard {
@@ -50,5 +50,19 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 
 		s.meems[tokenId].verifiedBy = msg.sender;
+	}
+
+	function setTokenRoot(
+		uint256 tokenId,
+		Chain rootChain,
+		address root,
+		uint256 rootTokenId
+	) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+
+		s.meems[tokenId].rootChain = rootChain;
+		s.meems[tokenId].root = root;
+		s.meems[tokenId].rootTokenId = rootTokenId;
 	}
 }

@@ -68,6 +68,7 @@ export async function deployDiamond(options: {
 
 	const facets: Record<string, Ethers.Contract | null> = {
 		AccessControlFacet: null,
+		ClippingFacet: null,
 		ERC721Facet: null,
 		InitDiamond: null,
 		MeemAdminFacet: null,
