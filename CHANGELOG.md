@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/meemproject/meem-contracts/compare/v1.10.0...v1.11.0) (2022-03-07)
+
+
+### Features
+
+* clipping of meems ([9de4228](https://github.com/meemproject/meem-contracts/commit/9de4228))
+
 # [1.10.0](https://github.com/meemproject/meem-contracts/compare/v1.9.2...v1.10.0) (2022-02-06)
 
 
