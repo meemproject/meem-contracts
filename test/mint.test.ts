@@ -166,7 +166,6 @@ describe('Minting', function Test() {
 
 	it('Can create and transfer child meem', async () => {
 		const m = await queryFacet.getMeem(token0)
-		console.log(m)
 		const { status } = await (
 			await meemFacet.connect(signers[0]).mint(
 				{
@@ -191,7 +190,7 @@ describe('Minting', function Test() {
 		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, signers[2].address)
 		assert.equal(meem.parent, contractAddress)
-		assert.equal(meem.root, zeroAddress)
+		assert.equal(meem.root, contractAddress)
 
 		const ca = await erc721Facet.contractAddress()
 		console.log({ contractAddress: ca })
@@ -207,7 +206,7 @@ describe('Minting', function Test() {
 		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, owner)
 		assert.equal(meem.parent, contractAddress)
-		assert.equal(meem.root, zeroAddress)
+		assert.equal(meem.root, contractAddress)
 
 		const o = await erc721Facet.ownerOf(token2)
 		assert.equal(o, owner)
