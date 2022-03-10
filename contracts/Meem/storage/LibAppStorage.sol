@@ -81,8 +81,12 @@ library LibAppStorage {
 		mapping(uint256 => address[]) clippings;
 		/** address => tokenIds */
 		mapping(address => uint256[]) addressClippings;
-		/** address => tokenId with flag to check if it has already been clipped */
-		mapping(address => mapping(uint256 => bool)) addressHasClipped;
+		/** address => tokenId => index */
+		mapping(address => mapping(uint256 => uint256)) clippingsIndex;
+		/** address => tokenId => index */
+		mapping(address => mapping(uint256 => uint256)) addressClippingsIndex;
+		/** address => tokenId => index */
+		mapping(address => mapping(uint256 => bool)) hasAddressClipped;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

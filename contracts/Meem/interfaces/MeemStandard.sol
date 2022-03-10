@@ -379,7 +379,11 @@ interface IMeemPermissionsStandard {
 interface IClippingStandard {
 	event TokenClipped(uint256 tokenId, address addy);
 
+	event TokenUnClipped(uint256 tokenId, address addy);
+
 	function clip(uint256 tokenId) external;
+
+	function unClip(uint256 tokenId) external;
 
 	function addressClippings(address addy)
 		external

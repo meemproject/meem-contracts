@@ -77,3 +77,5 @@ error InvalidMeemType();
 error InvalidToken();
 
 error AlreadyClipped();
+
+error NotClipped();

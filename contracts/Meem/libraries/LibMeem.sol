@@ -6,9 +6,10 @@ import '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibArray} from '../libraries/LibArray.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -69,6 +70,8 @@ library LibMeem {
 	);
 
 	event TokenClipped(uint256 tokenId, address addy);
+
+	event TokenUnClipped(uint256 tokenId, address addy);
 
 	function getRaribleV2Royalties(uint256 tokenId)
 		internal
@@ -1163,15 +1166,41 @@ library LibMeem {
 	function clip(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		if (s.addressHasClipped[msg.sender][tokenId]) {
+		if (s.hasAddressClipped[msg.sender][tokenId]) {
 			revert AlreadyClipped();
 		}
 
 		s.clippings[tokenId].push(msg.sender);
 		s.addressClippings[msg.sender].push(tokenId);
-		s.addressHasClipped[msg.sender][tokenId] = true;
+		s.clippingsIndex[msg.sender][tokenId] = s.clippings[tokenId].length - 1;
+		s.addressClippingsIndex[msg.sender][tokenId] =
+			s.addressClippings[msg.sender].length -
+			1;
+		s.hasAddressClipped[msg.sender][tokenId] = true;
 
 		emit TokenClipped(tokenId, msg.sender);
+	}
+
+	function unClip(uint256 tokenId) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (!s.hasAddressClipped[msg.sender][tokenId]) {
+			revert NotClipped();
+		}
+
+		LibArray.removeAt(
+			s.clippings[tokenId],
+			s.clippingsIndex[msg.sender][tokenId]
+		);
+		LibArray.removeAt(
+			s.addressClippings[msg.sender],
+			s.addressClippingsIndex[msg.sender][tokenId]
+		);
+		s.clippingsIndex[msg.sender][tokenId] = 0;
+		s.addressClippingsIndex[msg.sender][tokenId] = 0;
+		s.hasAddressClipped[msg.sender][tokenId] = false;
+
+		emit TokenUnClipped(tokenId, msg.sender);
 	}
 
 	function tokenClippings(uint256 tokenId)
@@ -1198,7 +1227,7 @@ library LibMeem {
 		returns (bool)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.addressHasClipped[addy][tokenId];
+		return s.clippingsIndex[addy][tokenId] != 0;
 	}
 
 	function clippings(uint256 tokenId)
