@@ -33,13 +33,13 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		LibMeem.mint(
 			MeemMintParameters({
 				to: toCopyAddress,
-				mTokenURI: params.mTokenURI,
+				tokenURI: params.tokenURI,
 				parentChain: params.parentChain,
 				parent: address(this),
 				parentTokenId: tokenId,
 				meemType: MeemType.Copy,
 				data: params.data,
-				isVerified: params.isVerified,
+				isDataLocked: params.isDataLocked,
 				mintedBy: params.mintedBy
 			}),
 			properties,
@@ -62,13 +62,13 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		LibMeem.mint(
 			MeemMintParameters({
 				to: remixParams.to,
-				mTokenURI: remixParams.mTokenURI,
+				tokenURI: remixParams.tokenURI,
 				parentChain: remixParams.parentChain,
 				parent: address(this),
 				parentTokenId: tokenId,
 				meemType: MeemType.Remix,
 				data: remixParams.data,
-				isVerified: remixParams.isVerified,
+				isDataLocked: remixParams.isDataLocked,
 				mintedBy: remixParams.mintedBy
 			}),
 			remixProperties,

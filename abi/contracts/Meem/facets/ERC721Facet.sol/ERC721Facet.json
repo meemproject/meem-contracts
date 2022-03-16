@@ -32,11 +32,6 @@
   },
   {
     "inputs": [],
-    "name": "MeemNotVerified",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "NoApproveSelf",
     "type": "error"
   },

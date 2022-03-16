@@ -76,7 +76,7 @@ struct MeemBase {
 	uint256 generation;
 	uint256 mintedAt;
 	string data;
-	address verifiedBy;
+	address dataLockedBy;
 	MeemType meemType;
 	address mintedBy;
 }
@@ -94,7 +94,7 @@ struct Meem {
 	MeemProperties childProperties;
 	uint256 mintedAt;
 	string data;
-	address verifiedBy;
+	address dataLockedBy;
 	MeemType meemType;
 	address mintedBy;
 }
@@ -107,13 +107,13 @@ struct WrappedItem {
 
 struct MeemMintParameters {
 	address to;
-	string mTokenURI;
+	string tokenURI;
 	Chain parentChain;
 	address parent;
 	uint256 parentTokenId;
 	MeemType meemType;
 	string data;
-	bool isVerified;
+	bool isDataLocked;
 	address mintedBy;
 }
 
@@ -211,8 +211,6 @@ interface IMeemAdminStandard {
 	function setContractURI(string memory newContractURI) external;
 
 	function setMeemIDAddress(address meemID) external;
-
-	function verifyToken(uint256 tokenId) external;
 
 	function setTokenRoot(
 		uint256 tokenId,

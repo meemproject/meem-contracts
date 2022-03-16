@@ -94,11 +94,6 @@
   },
   {
     "inputs": [],
-    "name": "NoCopyUnverified",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "NoPermission",
     "type": "error"
   },
@@ -351,7 +346,7 @@
           },
           {
             "internalType": "string",
-            "name": "mTokenURI",
+            "name": "tokenURI",
             "type": "string"
           },
           {
@@ -381,7 +376,7 @@
           },
           {
             "internalType": "bool",
-            "name": "isVerified",
+            "name": "isDataLocked",
             "type": "bool"
           },
           {
@@ -751,7 +746,7 @@
           },
           {
             "internalType": "string",
-            "name": "mTokenURI",
+            "name": "tokenURI",
             "type": "string"
           },
           {
@@ -781,7 +776,7 @@
           },
           {
             "internalType": "bool",
-            "name": "isVerified",
+            "name": "isDataLocked",
             "type": "bool"
           },
           {
@@ -1156,7 +1151,7 @@
           },
           {
             "internalType": "string",
-            "name": "mTokenURI",
+            "name": "tokenURI",
             "type": "string"
           },
           {
@@ -1186,7 +1181,7 @@
           },
           {
             "internalType": "bool",
-            "name": "isVerified",
+            "name": "isDataLocked",
             "type": "bool"
           },
           {
@@ -1548,7 +1543,7 @@
           },
           {
             "internalType": "string",
-            "name": "mTokenURI",
+            "name": "tokenURI",
             "type": "string"
           },
           {
@@ -1578,7 +1573,7 @@
           },
           {
             "internalType": "bool",
-            "name": "isVerified",
+            "name": "isDataLocked",
             "type": "bool"
           },
           {

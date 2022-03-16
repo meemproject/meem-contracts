@@ -435,7 +435,7 @@
           },
           {
             "internalType": "address",
-            "name": "verifiedBy",
+            "name": "dataLockedBy",
             "type": "address"
           },
           {

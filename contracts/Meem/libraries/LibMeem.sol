@@ -119,7 +119,7 @@ library LibMeem {
 			params.meemType != MeemType.Copy &&
 			!LibStrings.compareStrings(
 				'ipfs://',
-				LibStrings.substring(params.mTokenURI, 0, 7)
+				LibStrings.substring(params.tokenURI, 0, 7)
 			)
 		) {
 			revert InvalidURI();
@@ -131,9 +131,8 @@ library LibMeem {
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
-		if (params.isVerified) {
-			LibAccessControl.requireRole(s.MINTER_ROLE);
-			s.meems[tokenId].verifiedBy = msg.sender;
+		if (params.isDataLocked) {
+			s.meems[tokenId].dataLockedBy = msg.sender;
 		}
 
 		s.meems[tokenId].parentChain = params.parentChain;
@@ -166,18 +165,18 @@ library LibMeem {
 			);
 
 			// If parent is verified, this child is also verified
-			if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
-				s.meems[tokenId].verifiedBy = address(this);
-			}
+			// if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
+			// 	s.meems[tokenId].verifiedBy = address(this);
+			// }
 
 			if (params.meemType == MeemType.Copy) {
-				if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
-					revert NoCopyUnverified();
-				}
+				// if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
+				// 	revert NoCopyUnverified();
+				// }
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
 			} else {
-				s.tokenURIs[tokenId] = params.mTokenURI;
+				s.tokenURIs[tokenId] = params.tokenURI;
 				s.meems[tokenId].meemType = MeemType.Remix;
 			}
 
@@ -219,7 +218,7 @@ library LibMeem {
 			s.meems[tokenId].root = params.parent;
 			s.meems[tokenId].rootTokenId = params.parentTokenId;
 			s.meems[tokenId].rootChain = params.parentChain;
-			s.tokenURIs[tokenId] = params.mTokenURI;
+			s.tokenURIs[tokenId] = params.tokenURI;
 			if (params.parent == address(0)) {
 				if (params.meemType != MeemType.Original) {
 					revert InvalidMeemType();
@@ -550,7 +549,7 @@ library LibMeem {
 			isCopy
 				? s.meems[s.meems[tokenId].parentTokenId].data
 				: s.meems[tokenId].data,
-			s.meems[tokenId].verifiedBy,
+			s.meems[tokenId].dataLockedBy,
 			s.meems[tokenId].meemType,
 			s.meems[tokenId].mintedBy
 		);

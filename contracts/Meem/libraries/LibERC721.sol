@@ -450,9 +450,9 @@ library LibERC721 {
 			revert ToAddressInvalid(address(0));
 		}
 
-		if (s.meems[tokenId].verifiedBy == address(0)) {
-			revert MeemNotVerified();
-		}
+		// if (s.meems[tokenId].verifiedBy == address(0)) {
+		// 	revert MeemNotVerified();
+		// }
 
 		// Clear approvals from the previous owner
 		_approve(address(0), tokenId);
