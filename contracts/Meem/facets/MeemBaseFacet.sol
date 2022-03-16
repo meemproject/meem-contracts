@@ -39,8 +39,9 @@ contract MeemBaseFacet is IMeemBaseStandard {
 				parentTokenId: tokenId,
 				meemType: MeemType.Copy,
 				data: params.data,
-				isDataLocked: params.isDataLocked,
-				mintedBy: params.mintedBy
+				isURILocked: params.isURILocked,
+				mintedBy: params.mintedBy,
+				uriSource: params.uriSource
 			}),
 			properties,
 			childProperties
@@ -68,8 +69,9 @@ contract MeemBaseFacet is IMeemBaseStandard {
 				parentTokenId: tokenId,
 				meemType: MeemType.Remix,
 				data: remixParams.data,
-				isDataLocked: remixParams.isDataLocked,
-				mintedBy: remixParams.mintedBy
+				isURILocked: remixParams.isURILocked,
+				mintedBy: remixParams.mintedBy,
+				uriSource: remixParams.uriSource
 			}),
 			remixProperties,
 			remixChildProperties

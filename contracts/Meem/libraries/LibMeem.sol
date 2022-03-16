@@ -2,14 +2,14 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import '../interfaces/MeemStandard.sol';
+import {WrappedItem, IMeemPermissionsStandard, PropertyType, PermissionType, MeemPermission, MeemProperties, Split, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission} from '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped, URILocked} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -73,6 +73,14 @@ library LibMeem {
 
 	event TokenUnClipped(uint256 tokenId, address addy);
 
+	event URISourceSet(uint256 tokenId, URISource uriSource);
+
+	event URISet(uint256 tokenId, string uri);
+
+	event URILockedBySet(uint256 tokenId, address lockedBy);
+
+	event DataSet(uint256 tokenId, string data);
+
 	function getRaribleV2Royalties(uint256 tokenId)
 		internal
 		view
@@ -116,7 +124,8 @@ library LibMeem {
 
 		// Require IPFS uri
 		if (
-			params.meemType != MeemType.Copy &&
+			params.uriSource != URISource.Data &&
+			params.isURILocked &&
 			!LibStrings.compareStrings(
 				'ipfs://',
 				LibStrings.substring(params.tokenURI, 0, 7)
@@ -131,8 +140,8 @@ library LibMeem {
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
-		if (params.isDataLocked) {
-			s.meems[tokenId].dataLockedBy = msg.sender;
+		if (params.isURILocked) {
+			s.meems[tokenId].uriLockedBy = msg.sender;
 		}
 
 		s.meems[tokenId].parentChain = params.parentChain;
@@ -549,9 +558,10 @@ library LibMeem {
 			isCopy
 				? s.meems[s.meems[tokenId].parentTokenId].data
 				: s.meems[tokenId].data,
-			s.meems[tokenId].dataLockedBy,
+			s.meems[tokenId].uriLockedBy,
 			s.meems[tokenId].meemType,
-			s.meems[tokenId].mintedBy
+			s.meems[tokenId].mintedBy,
+			s.meems[tokenId].uriSource
 		);
 
 		return meem;
@@ -1241,5 +1251,62 @@ library LibMeem {
 	function numClippings(uint256 tokenId) internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.clippings[tokenId].length;
+	}
+
+	function setData(uint256 tokenId, string memory data) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.meems[tokenId].data = data;
+		emit DataSet(tokenId, s.meems[tokenId].data);
+	}
+
+	function lockUri(uint256 tokenId) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		// Require IPFS uri or URI type to be data
+		if (
+			s.meems[tokenId].uriSource != URISource.Data &&
+			!LibStrings.compareStrings(
+				'ipfs://',
+				LibStrings.substring(s.tokenURIs[tokenId], 0, 7)
+			)
+		) {
+			revert InvalidURI();
+		}
+
+		s.meems[tokenId].uriLockedBy = msg.sender;
+
+		emit URILockedBySet(tokenId, s.meems[tokenId].uriLockedBy);
+	}
+
+	function setURISource(uint256 tokenId, URISource uriSource) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.meems[tokenId].uriSource = uriSource;
+		emit URISourceSet(tokenId, uriSource);
+	}
+
+	function setTokenUri(uint256 tokenId, string memory uri) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.tokenURIs[tokenId] = uri;
+
+		emit URISet(tokenId, uri);
 	}
 }

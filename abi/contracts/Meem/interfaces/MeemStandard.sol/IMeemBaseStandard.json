@@ -230,13 +230,18 @@
           },
           {
             "internalType": "bool",
-            "name": "isDataLocked",
+            "name": "isURILocked",
             "type": "bool"
           },
           {
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -630,13 +635,18 @@
           },
           {
             "internalType": "bool",
-            "name": "isDataLocked",
+            "name": "isURILocked",
             "type": "bool"
           },
           {
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -1035,13 +1045,18 @@
           },
           {
             "internalType": "bool",
-            "name": "isDataLocked",
+            "name": "isURILocked",
             "type": "bool"
           },
           {
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -1427,13 +1442,18 @@
           },
           {
             "internalType": "bool",
-            "name": "isDataLocked",
+            "name": "isURILocked",
             "type": "bool"
           },
           {
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
           }
         ],
         "internalType": "struct MeemMintParameters",

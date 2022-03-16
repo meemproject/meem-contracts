@@ -435,7 +435,7 @@
           },
           {
             "internalType": "address",
-            "name": "dataLockedBy",
+            "name": "uriLockedBy",
             "type": "address"
           },
           {
@@ -447,6 +447,11 @@
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
           }
         ],
         "internalType": "struct Meem",

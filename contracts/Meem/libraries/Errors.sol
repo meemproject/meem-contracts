@@ -79,3 +79,5 @@ error InvalidToken();
 error AlreadyClipped();
 
 error NotClipped();
+
+error URILocked();

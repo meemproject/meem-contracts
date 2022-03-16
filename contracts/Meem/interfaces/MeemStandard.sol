@@ -34,6 +34,11 @@ enum MeemType {
 	Wrapped
 }
 
+enum URISource {
+	TokenURI,
+	Data
+}
+
 struct Split {
 	address toAddress;
 	uint256 amount;
@@ -76,9 +81,10 @@ struct MeemBase {
 	uint256 generation;
 	uint256 mintedAt;
 	string data;
-	address dataLockedBy;
+	address uriLockedBy;
 	MeemType meemType;
 	address mintedBy;
+	URISource uriSource;
 }
 
 struct Meem {
@@ -94,9 +100,10 @@ struct Meem {
 	MeemProperties childProperties;
 	uint256 mintedAt;
 	string data;
-	address dataLockedBy;
+	address uriLockedBy;
 	MeemType meemType;
 	address mintedBy;
+	URISource uriSource;
 }
 
 struct WrappedItem {
@@ -113,8 +120,9 @@ struct MeemMintParameters {
 	uint256 parentTokenId;
 	MeemType meemType;
 	string data;
-	bool isDataLocked;
+	bool isURILocked;
 	address mintedBy;
+	URISource uriSource;
 }
 
 interface IMeemBaseStandard {
@@ -302,6 +310,14 @@ interface IMeemPermissionsStandard {
 		MeemPermission[] permission
 	);
 
+	event URISourceSet(uint256 tokenId, URISource uriSource);
+
+	event URISet(uint256 tokenId, string uri);
+
+	event URILockedBySet(uint256 tokenId, address lockedBy);
+
+	event DataSet(uint256 tokenId, string data);
+
 	function lockPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -372,6 +388,14 @@ interface IMeemPermissionsStandard {
 
 	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external;
+
+	function setData(uint256 tokenId, string memory data) external;
+
+	function lockUri(uint256 tokenId) external;
+
+	function setURISource(uint256 tokenId, URISource uriSource) external;
+
+	function setTokenUri(uint256 tokenId, string memory uri) external;
 }
 
 interface IClippingStandard {

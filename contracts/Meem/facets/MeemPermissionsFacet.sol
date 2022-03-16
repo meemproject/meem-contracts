@@ -6,7 +6,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard} from '../interfaces/MeemStandard.sol';
+import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard, URISource} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
@@ -130,5 +130,24 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 			idx,
 			permission
 		);
+	}
+
+	function setData(uint256 tokenId, string memory data) external override {
+		LibMeem.setData(tokenId, data);
+	}
+
+	function lockUri(uint256 tokenId) external override {
+		LibMeem.lockUri(tokenId);
+	}
+
+	function setURISource(uint256 tokenId, URISource uriSource)
+		external
+		override
+	{
+		LibMeem.setURISource(tokenId, uriSource);
+	}
+
+	function setTokenUri(uint256 tokenId, string memory uri) external override {
+		LibMeem.setTokenUri(tokenId, uri);
 	}
 }
