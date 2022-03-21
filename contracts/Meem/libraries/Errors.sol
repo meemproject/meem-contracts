@@ -81,3 +81,7 @@ error AlreadyClipped();
 error NotClipped();
 
 error URILocked();
+
+error AlreadyReacted();
+
+error ReactionNotFound();

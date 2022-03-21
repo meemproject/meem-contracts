@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType } from './helpers/meemStandard'
+import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 
 chai.use(chaiAsPromised)
 
@@ -42,13 +42,15 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[0].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent,
 					parentTokenId: 0,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false,
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
 				{
@@ -96,13 +98,15 @@ describe('Child Meem Minting', function Test() {
 			meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
 				meemMintData,
@@ -132,13 +136,15 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
 				mintData,
@@ -172,13 +178,15 @@ describe('Child Meem Minting', function Test() {
 		await meemFacet.connect(signers[2]).mint(
 			{
 				to: signers[4].address,
-				mTokenURI: ipfsURL,
+				tokenURI: ipfsURL,
 				parentChain: Chain.Polygon,
 				parent: contractAddress,
 				parentTokenId: token0,
 				meemType: MeemType.Remix,
 				data: '',
-				isVerified: false,
+				isURILocked: false,
+				reactionTypes: [],
+				uriSource: UriSource.TokenUri,
 				mintedBy: signers[0].address
 			},
 			mintData,
@@ -207,13 +215,15 @@ describe('Child Meem Minting', function Test() {
 			await meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
 				mintData,
@@ -247,13 +257,15 @@ describe('Child Meem Minting', function Test() {
 			meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token1,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false,
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
 				mintData,

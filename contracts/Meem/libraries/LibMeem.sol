@@ -561,7 +561,8 @@ library LibMeem {
 			s.meems[tokenId].uriLockedBy,
 			s.meems[tokenId].meemType,
 			s.meems[tokenId].mintedBy,
-			s.meems[tokenId].uriSource
+			s.meems[tokenId].uriSource,
+			s.meems[tokenId].reactionTypes
 		);
 
 		return meem;

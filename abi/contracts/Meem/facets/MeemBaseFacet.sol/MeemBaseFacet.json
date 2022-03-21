@@ -388,6 +388,11 @@
             "internalType": "enum URISource",
             "name": "uriSource",
             "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "reactionTypes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -793,6 +798,11 @@
             "internalType": "enum URISource",
             "name": "uriSource",
             "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "reactionTypes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -1203,6 +1213,11 @@
             "internalType": "enum URISource",
             "name": "uriSource",
             "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "reactionTypes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct MeemMintParameters",
@@ -1600,6 +1615,11 @@
             "internalType": "enum URISource",
             "name": "uriSource",
             "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "reactionTypes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct MeemMintParameters",

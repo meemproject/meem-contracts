@@ -31,4 +31,19 @@ library LibArray {
 		array.pop();
 		return array;
 	}
+
+	function removeAt(string[] storage array, uint256 index)
+		internal
+		returns (string[] memory)
+	{
+		if (index >= array.length) {
+			revert('Index out of range');
+		}
+
+		for (uint256 i = index; i < array.length - 1; i++) {
+			array[i] = array[i + 1];
+		}
+		array.pop();
+		return array;
+	}
 }

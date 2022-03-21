@@ -10,7 +10,12 @@ import {
 	MeemSplitsFacet
 } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType, PropertyType } from './helpers/meemStandard'
+import {
+	Chain,
+	MeemType,
+	PropertyType,
+	UriSource
+} from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -64,14 +69,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -119,14 +126,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -174,14 +183,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -242,14 +253,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -286,14 +299,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -325,14 +340,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -364,14 +381,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -409,14 +428,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,
@@ -453,14 +474,16 @@ describe('Set Splits', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: []
 				},
 				{
 					...meemMintData,

@@ -85,6 +85,7 @@ struct MeemBase {
 	MeemType meemType;
 	address mintedBy;
 	URISource uriSource;
+	string[] reactionTypes;
 }
 
 struct Meem {
@@ -104,6 +105,7 @@ struct Meem {
 	MeemType meemType;
 	address mintedBy;
 	URISource uriSource;
+	string[] reactionTypes;
 }
 
 struct WrappedItem {
@@ -123,6 +125,12 @@ struct MeemMintParameters {
 	bool isURILocked;
 	address mintedBy;
 	URISource uriSource;
+	string[] reactionTypes;
+}
+
+struct Reaction {
+	string reaction;
+	uint256 count;
 }
 
 interface IMeemBaseStandard {
@@ -423,4 +431,40 @@ interface IClippingStandard {
 		returns (address[] memory);
 
 	function numClippings(uint256 tokenId) external view returns (uint256);
+}
+
+interface IReactionStandard {
+	event TokenReactionAdded(
+		uint256 tokenId,
+		address addy,
+		string reaction,
+		uint256 newTotalReactions
+	);
+
+	event TokenReactionRemoved(
+		uint256 tokenId,
+		address addy,
+		string reaction,
+		uint256 newTotalReactions
+	);
+
+	event TokenReactionTypesSet(uint256 tokenId, string[] reactionTypes);
+
+	function addReaction(uint256 tokenId, string memory reaction) external;
+
+	function removeReaction(uint256 tokenId, string memory reaction) external;
+
+	function getReactedAt(
+		uint256 tokenId,
+		address addy,
+		string memory reaction
+	) external view returns (uint256);
+
+	function setReactionTypes(uint256 tokenId, string[] memory reactionTypes)
+		external;
+
+	function getReactions(uint256 tokenId)
+		external
+		view
+		returns (Reaction[] memory);
 }

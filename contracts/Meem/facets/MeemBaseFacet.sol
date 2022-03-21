@@ -41,7 +41,8 @@ contract MeemBaseFacet is IMeemBaseStandard {
 				data: params.data,
 				isURILocked: params.isURILocked,
 				mintedBy: params.mintedBy,
-				uriSource: params.uriSource
+				uriSource: params.uriSource,
+				reactionTypes: params.reactionTypes
 			}),
 			properties,
 			childProperties
@@ -71,7 +72,8 @@ contract MeemBaseFacet is IMeemBaseStandard {
 				data: remixParams.data,
 				isURILocked: remixParams.isURILocked,
 				mintedBy: remixParams.mintedBy,
-				uriSource: remixParams.uriSource
+				uriSource: remixParams.uriSource,
+				reactionTypes: remixParams.reactionTypes
 			}),
 			remixProperties,
 			remixChildProperties
