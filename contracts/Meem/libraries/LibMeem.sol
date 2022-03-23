@@ -9,7 +9,7 @@ import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped, URILocked} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped, URILocked, IncorrectMsgValue} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -150,6 +150,7 @@ library LibMeem {
 		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
+		s.meems[tokenId].reactionTypes = params.reactionTypes;
 
 		if (
 			params.mintedBy != address(0) &&
@@ -172,6 +173,7 @@ library LibMeem {
 				params.meemType,
 				params.parentTokenId
 			);
+			handleSaleDistribution(params.parentTokenId);
 
 			// If parent is verified, this child is also verified
 			// if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
@@ -854,6 +856,31 @@ library LibMeem {
 		}
 	}
 
+	function handleSaleDistribution(uint256 tokenId) internal {
+		if (msg.value == 0) {
+			return;
+		}
+
+		uint256 leftover = msg.value;
+
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		for (uint256 i = 0; i < s.meemProperties[tokenId].splits.length; i++) {
+			uint256 amt = (msg.value *
+				s.meemProperties[tokenId].splits[i].amount) / 10000;
+
+			address payable receiver = payable(
+				s.meemProperties[tokenId].splits[i].toAddress
+			);
+
+			receiver.transfer(amt);
+			leftover = leftover - amt;
+		}
+
+		if (leftover > 0) {
+			payable(s.meems[tokenId].owner).transfer(leftover);
+		}
+	}
+
 	function getPermissions(
 		MeemProperties storage self,
 		PermissionType permissionType
@@ -1114,6 +1141,9 @@ library LibMeem {
 		);
 
 		bool hasPermission = false;
+		bool hasCostBeenSet = false;
+		uint256 costWei = 0;
+
 		for (uint256 i = 0; i < perms.length; i++) {
 			MeemPermission storage perm = perms[i];
 			if (
@@ -1124,8 +1154,9 @@ library LibMeem {
 					parent.owner == msg.sender)
 			) {
 				hasPermission = true;
-				break;
-			} else if (perm.permission == Permission.Addresses) {
+			}
+
+			if (perm.permission == Permission.Addresses) {
 				// Allowed if to is in the list of approved addresses
 				for (uint256 j = 0; j < perm.addresses.length; j++) {
 					if (perm.addresses[j] == msg.sender) {
@@ -1133,15 +1164,24 @@ library LibMeem {
 						break;
 					}
 				}
-
-				if (hasPermission) {
-					break;
-				}
 			}
+
+			if (
+				hasPermission &&
+				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
+			) {
+				costWei = perm.costWei;
+				hasCostBeenSet = true;
+			}
+			// TODO: Check external token holders on same network
 		}
 
 		if (!hasPermission) {
 			revert NoPermission();
+		}
+
+		if (costWei != msg.value) {
+			revert IncorrectMsgValue();
 		}
 	}
 

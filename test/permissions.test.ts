@@ -362,7 +362,8 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					]
 				},
@@ -436,7 +437,8 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						}
 					]
 				},
@@ -531,13 +533,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					]
 				},
@@ -609,7 +613,7 @@ describe('Minting Permissions', function Test() {
 		)
 	})
 
-	it.only('Can lock permissions', async () => {
+	it('Can lock permissions', async () => {
 		await (
 			await meemFacet.connect(signers[0]).mint(
 				{
@@ -632,13 +636,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					remixPermissions: [
@@ -646,13 +652,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					readPermissions: [
@@ -660,13 +668,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					copyPermissionsLockedBy: signers[2].address,
@@ -680,13 +690,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					remixPermissions: [
@@ -694,13 +706,15 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					readPermissions: [
@@ -708,18 +722,23 @@ describe('Minting Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: 0
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: signers[2].address,
-							addresses: []
+							addresses: [],
+							costWei: 0
 						}
 					],
 					copyPermissionsLockedBy: signers[2].address,
 					remixPermissionsLockedBy: signers[2].address,
 					readPermissionsLockedBy: signers[2].address
+				},
+				{
+					value: ethers.utils.parseEther('0.01')
 				}
 			)
 		).wait()

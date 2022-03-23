@@ -85,3 +85,5 @@ error URILocked();
 error AlreadyReacted();
 
 error ReactionNotFound();
+
+error IncorrectMsgValue();

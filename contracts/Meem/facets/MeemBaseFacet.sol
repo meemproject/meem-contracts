@@ -16,7 +16,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external override {
+	) external payable override {
 		LibMeem.mint(params, properties, childProperties);
 	}
 
@@ -25,7 +25,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemProperties memory properties,
 		MeemProperties memory childProperties,
 		address toCopyAddress
-	) external override {
+	) external payable override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = LibMeem.mint(params, properties, childProperties);
@@ -56,7 +56,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemMintParameters memory remixParams,
 		MeemProperties memory remixProperties,
 		MeemProperties memory remixChildProperties
-	) external override {
+	) external payable override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = LibMeem.mint(params, properties, childProperties);

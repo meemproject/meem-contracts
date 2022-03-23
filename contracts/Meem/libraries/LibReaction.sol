@@ -49,7 +49,7 @@ library LibReaction {
 
 	function removeReaction(uint256 tokenId, string memory reaction) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		if (s.addressReactionsAt[tokenId][reaction][msg.sender] != 0) {
+		if (s.addressReactionsAt[tokenId][reaction][msg.sender] == 0) {
 			revert ReactionNotFound();
 		}
 
@@ -77,7 +77,7 @@ library LibReaction {
 	) internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		if (s.addressReactionsAt[tokenId][reaction][addy] != 0) {
+		if (s.addressReactionsAt[tokenId][reaction][addy] == 0) {
 			revert ReactionNotFound();
 		}
 

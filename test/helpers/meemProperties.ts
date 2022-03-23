@@ -6,7 +6,8 @@ export const meemMintData = {
 			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
-			lockedBy: '0x0000000000000000000000000000000000000000'
+			lockedBy: '0x0000000000000000000000000000000000000000',
+			costWei: 0
 		}
 	],
 	remixPermissions: [
@@ -14,7 +15,8 @@ export const meemMintData = {
 			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
-			lockedBy: '0x0000000000000000000000000000000000000000'
+			lockedBy: '0x0000000000000000000000000000000000000000',
+			costWei: 0
 		}
 	],
 	readPermissions: [
@@ -22,7 +24,8 @@ export const meemMintData = {
 			permission: Permission.Anyone,
 			addresses: [],
 			numTokens: 0,
-			lockedBy: '0x0000000000000000000000000000000000000000'
+			lockedBy: '0x0000000000000000000000000000000000000000',
+			costWei: 0
 		}
 	],
 	copyPermissionsLockedBy: '0x0000000000000000000000000000000000000000',

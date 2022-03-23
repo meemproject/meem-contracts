@@ -44,11 +44,13 @@ struct Split {
 	uint256 amount;
 	address lockedBy;
 }
+
 struct MeemPermission {
 	Permission permission;
 	address[] addresses;
 	uint256 numTokens;
 	address lockedBy;
+	uint256 costWei;
 }
 
 struct MeemProperties {
@@ -144,14 +146,14 @@ interface IMeemBaseStandard {
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external;
+	) external payable;
 
 	function mintAndCopy(
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties,
 		address toCopyAddress
-	) external;
+	) external payable;
 
 	function mintAndRemix(
 		MeemMintParameters memory params,
@@ -160,7 +162,7 @@ interface IMeemBaseStandard {
 		MeemMintParameters memory remixParams,
 		MeemProperties memory remixProperties,
 		MeemProperties memory remixChildProperties
-	) external;
+	) external payable;
 
 	// TODO: Implement child minting
 	// function mintChild(
