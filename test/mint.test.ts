@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType } from './helpers/meemStandard'
+import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -53,14 +53,16 @@ describe('Minting', function Test() {
 			meemFacet.connect(signers[1]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -73,14 +75,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -104,8 +108,8 @@ describe('Minting', function Test() {
 
 		assert.equal(tokenIds[0].toNumber(), token0)
 
-		const m = await queryFacet.getMeem(token0)
-		assert.equal(m.verifiedBy, signers[0].address)
+		// const m = await queryFacet.getMeem(token0)
+		// assert.equal(m.verifiedBy, signers[0].address)
 	})
 
 	it('Can not transfer wMeem as non-admin', async () => {
@@ -113,14 +117,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[2].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent,
 					parentTokenId: 0,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -170,14 +176,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[2].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -217,14 +225,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[0].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -250,14 +260,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[0].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent: otherAddress,
 					parentTokenId: 1,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -270,14 +282,16 @@ describe('Minting', function Test() {
 			meemFacet.connect(signers[0]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent: otherAddress,
 					parentTokenId: 1,
 					meemType: MeemType.Copy,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -310,14 +324,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[5].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -329,14 +345,16 @@ describe('Minting', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[5].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData

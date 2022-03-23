@@ -343,7 +343,7 @@ describe('Minting Permissions', function Test() {
 		await (
 			await meemFacet.connect(signers[0]).mint(
 				{
-					to: owner,
+					to: signers[0].address,
 					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
@@ -357,7 +357,7 @@ describe('Minting Permissions', function Test() {
 				},
 				{
 					...meemMintData,
-					copyPermissions: [
+					remixPermissions: [
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
