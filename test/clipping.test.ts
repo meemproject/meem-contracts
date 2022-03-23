@@ -12,7 +12,7 @@ import {
 	MeemQueryFacet
 } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType } from './helpers/meemStandard'
+import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
 chai.use(chaiAsPromised)
@@ -61,14 +61,16 @@ describe('Clipping', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -77,7 +79,8 @@ describe('Clipping', function Test() {
 		assert.equal(status, 1)
 	}
 
-	it('Can clip a Meem', async () => {
+	it('Can clip Meems', async () => {
+		await mintZeroMeem()
 		await mintZeroMeem()
 
 		const { status } = await (
@@ -85,11 +88,19 @@ describe('Clipping', function Test() {
 		).wait()
 		assert.equal(status, 1)
 
-		const clippings = await clippingFacet.addressClippings(signers[1].address)
+		let clippings = await clippingFacet.addressClippings(signers[1].address)
 		assert.equal(clippings.length, 1)
 		assert.equal(
 			clippings[0].toNumber(),
 			ethers.BigNumber.from(token0).toNumber()
+		)
+
+		await (await clippingFacet.connect(signers[1]).clip(token1)).wait()
+		clippings = await clippingFacet.addressClippings(signers[1].address)
+		assert.equal(clippings.length, 2)
+		assert.equal(
+			clippings[1].toNumber(),
+			ethers.BigNumber.from(token1).toNumber()
 		)
 	})
 
@@ -118,5 +129,26 @@ describe('Clipping', function Test() {
 		assert.isTrue(clippers.includes(signers[1].address))
 		assert.isTrue(clippers.includes(signers[2].address))
 		assert.isTrue(clippers.includes(signers[3].address))
+	})
+
+	it('Can un-clip a Meem', async () => {
+		await mintZeroMeem()
+
+		const { status } = await (
+			await clippingFacet.connect(signers[1]).clip(token0)
+		).wait()
+		assert.equal(status, 1)
+
+		let clippings = await clippingFacet.addressClippings(signers[1].address)
+		assert.equal(clippings.length, 1)
+		assert.equal(
+			clippings[0].toNumber(),
+			ethers.BigNumber.from(token0).toNumber()
+		)
+
+		await (await clippingFacet.connect(signers[1]).unClip(token0)).wait()
+
+		clippings = await clippingFacet.addressClippings(signers[1].address)
+		assert.equal(clippings.length, 0)
 	})
 })

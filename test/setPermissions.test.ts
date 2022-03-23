@@ -15,7 +15,8 @@ import {
 	MeemType,
 	Permission,
 	PermissionType,
-	PropertyType
+	PropertyType,
+	UriSource
 } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
@@ -70,14 +71,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -91,14 +94,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				{
 					...meemMintData,
@@ -107,13 +112,15 @@ describe('Set Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: '0'
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: '0'
 						}
 					]
 				},
@@ -129,7 +136,8 @@ describe('Set Permissions', function Test() {
 						permission: Permission.Anyone,
 						numTokens: 0,
 						lockedBy: zeroAddress,
-						addresses: []
+						addresses: [],
+						costWei: '0'
 					}
 				])
 		).wait()
@@ -147,14 +155,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				{
 					...meemMintData,
@@ -163,13 +173,15 @@ describe('Set Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: '0'
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: '0'
 						}
 					],
 					copyPermissionsLockedBy: owner
@@ -186,7 +198,8 @@ describe('Set Permissions', function Test() {
 						permission: Permission.Anyone,
 						numTokens: 0,
 						lockedBy: zeroAddress,
-						addresses: []
+						addresses: [],
+						costWei: '0'
 					}
 				])
 		)
@@ -197,14 +210,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				{
 					...meemMintData,
@@ -213,13 +228,15 @@ describe('Set Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: owner,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: '0'
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: '0'
 						}
 					]
 				},
@@ -235,7 +252,8 @@ describe('Set Permissions', function Test() {
 						permission: Permission.Anyone,
 						numTokens: 0,
 						lockedBy: zeroAddress,
-						addresses: []
+						addresses: [],
+						costWei: '0'
 					}
 				])
 		)
@@ -246,14 +264,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				{
 					...meemMintData,
@@ -262,13 +282,15 @@ describe('Set Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: owner,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: '0'
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: '0'
 						}
 					]
 				},
@@ -284,13 +306,15 @@ describe('Set Permissions', function Test() {
 						permission: Permission.Anyone,
 						numTokens: 0,
 						lockedBy: zeroAddress,
-						addresses: []
+						addresses: [],
+						costWei: '0'
 					},
 					{
 						permission: Permission.Addresses,
 						numTokens: 0,
 						lockedBy: owner,
-						addresses: [signers[1].address]
+						addresses: [signers[1].address],
+						costWei: '0'
 					}
 				])
 		).wait()
@@ -317,14 +341,16 @@ describe('Set Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				{
 					...meemMintData,
@@ -333,13 +359,15 @@ describe('Set Permissions', function Test() {
 							permission: Permission.Addresses,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: [signers[1].address]
+							addresses: [signers[1].address],
+							costWei: '0'
 						},
 						{
 							permission: Permission.Owner,
 							numTokens: 0,
 							lockedBy: zeroAddress,
-							addresses: []
+							addresses: [],
+							costWei: '0'
 						}
 					]
 				},
@@ -355,7 +383,8 @@ describe('Set Permissions', function Test() {
 						permission: Permission.Anyone,
 						numTokens: 0,
 						lockedBy: zeroAddress,
-						addresses: []
+						addresses: [],
+						costWei: '0'
 					}
 				])
 		)

@@ -16,7 +16,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external override {
+	) external payable override {
 		LibMeem.mint(params, properties, childProperties);
 	}
 
@@ -25,7 +25,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemProperties memory properties,
 		MeemProperties memory childProperties,
 		address toCopyAddress
-	) external override {
+	) external payable override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = LibMeem.mint(params, properties, childProperties);
@@ -33,14 +33,16 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		LibMeem.mint(
 			MeemMintParameters({
 				to: toCopyAddress,
-				mTokenURI: params.mTokenURI,
+				tokenURI: params.tokenURI,
 				parentChain: params.parentChain,
 				parent: address(this),
 				parentTokenId: tokenId,
 				meemType: MeemType.Copy,
 				data: params.data,
-				isVerified: params.isVerified,
-				mintedBy: params.mintedBy
+				isURILocked: params.isURILocked,
+				mintedBy: params.mintedBy,
+				uriSource: params.uriSource,
+				reactionTypes: params.reactionTypes
 			}),
 			properties,
 			childProperties
@@ -54,7 +56,7 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		MeemMintParameters memory remixParams,
 		MeemProperties memory remixProperties,
 		MeemProperties memory remixChildProperties
-	) external override {
+	) external payable override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.MINTER_ROLE);
 		uint256 tokenId = LibMeem.mint(params, properties, childProperties);
@@ -62,14 +64,16 @@ contract MeemBaseFacet is IMeemBaseStandard {
 		LibMeem.mint(
 			MeemMintParameters({
 				to: remixParams.to,
-				mTokenURI: remixParams.mTokenURI,
+				tokenURI: remixParams.tokenURI,
 				parentChain: remixParams.parentChain,
 				parent: address(this),
 				parentTokenId: tokenId,
 				meemType: MeemType.Remix,
 				data: remixParams.data,
-				isVerified: remixParams.isVerified,
-				mintedBy: remixParams.mintedBy
+				isURILocked: remixParams.isURILocked,
+				mintedBy: remixParams.mintedBy,
+				uriSource: remixParams.uriSource,
+				reactionTypes: remixParams.reactionTypes
 			}),
 			remixProperties,
 			remixChildProperties

@@ -45,13 +45,6 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		s.meemID = meemID;
 	}
 
-	function verifyToken(uint256 tokenId) external override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.ADMIN_ROLE);
-
-		s.meems[tokenId].verifiedBy = msg.sender;
-	}
-
 	function setTokenRoot(
 		uint256 tokenId,
 		Chain rootChain,

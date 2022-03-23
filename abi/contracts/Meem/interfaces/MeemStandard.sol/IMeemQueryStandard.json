@@ -126,6 +126,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -153,6 +158,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -180,6 +190,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -296,6 +311,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -323,6 +343,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -350,6 +375,11 @@
                     "internalType": "address",
                     "name": "lockedBy",
                     "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "costWei",
+                    "type": "uint256"
                   }
                 ],
                 "internalType": "struct MeemPermission[]",
@@ -435,7 +465,7 @@
           },
           {
             "internalType": "address",
-            "name": "verifiedBy",
+            "name": "uriLockedBy",
             "type": "address"
           },
           {
@@ -447,6 +477,16 @@
             "internalType": "address",
             "name": "mintedBy",
             "type": "address"
+          },
+          {
+            "internalType": "enum URISource",
+            "name": "uriSource",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string[]",
+            "name": "reactionTypes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct Meem",

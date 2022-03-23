@@ -75,7 +75,8 @@ export async function deployDiamond(options: {
 		MeemBaseFacet: null,
 		MeemPermissionsFacet: null,
 		MeemQueryFacet: null,
-		MeemSplitsFacet: null
+		MeemSplitsFacet: null,
+		ReactionFacet: null
 	}
 
 	const cuts = []

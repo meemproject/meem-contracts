@@ -16,7 +16,8 @@ import {
 	MeemType,
 	Permission,
 	PermissionType,
-	PropertyType
+	PropertyType,
+	UriSource
 } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
@@ -78,13 +79,15 @@ describe('Child root properties', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
+					isURILocked: true,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
 				meemMintData,
@@ -100,13 +103,15 @@ describe('Child root properties', function Test() {
 			await meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isURILocked: true,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
 				meemMintData,
@@ -126,13 +131,15 @@ describe('Child root properties', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Ethereum,
 					parent: nftAddress,
 					parentTokenId: 2000,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false,
+					isURILocked: true,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
 				meemMintData,
@@ -145,13 +152,15 @@ describe('Child root properties', function Test() {
 			await meemFacet.connect(signers[1]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: false,
+					isURILocked: true,
+					uriSource: UriSource.TokenUri,
+					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
 				meemMintData,

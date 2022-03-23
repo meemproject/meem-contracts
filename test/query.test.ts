@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType } from './helpers/meemStandard'
+import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 
 chai.use(chaiAsPromised)
 
@@ -46,14 +46,16 @@ describe('Query Meems', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[4].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent,
 					parentTokenId: 50,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData

@@ -28,3 +28,8 @@ export enum MeemType {
 	Remix,
 	Wrapped
 }
+
+export enum UriSource {
+	TokenUri,
+	Data
+}

@@ -34,16 +34,23 @@ enum MeemType {
 	Wrapped
 }
 
+enum URISource {
+	TokenURI,
+	Data
+}
+
 struct Split {
 	address toAddress;
 	uint256 amount;
 	address lockedBy;
 }
+
 struct MeemPermission {
 	Permission permission;
 	address[] addresses;
 	uint256 numTokens;
 	address lockedBy;
+	uint256 costWei;
 }
 
 struct MeemProperties {
@@ -76,9 +83,11 @@ struct MeemBase {
 	uint256 generation;
 	uint256 mintedAt;
 	string data;
-	address verifiedBy;
+	address uriLockedBy;
 	MeemType meemType;
 	address mintedBy;
+	URISource uriSource;
+	string[] reactionTypes;
 }
 
 struct Meem {
@@ -94,9 +103,11 @@ struct Meem {
 	MeemProperties childProperties;
 	uint256 mintedAt;
 	string data;
-	address verifiedBy;
+	address uriLockedBy;
 	MeemType meemType;
 	address mintedBy;
+	URISource uriSource;
+	string[] reactionTypes;
 }
 
 struct WrappedItem {
@@ -107,14 +118,21 @@ struct WrappedItem {
 
 struct MeemMintParameters {
 	address to;
-	string mTokenURI;
+	string tokenURI;
 	Chain parentChain;
 	address parent;
 	uint256 parentTokenId;
 	MeemType meemType;
 	string data;
-	bool isVerified;
+	bool isURILocked;
 	address mintedBy;
+	URISource uriSource;
+	string[] reactionTypes;
+}
+
+struct Reaction {
+	string reaction;
+	uint256 count;
 }
 
 interface IMeemBaseStandard {
@@ -128,14 +146,14 @@ interface IMeemBaseStandard {
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties
-	) external;
+	) external payable;
 
 	function mintAndCopy(
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
 		MeemProperties memory childProperties,
 		address toCopyAddress
-	) external;
+	) external payable;
 
 	function mintAndRemix(
 		MeemMintParameters memory params,
@@ -144,7 +162,7 @@ interface IMeemBaseStandard {
 		MeemMintParameters memory remixParams,
 		MeemProperties memory remixProperties,
 		MeemProperties memory remixChildProperties
-	) external;
+	) external payable;
 
 	// TODO: Implement child minting
 	// function mintChild(
@@ -211,8 +229,6 @@ interface IMeemAdminStandard {
 	function setContractURI(string memory newContractURI) external;
 
 	function setMeemIDAddress(address meemID) external;
-
-	function verifyToken(uint256 tokenId) external;
 
 	function setTokenRoot(
 		uint256 tokenId,
@@ -304,6 +320,14 @@ interface IMeemPermissionsStandard {
 		MeemPermission[] permission
 	);
 
+	event URISourceSet(uint256 tokenId, URISource uriSource);
+
+	event URISet(uint256 tokenId, string uri);
+
+	event URILockedBySet(uint256 tokenId, address lockedBy);
+
+	event DataSet(uint256 tokenId, string data);
+
 	function lockPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -374,12 +398,24 @@ interface IMeemPermissionsStandard {
 
 	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external;
+
+	function setData(uint256 tokenId, string memory data) external;
+
+	function lockUri(uint256 tokenId) external;
+
+	function setURISource(uint256 tokenId, URISource uriSource) external;
+
+	function setTokenUri(uint256 tokenId, string memory uri) external;
 }
 
 interface IClippingStandard {
 	event TokenClipped(uint256 tokenId, address addy);
 
+	event TokenUnClipped(uint256 tokenId, address addy);
+
 	function clip(uint256 tokenId) external;
+
+	function unClip(uint256 tokenId) external;
 
 	function addressClippings(address addy)
 		external
@@ -397,4 +433,40 @@ interface IClippingStandard {
 		returns (address[] memory);
 
 	function numClippings(uint256 tokenId) external view returns (uint256);
+}
+
+interface IReactionStandard {
+	event TokenReactionAdded(
+		uint256 tokenId,
+		address addy,
+		string reaction,
+		uint256 newTotalReactions
+	);
+
+	event TokenReactionRemoved(
+		uint256 tokenId,
+		address addy,
+		string reaction,
+		uint256 newTotalReactions
+	);
+
+	event TokenReactionTypesSet(uint256 tokenId, string[] reactionTypes);
+
+	function addReaction(uint256 tokenId, string memory reaction) external;
+
+	function removeReaction(uint256 tokenId, string memory reaction) external;
+
+	function getReactedAt(
+		uint256 tokenId,
+		address addy,
+		string memory reaction
+	) external view returns (uint256);
+
+	function setReactionTypes(uint256 tokenId, string[] memory reactionTypes)
+		external;
+
+	function getReactions(uint256 tokenId)
+		external
+		view
+		returns (Reaction[] memory);
 }

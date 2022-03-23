@@ -9,6 +9,10 @@ contract ClippingFacet is IClippingStandard {
 		return LibMeem.clip(tokenId);
 	}
 
+	function unClip(uint256 tokenId) external override {
+		return LibMeem.unClip(tokenId);
+	}
+
 	function clippings(uint256 tokenId)
 		external
 		view

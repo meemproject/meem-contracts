@@ -13,7 +13,8 @@ import {
 	Chain,
 	MeemType,
 	PermissionType,
-	PropertyType
+	PropertyType,
+	UriSource
 } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
@@ -54,14 +55,16 @@ describe('Token Owner Permissions', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData

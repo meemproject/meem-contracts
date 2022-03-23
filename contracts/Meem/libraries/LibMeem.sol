@@ -2,13 +2,14 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import '../interfaces/MeemStandard.sol';
+import {WrappedItem, IMeemPermissionsStandard, PropertyType, PermissionType, MeemPermission, MeemProperties, Split, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission} from '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibArray} from '../libraries/LibArray.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 import {LibStrings} from '../libraries/LibStrings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped} from '../libraries/Errors.sol';
+import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, InvalidTotalCopies, NFTAlreadyWrapped, InvalidNonOwnerSplitAllocationAmount, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, InvalidChildGeneration, InvalidParent, ChildDepthExceeded, TokenNotFound, MissingRequiredPermissions, MissingRequiredSplits, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, InvalidTotalRemixes, AlreadyClipped, NotClipped, URILocked, IncorrectMsgValue} from '../libraries/Errors.sol';
 
 library LibMeem {
 	// Rarible royalties event
@@ -70,6 +71,16 @@ library LibMeem {
 
 	event TokenClipped(uint256 tokenId, address addy);
 
+	event TokenUnClipped(uint256 tokenId, address addy);
+
+	event URISourceSet(uint256 tokenId, URISource uriSource);
+
+	event URISet(uint256 tokenId, string uri);
+
+	event URILockedBySet(uint256 tokenId, address lockedBy);
+
+	event DataSet(uint256 tokenId, string data);
+
 	function getRaribleV2Royalties(uint256 tokenId)
 		internal
 		view
@@ -113,10 +124,11 @@ library LibMeem {
 
 		// Require IPFS uri
 		if (
-			params.meemType != MeemType.Copy &&
+			params.uriSource != URISource.Data &&
+			params.isURILocked &&
 			!LibStrings.compareStrings(
 				'ipfs://',
-				LibStrings.substring(params.mTokenURI, 0, 7)
+				LibStrings.substring(params.tokenURI, 0, 7)
 			)
 		) {
 			revert InvalidURI();
@@ -128,9 +140,8 @@ library LibMeem {
 		// Initializes mapping w/ default values
 		delete s.meems[tokenId];
 
-		if (params.isVerified) {
-			LibAccessControl.requireRole(s.MINTER_ROLE);
-			s.meems[tokenId].verifiedBy = msg.sender;
+		if (params.isURILocked) {
+			s.meems[tokenId].uriLockedBy = msg.sender;
 		}
 
 		s.meems[tokenId].parentChain = params.parentChain;
@@ -139,6 +150,7 @@ library LibMeem {
 		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
+		s.meems[tokenId].reactionTypes = params.reactionTypes;
 
 		if (
 			params.mintedBy != address(0) &&
@@ -161,20 +173,21 @@ library LibMeem {
 				params.meemType,
 				params.parentTokenId
 			);
+			handleSaleDistribution(params.parentTokenId);
 
 			// If parent is verified, this child is also verified
-			if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
-				s.meems[tokenId].verifiedBy = address(this);
-			}
+			// if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
+			// 	s.meems[tokenId].verifiedBy = address(this);
+			// }
 
 			if (params.meemType == MeemType.Copy) {
-				if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
-					revert NoCopyUnverified();
-				}
+				// if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
+				// 	revert NoCopyUnverified();
+				// }
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
 			} else {
-				s.tokenURIs[tokenId] = params.mTokenURI;
+				s.tokenURIs[tokenId] = params.tokenURI;
 				s.meems[tokenId].meemType = MeemType.Remix;
 			}
 
@@ -216,7 +229,7 @@ library LibMeem {
 			s.meems[tokenId].root = params.parent;
 			s.meems[tokenId].rootTokenId = params.parentTokenId;
 			s.meems[tokenId].rootChain = params.parentChain;
-			s.tokenURIs[tokenId] = params.mTokenURI;
+			s.tokenURIs[tokenId] = params.tokenURI;
 			if (params.parent == address(0)) {
 				if (params.meemType != MeemType.Original) {
 					revert InvalidMeemType();
@@ -547,9 +560,11 @@ library LibMeem {
 			isCopy
 				? s.meems[s.meems[tokenId].parentTokenId].data
 				: s.meems[tokenId].data,
-			s.meems[tokenId].verifiedBy,
+			s.meems[tokenId].uriLockedBy,
 			s.meems[tokenId].meemType,
-			s.meems[tokenId].mintedBy
+			s.meems[tokenId].mintedBy,
+			s.meems[tokenId].uriSource,
+			s.meems[tokenId].reactionTypes
 		);
 
 		return meem;
@@ -841,6 +856,31 @@ library LibMeem {
 		}
 	}
 
+	function handleSaleDistribution(uint256 tokenId) internal {
+		if (msg.value == 0) {
+			return;
+		}
+
+		uint256 leftover = msg.value;
+
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		for (uint256 i = 0; i < s.meemProperties[tokenId].splits.length; i++) {
+			uint256 amt = (msg.value *
+				s.meemProperties[tokenId].splits[i].amount) / 10000;
+
+			address payable receiver = payable(
+				s.meemProperties[tokenId].splits[i].toAddress
+			);
+
+			receiver.transfer(amt);
+			leftover = leftover - amt;
+		}
+
+		if (leftover > 0) {
+			payable(s.meems[tokenId].owner).transfer(leftover);
+		}
+	}
+
 	function getPermissions(
 		MeemProperties storage self,
 		PermissionType permissionType
@@ -1101,6 +1141,9 @@ library LibMeem {
 		);
 
 		bool hasPermission = false;
+		bool hasCostBeenSet = false;
+		uint256 costWei = 0;
+
 		for (uint256 i = 0; i < perms.length; i++) {
 			MeemPermission storage perm = perms[i];
 			if (
@@ -1111,8 +1154,9 @@ library LibMeem {
 					parent.owner == msg.sender)
 			) {
 				hasPermission = true;
-				break;
-			} else if (perm.permission == Permission.Addresses) {
+			}
+
+			if (perm.permission == Permission.Addresses) {
 				// Allowed if to is in the list of approved addresses
 				for (uint256 j = 0; j < perm.addresses.length; j++) {
 					if (perm.addresses[j] == msg.sender) {
@@ -1120,15 +1164,24 @@ library LibMeem {
 						break;
 					}
 				}
-
-				if (hasPermission) {
-					break;
-				}
 			}
+
+			if (
+				hasPermission &&
+				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
+			) {
+				costWei = perm.costWei;
+				hasCostBeenSet = true;
+			}
+			// TODO: Check external token holders on same network
 		}
 
 		if (!hasPermission) {
 			revert NoPermission();
+		}
+
+		if (costWei != msg.value) {
+			revert IncorrectMsgValue();
 		}
 	}
 
@@ -1163,15 +1216,41 @@ library LibMeem {
 	function clip(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		if (s.addressHasClipped[msg.sender][tokenId]) {
+		if (s.hasAddressClipped[msg.sender][tokenId]) {
 			revert AlreadyClipped();
 		}
 
 		s.clippings[tokenId].push(msg.sender);
 		s.addressClippings[msg.sender].push(tokenId);
-		s.addressHasClipped[msg.sender][tokenId] = true;
+		s.clippingsIndex[msg.sender][tokenId] = s.clippings[tokenId].length - 1;
+		s.addressClippingsIndex[msg.sender][tokenId] =
+			s.addressClippings[msg.sender].length -
+			1;
+		s.hasAddressClipped[msg.sender][tokenId] = true;
 
 		emit TokenClipped(tokenId, msg.sender);
+	}
+
+	function unClip(uint256 tokenId) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (!s.hasAddressClipped[msg.sender][tokenId]) {
+			revert NotClipped();
+		}
+
+		LibArray.removeAt(
+			s.clippings[tokenId],
+			s.clippingsIndex[msg.sender][tokenId]
+		);
+		LibArray.removeAt(
+			s.addressClippings[msg.sender],
+			s.addressClippingsIndex[msg.sender][tokenId]
+		);
+		s.clippingsIndex[msg.sender][tokenId] = 0;
+		s.addressClippingsIndex[msg.sender][tokenId] = 0;
+		s.hasAddressClipped[msg.sender][tokenId] = false;
+
+		emit TokenUnClipped(tokenId, msg.sender);
 	}
 
 	function tokenClippings(uint256 tokenId)
@@ -1198,7 +1277,7 @@ library LibMeem {
 		returns (bool)
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.addressHasClipped[addy][tokenId];
+		return s.clippingsIndex[addy][tokenId] != 0;
 	}
 
 	function clippings(uint256 tokenId)
@@ -1213,5 +1292,62 @@ library LibMeem {
 	function numClippings(uint256 tokenId) internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.clippings[tokenId].length;
+	}
+
+	function setData(uint256 tokenId, string memory data) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.meems[tokenId].data = data;
+		emit DataSet(tokenId, s.meems[tokenId].data);
+	}
+
+	function lockUri(uint256 tokenId) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		// Require IPFS uri or URI type to be data
+		if (
+			s.meems[tokenId].uriSource != URISource.Data &&
+			!LibStrings.compareStrings(
+				'ipfs://',
+				LibStrings.substring(s.tokenURIs[tokenId], 0, 7)
+			)
+		) {
+			revert InvalidURI();
+		}
+
+		s.meems[tokenId].uriLockedBy = msg.sender;
+
+		emit URILockedBySet(tokenId, s.meems[tokenId].uriLockedBy);
+	}
+
+	function setURISource(uint256 tokenId, URISource uriSource) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.meems[tokenId].uriSource = uriSource;
+		emit URISourceSet(tokenId, uriSource);
+	}
+
+	function setTokenUri(uint256 tokenId, string memory uri) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meems[tokenId].uriLockedBy != address(0)) {
+			revert URILocked();
+		}
+
+		s.tokenURIs[tokenId] = uri;
+
+		emit URISet(tokenId, uri);
 	}
 }

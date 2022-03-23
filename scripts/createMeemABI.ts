@@ -8,6 +8,7 @@ import meemBaseABI from '../abi/contracts/Meem/facets/MeemBaseFacet.sol/MeemBase
 import meemPermissionsABI from '../abi/contracts/Meem/facets/MeemPermissionsFacet.sol/MeemPermissionsFacet.json'
 import meemQueryABI from '../abi/contracts/Meem/facets/MeemQueryFacet.sol/MeemQueryFacet.json'
 import meemSplitsABI from '../abi/contracts/Meem/facets/MeemSplitsFacet.sol/MeemSplitsFacet.json'
+import reactionsABI from '../abi/contracts/Meem/facets/ReactionFacet.sol/ReactionFacet.json'
 import meemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
 
 const combinedABI = [
@@ -19,7 +20,8 @@ const combinedABI = [
 	...meemPermissionsABI,
 	...meemQueryABI,
 	...meemSplitsABI,
-	...meemDiamondABI
+	...meemDiamondABI,
+	...reactionsABI
 ]
 
 fs.writeFileSync(

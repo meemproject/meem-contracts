@@ -16,7 +16,8 @@ import {
 	MeemType,
 	Permission,
 	PermissionType,
-	PropertyType
+	PropertyType,
+	UriSource
 } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
@@ -78,14 +79,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: owner,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -99,14 +102,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: nftAddress,
 					parentTokenId: 1313,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -129,14 +134,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: nftAddress,
 					parentTokenId: 1313,
 					meemType: MeemType.Wrapped,
 					data: '',
-					isVerified: false,
-					mintedBy: signers[0].address
+					isURILocked: false,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -159,14 +166,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -177,14 +186,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: contractAddress,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -207,14 +218,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -225,14 +238,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -255,14 +270,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: signers[1].address,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
@@ -273,14 +290,16 @@ describe('Facilitate Claim', function Test() {
 			await meemFacet.connect(signers[0]).mint(
 				{
 					to: contractAddress,
-					mTokenURI: ipfsURL,
+					tokenURI: ipfsURL,
 					parentChain: Chain.Polygon,
 					parent: contractAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					data: '',
-					isVerified: true,
-					mintedBy: signers[0].address
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
 				},
 				meemMintData,
 				meemMintData
