@@ -1,3 +1,11 @@
+# [1.12.0](https://github.com/meemproject/meem-contracts/compare/v1.11.0...v1.12.0) (2022-03-23)
+
+
+### Features
+
+* reactions and ability to "purchase" a meem ([f90e895](https://github.com/meemproject/meem-contracts/commit/f90e895))
+* unclip ([b35c921](https://github.com/meemproject/meem-contracts/commit/b35c921))
+
 # [1.11.0](https://github.com/meemproject/meem-contracts/compare/v1.10.0...v1.11.0) (2022-03-07)
 
 
