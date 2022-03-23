@@ -28,3 +28,5 @@ coverage.json
 
 # Local network
 .diamond/31337.json
+
+scratch.*
