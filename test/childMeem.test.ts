@@ -273,4 +273,41 @@ describe('Child Meem Minting', function Test() {
 			)
 		)
 	})
+
+	it('Can mint with locked URI', async () => {
+		const mintData = {
+			...meemMintData,
+			splits: [
+				...meemMintData.splits,
+				{
+					toAddress: signers[1].address,
+					amount: 100,
+					lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+				},
+				{
+					toAddress: signers[2].address,
+					amount: 100,
+					lockedBy: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+				}
+			]
+		}
+
+		await meemFacet.connect(signers[2]).mint(
+			{
+				to: signers[4].address,
+				tokenURI: ipfsURL,
+				parentChain: Chain.Polygon,
+				parent: contractAddress,
+				parentTokenId: token0,
+				meemType: MeemType.Remix,
+				data: '',
+				isURILocked: true,
+				reactionTypes: [],
+				uriSource: UriSource.TokenUri,
+				mintedBy: signers[0].address
+			},
+			mintData,
+			mintData
+		)
+	})
 })

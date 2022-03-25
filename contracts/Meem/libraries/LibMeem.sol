@@ -151,6 +151,7 @@ library LibMeem {
 		s.meems[tokenId].mintedAt = block.timestamp;
 		s.meems[tokenId].data = params.data;
 		s.meems[tokenId].reactionTypes = params.reactionTypes;
+		s.meems[tokenId].uriSource = params.uriSource;
 
 		if (
 			params.mintedBy != address(0) &&
