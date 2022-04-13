@@ -1,3 +1,5 @@
+## [1.12.1](https://github.com/meemproject/meem-contracts/compare/v1.12.0...v1.12.1) (2022-04-13)
+
 # [1.12.0](https://github.com/meemproject/meem-contracts/compare/v1.11.0...v1.12.0) (2022-03-23)
 
 
