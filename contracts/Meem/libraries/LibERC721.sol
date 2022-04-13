@@ -5,7 +5,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibArray} from '../libraries/LibArray.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Meem, MeemType} from '../interfaces/MeemStandard.sol';
+import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
 import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT, MeemNotVerified, NotTokenAdmin} from '../libraries/Errors.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
@@ -157,6 +157,10 @@ library LibERC721 {
 
 		if (!_exists(tokenId)) {
 			revert TokenNotFound(tokenId);
+		}
+
+		if (s.meems[tokenId].uriSource == URISource.Data) {
+			return s.meems[tokenId].data;
 		}
 
 		return s.tokenURIs[tokenId];
